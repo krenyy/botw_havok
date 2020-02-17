@@ -1,57 +1,98 @@
 from ..binary import BinaryReader, BinaryWriter
-from ..container.sections.util import GlobalFixup, GlobalReference, LocalFixup
+from ..container.sections.util import GlobalReference, LocalFixup
 from .base import HKBase
+from .common.hkReferencedObject import hkReferencedObject
+from .hkpPhysicsSystem import hkpPhysicsSystem
+from typing import List
 
 if False:
     from ..hk import HK
-    from ..container.sections.data import HKDataSection, HKObject
+    from ..container.sections.data import HKObject
 
 
-class HKPPhysicsData(HKBase):
-    """Physics data container
+class hkpPhysicsData(HKBase, hkReferencedObject):
+    """Physics data container, contains references
+    to world info physics systems
     """
 
-    unknownCount: int  # TODO: figure out what this is
+    # worldCinfo: hkpWorldCinfo  # Doesn't seem to be used in BotW (?)
+    systems: List[hkpPhysicsSystem]
 
-    def deserialize(self, hk: "HK", dsec: "HKDataSection", obj: "HKObject"):
-        self.hkobj = obj
+    def __init__(self):
+        super().__init__()  # HKBase
 
-        br = BinaryReader(self.hkobj.data)
+        self.systems = []
+
+    def deserialize(self, hk: "HK", obj: "HKObject"):
+        HKBase.deserialize(self, hk, obj)
+
+        br = BinaryReader(obj.bytes)
         br.big_endian = hk.header.endian == 0
 
-        hk._assert_pointer(br)
-        hk._assert_pointer(br)
+        # Read base referenced object data
+        hkReferencedObject.deserialize(self, hk, br)
+
+        # worldCinfo_offset = br.tell()
         hk._assert_pointer(br)
 
-        self.unknownCount = self.read_counter(hk, br)
+        # systemCount_offset = br.tell()
+        systemCount = self.read_counter(hk, br)
         br.align_to(16)
 
-        physicsSystemCount = len(
-            [o for o in dsec.objects if o.hkclass.name == "hkpPhysicsSystem"]
-        )
+        # systems_offset = br.read()
 
-        for _ in range(physicsSystemCount):
-            hk._assert_pointer(br)
+        for gr in obj.global_references:
+            if gr.src_rel_offset == br.tell():
+                system = hkpPhysicsSystem()
+                system.deserialize(hk, gr.dst_obj)
+                hk.data.objects.remove(gr.dst_obj)
+                self.systems.append(system)
 
-    def serialize(self, hk: "HK", dsec: "HKDataSection"):
+                hk._assert_pointer(br)
+        br.align_to(16)
+
+        obj.global_references.clear()
+
+    def serialize(self, hk: "HK"):
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
-        hk._write_empty_pointer(bw)
-        hk._write_empty_pointer(bw)
+        hkReferencedObject.serialize(hk, bw)
+
+        # worldCinfo_offset = bw.tell()
         hk._write_empty_pointer(bw)
 
-        lfu = LocalFixup()
-        lfu.src = bw.tell() - dsec.absolute_offset
-        self.write_counter(hk, bw, self.unknownCount)  # ?
+        systemCount_offset = bw.tell()
+        self.write_counter(hk, bw, len(self.systems))
         bw.align_to(16)
-        lfu.dst = bw.tell() - dsec.absolute_offset
-        hk.pointers.append(pointer)
 
-        link = HKChunkLink()
-        link.src = bw.tell() - sec.abs_offset
-        link.dst_section_id = 2
-        sec.links.append(link)
+        systems_offset = bw.tell()
+        for system in self.systems:
+            system.serialize(hk)
+            hk.data.objects.append(system.hkobj)
 
-        bw.write_int64(0)
-        bw.write_int64(0)
+            gr = GlobalReference()
+            gr.src_obj = self.hkobj
+            gr.src_rel_offset = bw.tell()
+            gr.dst_obj = system.hkobj
+            self.hkobj.global_references.append(gr)
+
+            hk._write_empty_pointer(bw)
+        bw.align_to(16)
+
+        HKBase.serialize(self, hk, bw)
+
+    def asdict(self):
+        d = hkReferencedObject.asdict(self)
+        d.update(
+            {
+                # "worldCinfo": self.worldCinfo,
+                "systems": [ps.asdict() for ps in self.systems],
+            }
+        )
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        # inst.worldCinfo = d['worldCinfo']
+        inst.systems = [hkpPhysicsSystem.fromdict(ps) for ps in d["systems"]]

@@ -7,10 +7,7 @@ class HKTypesSection(HKSection):
     """
 
     id: int = 1
-
-    def __init__(self, d: dict = None):
-        if d:
-            self.id = d.values()
+    tag: str = "__types__"
 
     def read(self, br: BinaryReader):
         super().read(br)
@@ -32,12 +29,5 @@ class HKTypesSection(HKSection):
         bw.fill_uint32(f"{self.tag}imp", self.imports_offset)
         bw.fill_uint32(f"{self.tag}eof", self.EOF_offset)
 
-    def asdict(self):
-        return {"id": self.id}
-
-    @classmethod
-    def fromdict(cls, d: dict):
-        return cls(d)
-
     def __repr__(self):
-        return f"{self.__class__.__name__}()"
+        return f"<{self.__class__.__name__} ()>"

@@ -7,15 +7,6 @@ class ActorInfo:
     ShapeInfoStart: int
     ShapeInfoEnd: int
 
-    def __init__(self, d: dict = None):
-        if d:
-            (
-                self.HashId,
-                self.SRTHash,
-                self.ShapeInfoStart,
-                self.ShapeInfoEnd,
-            ) = d.values()
-
     def read(self, br: BinaryReader):
         self.HashId = br.read_uint32()
         self.SRTHash = br.read_int32()
@@ -38,7 +29,13 @@ class ActorInfo:
 
     @classmethod
     def fromdict(cls, d: dict):
-        return cls(d)
+        inst = cls()
+        inst.HashId = d["HashId"]
+        inst.SRTHash = d["SRTHash"]
+        inst.ShapeInfoStart = d["ShapeInfoStart"]
+        inst.ShapeInfoEnd = d["ShapeInfoEnd"]
+
+        return inst
 
     def __repr__(self):
         return (

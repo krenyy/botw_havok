@@ -1,7 +1,7 @@
 import typing
 
 from ...binary import BinaryReader, BinaryWriter
-from ...classes import class_hk_map
+from ...classes import hk_class_map
 from .base import HKSection
 from .classnames import HKClass
 from .util import GlobalFixup, GlobalReference, LocalFixup
@@ -17,25 +17,20 @@ class HKDataSection(HKSection):
     """
 
     id: int = 2
+    tag: str = "__data__"
 
     global_references: typing.List[GlobalReference]
 
     objects: typing.List[HKObject]
     contents: typing.List["HKBase"]
 
-    def __init__(self, d: dict = None):
+    def __init__(self):
         super().__init__()
         self.global_references = []
         self.objects = []
         self.contents = []
 
-        if d:
-            self.id = d["id"]
-            for json_obj in d["objects"]:
-                obj = class_hk_map[json_obj["Class"]].fromdict(json_obj)
-                self.objects.append(obj)
-
-    def read(self, hk: "HK", br: BinaryReader, deserialize: bool):
+    def read(self, hk: "HK", br: BinaryReader):
         super().read(br)
 
         # Map out all the objects contained in the data section
@@ -51,7 +46,7 @@ class HKDataSection(HKSection):
 
             obj.size = length
             obj.hkclass = cls
-            obj.read(hk, self, br, length)
+            obj.read(hk, br, length)
 
             self.objects.append(obj)
 
@@ -82,16 +77,14 @@ class HKDataSection(HKSection):
         # Seek to the end of the file to check for additional embedded hk files
         br.seek_absolute(self.absolute_offset + self.EOF_offset)
 
-        if deserialize:
-            self.deserialize(hk)
-
     def deserialize(self, hk: "HK"):
         for obj in self.objects:
             try:
-                hkcls = class_hk_map[obj.hkclass.name]()
-                hkcls.deserialize(hk, self, obj)
+                hkcls = hk_class_map[obj.hkclass.name]()
+                hkcls.deserialize(hk, obj)
                 self.contents.append(hkcls)
             except KeyError:
+                return "OK"  # for testing purposes
                 raise NotImplementedError(
                     f"Class '{obj.hkclass.name}' is not mapped out yet."
                 )
@@ -100,16 +93,33 @@ class HKDataSection(HKSection):
 
     def serialize(self, hk: "HK"):
         for hkcls in self.contents:
-            hkcls.serialize(hk, self)
+            self.objects.append(hkcls.hkobj)
+            hkcls.serialize(hk)
         self.contents.clear()
 
     def write(self, hk: "HK", bw: BinaryWriter):
+        # Clear out all the fixups beforehand
+        self.local_fixups.clear()
+        self.global_fixups.clear()
+        self.virtual_fixups.clear()
+
+        # Set data section absolute offset
         self.absolute_offset = bw.tell()
 
+        # Serialize the file if it happens to be deserialized
         if self.contents:
             self.serialize(hk)
 
         for obj in self.objects:
+            obj.write(hk, self, bw)
+            print(obj.reservations)
+            bw.reservations.update(
+                {
+                    k: v + obj.offset + self.absolute_offset
+                    for k, v in obj.reservations.items()
+                }
+            )
+
             # Create a Virtual fixup
             vfu = GlobalFixup()
             vfu.src = obj.offset
@@ -117,11 +127,6 @@ class HKDataSection(HKSection):
             vfu.dst = obj.hkclass.offset
 
             self.virtual_fixups.append(vfu)
-
-            obj.write(hk, self, bw)
-            bw.reservations.update(
-                {k: v + obj.offset + self.absolute_offset for k, v in obj.reservations}
-            )
 
         for gr in self.global_references:
             # Create a Global fixup
@@ -132,16 +137,19 @@ class HKDataSection(HKSection):
 
             self.global_fixups.append(gfu)
 
+        # Write local fixups
         self.local_fixups_offset = bw.tell() - self.absolute_offset
         for lfu in self.local_fixups:
             lfu.write(bw)
         bw.align_to(16, b"\xFF")
 
+        # Write global fixups
         self.global_fixups_offset = bw.tell() - self.absolute_offset
         for gfu in self.global_fixups:
             gfu.write(bw)
         bw.align_to(16, b"\xFF")
 
+        # Write virtual fixups
         self.virtual_fixups_offset = bw.tell() - self.absolute_offset
         for vfu in self.virtual_fixups:
             vfu.write(bw)
@@ -151,6 +159,7 @@ class HKDataSection(HKSection):
         self.imports_offset = bw.tell() - self.absolute_offset
         self.EOF_offset = bw.tell() - self.absolute_offset
 
+        # Fill the reserved header bytes with correct offsets
         bw.fill_uint32(f"{self.tag}abs", self.absolute_offset)
         bw.fill_uint32(f"{self.tag}loc", self.local_fixups_offset)
         bw.fill_uint32(f"{self.tag}glob", self.global_fixups_offset)
@@ -163,9 +172,12 @@ class HKDataSection(HKSection):
         # They usually have a StaticCompoundInfo in the first hkfile
         # and other classes in the second one. There's an offset in there
         # that points to the beginning of the second hkfile
-        for name, _ in bw.reservations:
+        for name in list(bw.reservations):
+            print(name)
             if name == "EOF:uint32":
-                bw.fill_uint32(name.split(":")[0], self.EOF_offset)
+                bw.fill_uint32(
+                    name.split(":")[0], self.absolute_offset + self.EOF_offset
+                )
             else:
                 raise Exception("There shouldn't be any other unresolved reservations!")
 
@@ -183,9 +195,8 @@ class HKDataSection(HKSection):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.id = d["id"]
-        inst.objects = [
-            class_hk_map[content["hkClass"]].fromdict(content)
+        inst.contents = [
+            hk_class_map[content["hkClass"]].fromdict(content)
             for content in d["contents"]
         ]
         return inst

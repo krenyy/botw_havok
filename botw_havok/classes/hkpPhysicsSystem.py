@@ -1,71 +1,65 @@
 from ..binary import BinaryReader, BinaryWriter
-from ..container.sections.util import HKChunkLink, HKDataLink
-from .base import HKChunk
+from .base import HKBase
+from .common.hkReferencedObject import hkReferencedObject
+from typing import List
 
 if False:
-    from ..hk import Havok
-    from ..container.sections import HKDataSection
+    from ..hk import HK
+    from ..container.sections.hkobject import HKObject
 
 
-class HKPPhysicsSystem(HKChunk):
-    """Physics system, usually contains a hkpRigidBody
+class hkpPhysicsSystem(HKBase, hkReferencedObject):
+    """Physics system, contains rigid bodies
     """
 
-    linked_chunks_count: int
+    # rigidBodies: List[hkpRigidBody]
+    # constraints: List[hkpConstraintInstance] # TODO: Do this
+    # actions: List[hkpAction] # Doesn't seem used
+    # phantoms: List[hkpPhantom] # Doesn't seem used
+
     name: str
+    userData: int
+    active: bool
 
-    def read(self, hk: "Havok", br: BinaryReader):
-        self.read_pointer(hk, br)
-        self.read_pointer(hk, br)
+    def deserialize(self, hk: "HK", obj: "HKObject"):
+        HKBase.deserialize(self, hk, obj)
 
-        self.children_count = self.read_counter(hk, br)
-        self.read_counter(hk, br)
-        self.read_counter(hk, br)
-        self.read_counter(hk, br)
+        br = BinaryReader(self.hkobj.bytes)
+        br.big_endian = hk.header.endian == 0
 
-        br.assert_int8(1)  # Unknown, always 1
+        hkReferencedObject.deserialize(self, hk, br)
+
+        # ---
+
+        rigidBodiesCount_offset = br.tell()
+        rigidBodiesCount = self.read_counter(hk, br)
+
+        constraintsCount_offset = br.tell()
+        constraintsCount = self.read_counter(hk, br)
+
+        actionsCount_offset = br.tell()
+        actionsCount = self.read_counter(hk, br)
+
+        phantomsCount_offset = br.tell()
+        phantomsCount = self.read_counter(hk, br)
+
+        namePointer_offset = br.tell()
+        hk._assert_pointer(br)
+
+        self.userData = br.read_uint64()
+        self.active = bool(br.read_int8())
         br.align_to(16)
 
-        br.seek_relative(+16)  # Padding?
+        # ---
 
-        self.name = br.read_string()  # 'Default Physics System'
-        br.align_to(16)
+        pass
 
-    def write(self, hk: "Havok", sec: "HKDataSection", bw: BinaryWriter):
-        if sec.links:
-            sec.links[-1].dst = bw.tell() - sec.abs_offset
+    def serialize(self, hk: "HK"):
+        bw = BinaryWriter()
+        bw.big_endian = hk.header.endian == 0
 
-        self.write_pointer(hk, bw)
-        self.write_pointer(hk, bw)
+        hkReferencedObject.serialize(self, hk, bw)
 
-        pointer = HKDataLink()
-        pointer.src = bw.tell() - sec.abs_offset
+        pass
 
-        self.write_counter(hk, bw, self.children_count)
-        self.write_counter(hk, bw, 0)
-        self.write_counter(hk, bw, 0)
-        self.write_counter(hk, bw, 0)
-
-        self.write_pointer(hk, bw)
-        self.write_pointer(hk, bw)
-
-        bw.write_int8(1)  # ?
-        bw.write_int8(0)
-        bw.write_int8(0)
-        bw.write_int8(0)
-        bw.align_to(16)
-
-        pointer.dst = bw.tell() - sec.abs_offset
-        sec.pointers.append(pointer)
-
-        link = HKChunkLink()
-        link.src = bw.tell() - sec.abs_offset
-        link.dst_section_id = 2
-
-        pointer = HKDataLink()
-        pointer.src = bw.tell() - sec.abs_offset - 0x10 - (2 * hk.header.pointer_size)
-        bw.seek_relative(+16)  # Padding?
-        pointer.dst = bw.tell() - sec.abs_offset
-
-        bw.write_string(self.name)
-        bw.align_to(16)
+        HKBase.serialize(self, hk, bw)

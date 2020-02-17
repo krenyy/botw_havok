@@ -7,15 +7,6 @@ class ShapeInfo:
     BodyGroup: int
     BodyLayerType: int
 
-    def __init__(self, d: dict = None):
-        if d:
-            (
-                self.ActorInfoIndex,
-                self.InstanceId,
-                self.BodyGroup,
-                self.BodyLayerType,
-            ) = d.values()
-
     def read(self, br: BinaryReader):
         self.ActorInfoIndex = br.read_int32()
         self.InstanceId = br.read_int32()
@@ -38,7 +29,13 @@ class ShapeInfo:
 
     @classmethod
     def fromdict(cls, d: dict):
-        return cls(d)
+        inst = cls()
+        inst.ActorInfoIndex = d["ActorInfoIndex"]
+        inst.InstanceId = d["InstanceId"]
+        inst.BodyGroup = d["BodyGroup"]
+        inst.BodyLayerType = d["BodyLayerType"]
+
+        return inst
 
     def __repr__(self):
         return (

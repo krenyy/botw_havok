@@ -22,7 +22,7 @@ class HKHeader:
     data_section_id: int = 2            # 0x18  # Always 2, refers to __data__ section
     data_section_offset: int = 0        # 0x1C  # Always 0, beginning offset in __data__
     classnames_section_id: int = 0      # 0x20  # Always 0, refers to __classnames__ section
-    classnames_section_offset: int = 0  # 0x24  # Always 75, offset to hkRootLevelContainer?
+    classnames_section_offset: int = 75 # 0x24  # Always 75, offset to hkRootLevelContainer?
     hk_version: str = "hk_2014.2.0-r1"  # 0x28  # Always same, ends with 0xFF
     flags: int = 0                      # 0x38  # Always 0x00 (?)
     max_predicate: int = 21             # 0x3C  # Always 0x15 (?)
@@ -34,11 +34,6 @@ class HKHeader:
     unk48: int = 0                      # 0x48  # Always 0 (padding?)
     unk4C: int = 0                      # 0x4C  # Always 0 (padding?)
     # fmt:on
-
-    def __init__(self, d: dict = None):
-        if d:
-            self.predicate_size = 16
-            self.unk40, self.unk42, self.unk44, self.unk48, self.unk4C = d.values()
 
     def to_switch(self):
         self.pointer_size = 8
@@ -135,7 +130,12 @@ class HKHeader:
 
     @classmethod
     def fromdict(cls, d: dict):
-        return cls(d)
+        inst = cls()
+        if d:
+            inst.predicate_size = 16  # TODO: see if this is right
+            inst.unk40, inst.unk42, inst.unk44, inst.unk48, inst.unk4C = d.values()
+
+        return inst
 
     def __repr__(self):
         base = f"{self.__class__.__name__}"

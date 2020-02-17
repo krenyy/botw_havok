@@ -1,11 +1,11 @@
 import typing
 
 from ...binary import BinaryReader, BinaryWriter
-from .classnames import HKClass
 from .util import GlobalReference, LocalFixup
 
 if False:
     from ...hk import HK
+    from .classnames import HKClass
     from .data import HKDataSection
 
 
@@ -14,8 +14,8 @@ class HKObject:
     """
 
     offset: int
-    hkclass: HKClass
-    data: bytes
+    hkclass: "HKClass"
+    bytes: bytes
     size: int
 
     local_fixups: typing.List[LocalFixup]
@@ -28,38 +28,24 @@ class HKObject:
         self.global_references = []
         self.reservations = {}
 
-    def set_curr_offset(
-        self, dsec: "HKDataSection", brw: typing.Union[BinaryReader, BinaryWriter]
-    ):
-        self.offset = brw.tell() - dsec.absolute_offset
+    def resolve_local_fixups(self, hk: "HK"):
+        hk.data.local_fixups.extend([lfu + self.offset for lfu in self.local_fixups])
 
-    def resolve_local_fixups(self, dsec: "HKDataSection"):
-        dsec.local_fixups.extend([lfu + self.offset for lfu in self.local_fixups])
-
-    def resolve_global_references(self, dsec: "HKDataSection"):
+    def resolve_global_references(self, hk: "HK"):
         for gr in self.global_references:
-            if gr not in dsec.global_references:
-                dsec.global_references.append(gr)
+            if gr not in hk.data.global_references:
+                hk.data.global_references.append(gr)
 
-    def read(self, hk: "HK", dsec: "HKDataSection", br: BinaryReader, size: int):
-        self.set_curr_offset(dsec, br)
-        self.data = br.read(size)
+    def read(self, hk: "HK", br: BinaryReader, size: int):
+        self.offset = br.tell() - hk.data.absolute_offset
+        self.bytes = br.read(size)
 
-    def write(self, hk: "HK", dsec: "HKDataSection", bw: BinaryWriter):
-        self.set_curr_offset(dsec, bw)
-        bw.write(self.data)
+    def write(self, hk: "HK", bw: BinaryWriter):
+        self.offset = bw.tell() - hk.data.absolute_offset
+        bw.write(self.bytes)
 
-        self.resolve_local_fixups(dsec)
-        self.resolve_global_references(dsec)
-
-    def asdict(self):
-        raise NotImplementedError(
-            "It's not possible to convert a serialized object to dict!"
-        )
-
-    @classmethod
-    def fromdict(self, d: dict):
-        raise NotImplementedError()
+        self.resolve_local_fixups(hk)
+        self.resolve_global_references(hk)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} ({self.hkclass.name})>"

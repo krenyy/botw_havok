@@ -1,13 +1,13 @@
-from .base import HKBase
 from typing import List
-from .common.ActorInfo import ActorInfo
-from .common.ShapeInfo import ShapeInfo
+
 from ..binary import BinaryReader, BinaryWriter
 from ..container.sections.util import LocalFixup
+from .base import HKBase
+from .common.ActorInfo import ActorInfo
+from .common.ShapeInfo import ShapeInfo
 
 if False:
     from ..hk import HK
-    from ..container.sections.data import HKDataSection
     from ..container.sections.hkobject import HKObject
 
 
@@ -22,16 +22,16 @@ class StaticCompoundInfo(HKBase):
         self.ActorInfo = []
         self.ShapeInfo = []
 
-    def deserialize(self, hk: "HK", dsec: "HKDataSection", obj: "HKObject"):
-        super().deserialize(hk, dsec, obj)
+    def deserialize(self, hk: "HK", obj: "HKObject"):
+        super().deserialize(hk, obj)
 
-        br = BinaryReader(self.hkobj.data)
+        br = BinaryReader(self.hkobj.bytes)
         br.big_endian = hk.header.endian == 0
 
         self.Offset = br.read_uint32()
 
         if not br.big_endian:
-            br.read_uint32()
+            br.seek_relative(+4)
 
         ai_count = self.read_counter(hk, br)
         si_count = self.read_counter(hk, br)
@@ -41,22 +41,22 @@ class StaticCompoundInfo(HKBase):
             ai = ActorInfo()
             ai.read(br)
             self.ActorInfo.append(ai)
-        br.align_to(16)  # ?
+        br.align_to(16)
 
         for _ in range(si_count):
             si = ShapeInfo()
             si.read(br)
             self.ShapeInfo.append(si)
-        br.align_to(16)  # ?
+        br.align_to(16)
 
-    def serialize(self, hk: "HK", dsec: "HKDataSection"):
+    def serialize(self, hk: "HK"):
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
-        bw.write_uint32(self.Offset)
+        bw.reserve_uint32("EOF")
 
-        if not bw.big_endian:
-            bw.write_uint32(0)  # U64 instead of U32 for Switch?
+        if hk.header.padding_option:  # probably
+            bw.write_uint32(0)
 
         ai_count_offset = bw.tell()
         self.write_counter(hk, bw, len(self.ActorInfo))
@@ -80,19 +80,28 @@ class StaticCompoundInfo(HKBase):
             ]
         )
 
-        super().serialize(hk, dsec, bw)
+        self.hkobj.reservations = bw.reservations
+
+        super().serialize(hk, bw)
 
     def asdict(self):
-        return (
-            super()
-            .asdict()
-            .update(
-                {
-                    "ActorInfo": [ai.asdict() for ai in self.ActorInfo],
-                    "ShapeInfo": [si.asdict() for si in self.ShapeInfo],
-                }
-            )
+        d = super().asdict()
+        d.update(
+            {
+                "ActorInfo": [ai.asdict() for ai in self.ActorInfo],
+                "ShapeInfo": [si.asdict() for si in self.ShapeInfo],
+            }
         )
+        return d
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        inst.hkClass = d["hkClass"]
+        inst.ActorInfo = [ActorInfo.fromdict(ai) for ai in d["ActorInfo"]]
+        inst.ShapeInfo = [ShapeInfo.fromdict(si) for si in d["ShapeInfo"]]
+
+        return inst
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.Offset}, {self.ActorInfo}, {self.ShapeInfo})"
+        return f"{self.__class__.__name__}({self.ActorInfo}, {self.ShapeInfo})"

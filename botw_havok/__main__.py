@@ -8,10 +8,9 @@ testhk = "/home/kreny/Desktop/hktestfiles/staticcompound/A-1-0_nx.hksc"
 # testhk = "/home/kreny/Desktop/model-box-long-name.bin"
 
 hk = Havok()
-hk.read(testhk, deserialize=False)
+hk.read(testhk)
 
 # hk.write("/home/kreny/Desktop/test.hkfile")
-
 
 import pdb
 

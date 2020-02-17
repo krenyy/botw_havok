@@ -20,6 +20,11 @@ class HKSection:
     imports_offset: int  # Never used?, equals to EOF_offset
     EOF_offset: int  # Points to the end of the section
 
+    def __init__(self):
+        self.local_fixups = []
+        self.global_fixups = []
+        self.virtual_fixups = []
+
     def read_header(self, br: BinaryReader):
         # Section name
         self.tag = br.read_string(19)

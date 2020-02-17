@@ -12,15 +12,7 @@ class HK:
     types: HKTypesSection
     data: HKDataSection
 
-    def __init__(self, d: dict = None):
-        if d:
-            self.header = HKHeader.fromdict(d["header"])
-
-            self.classnames = HKClassnamesSection.fromdict(d["classnames"])
-            self.types = HKTypesSection.fromdict(d["types"])
-            self.data = HKDataSection.fromdict(d["data"])
-
-    def read(self, br: BinaryReader, deserialize: bool):
+    def read(self, br: BinaryReader):
         # Read the endian byte ahead
         br.step_in(0x11)
         br.big_endian = br.read_int8() == 0
@@ -43,7 +35,7 @@ class HK:
         # Read Havok sections' data
         self.classnames.read(br)
         self.types.read(br)
-        self.data.read(self, br, deserialize)
+        self.data.read(self, br)
 
     def write(self, bw: BinaryWriter):
         # Write Havok header
@@ -58,6 +50,12 @@ class HK:
         self.classnames.write(bw)
         self.types.write(bw)
         self.data.write(self, bw)
+
+    def deserialize(self):
+        self.data.deserialize(self)
+
+    def serialize(self):
+        self.data.serialize(self)
 
     def _assert_pointer(self, br: BinaryReader):
         if self.header.pointer_size == 4:
@@ -75,9 +73,23 @@ class HK:
         else:
             raise Exception("Wrong pointer size!")
 
+    def asdict(self):
+        return {
+            "header": self.header.asdict(),
+            "classnames": self.classnames.asdict(),
+            "types": self.types.asdict(),
+            "data": self.data.asdict(),
+        }
+
     @classmethod
     def fromdict(cls, d: dict):
-        return cls(d)
+        inst = cls()
+        inst.header = HKHeader.fromdict(d["header"])
+        inst.classnames = HKClassnamesSection.fromdict(d["classnames"])
+        inst.types = HKTypesSection.fromdict(d["types"])
+        inst.data = HKDataSection.fromdict(d["data"])
+
+        return inst
 
     def to_switch(self):
         self.data.deserialize(self)

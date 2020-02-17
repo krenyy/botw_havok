@@ -1,17 +1,8 @@
-from .hkpPhysicsData import HKPPhysicsData
-from .hkRootLevelContainer import HKRootLevelContainer
-from .StaticCompoundInfo import StaticCompoundInfo
+__all__ = (
+    "hk_class_map",
+    "hk_signature_map",
+)
 
-class_signature_map = {
-    "hkRootLevelContainer": 1234567,
-    "hkpPhysicsData": 1234567,
-    "hkpPhysicsSystem": 1234567,
-    "StaticCompoundInfo": 1234567,
-}
 
-class_hk_map = {
-    "hkRootLevelContainer": HKRootLevelContainer,
-    "hkpPhysicsData": HKPPhysicsData,
-    "hkpPhysicsSystem": None,
-    "StaticCompoundInfo": StaticCompoundInfo,
-}
+from .util.class_map import hk_class_map
+from .util.signature_map import hk_signature_map

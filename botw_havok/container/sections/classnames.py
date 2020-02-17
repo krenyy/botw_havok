@@ -2,16 +2,13 @@ import typing
 
 from ...binary import BinaryReader, BinaryWriter
 from .base import HKSection
+from ...classes import hk_signature_map
 
 
 class HKClass:
     signature: int
     name: str
     offset: int
-
-    def __init__(self, d: dict = None):
-        if d:
-            self.signature, self.name = d.values()
 
     def read(self, csec: "HKClassnamesSection", br: BinaryReader):
         self.signature = br.read_uint32()
@@ -25,12 +22,13 @@ class HKClass:
         self.offset = bw.tell() - csec.absolute_offset
         bw.write_string(self.name)
 
-    def asdict(self):
-        return {"name": self.name, "signature": self.signature}
-
     @classmethod
-    def fromdict(cls, d: dict):
-        return cls(d)
+    def from_name(cls, name):
+        inst = cls()
+        inst.name = name
+        inst.signature = hk_signature_map[name]
+
+        return inst
 
     def __eq__(self, value: "HKClass"):
         return (self.signature == value.signature) and (self.name == value.name)
@@ -47,18 +45,22 @@ class HKClassnamesSection(HKSection):
     """
 
     id: int = 0
+    tag: str = "__classnames__"
 
     classes: typing.List[HKClass]
 
-    def __init__(self, d: dict = None):
+    def __init__(self):
         self.classes = []
 
-        if d:
-            self.id = d["id"]
-            self.classes = [HKClass.fromdict(cls) for cls in d["classes"]]
+        self.classes.append(HKClass.from_name("hkClass"))
+        self.classes.append(HKClass.from_name("hkClassMember"))
+        self.classes.append(HKClass.from_name("hkClassEnum"))
+        self.classes.append(HKClass.from_name("hkClassEnumItem"))
 
     def read(self, br: BinaryReader):
         super().read(br)
+
+        self.classes.clear()
 
         while br.tell() < self.absolute_offset + self.EOF_offset:
             if br.peek() == b"\xFF":
@@ -102,26 +104,20 @@ class HKClassnamesSection(HKSection):
         if isinstance(value, int):
             for cls in self.classes:
                 if cls.offset == value:
-                    if cls:
-                        return cls
-                    else:
-                        raise Exception("Invalid class offset!")
+                    return cls
+            else:
+                raise Exception(f"HKClass with offset {value} was not found!")
 
         elif isinstance(value, str):
             for cls in self.classes:
                 if cls.name == value:
                     return cls
             else:
-                raise Exception(f"Class with name {value} was not found!")
+                cls = HKClass()
+                cls.name = value
+                cls.signature = hk_signature_map[value]
         else:
             raise NotImplementedError("Wrong value type provided")
 
-    def asdict(self):
-        return {"id": self.id, "classes": self.classes}
-
-    @classmethod
-    def fromdict(cls, d: dict):
-        return cls(d)
-
     def __repr__(self):
-        return f"<{self.__class__.__name__} [{', '.join([repr(cls) for cls in self.classes])}]>"
+        return f"<{self.__class__.__name__} {self.classes}>"
