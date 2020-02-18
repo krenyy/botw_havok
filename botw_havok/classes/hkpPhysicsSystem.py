@@ -57,7 +57,6 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         hk._assert_pointer(br)
 
         # ----
-
         # U64 on Switch, U32 on WiiU?
         if hk.header.pointer_size == 8:
             self.userData = br.read_uint64()
@@ -69,16 +68,15 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
 
         # ----
 
-        for _ in range(rigidBodiesCount):
-            for gr in obj.global_references:
-                if gr.src_rel_offset == br.tell():
-                    rb = hkpRigidBody()
-                    rb.deserialize(hk, gr.dst_obj)
-                    hk.data.objects.remove(gr.dst_obj)
-                    self.rigidBodies.append(rb)
+        for gr in obj.global_references:
+            if gr.src_rel_offset == br.tell():
+                hk.data.objects.remove(gr.dst_obj)
 
-                    hk._assert_pointer(br)
-                    break
+                rb = hkpRigidBody()
+                self.rigidBodies.append(rb)
+                rb.deserialize(hk, gr.dst_obj)
+
+                hk._assert_pointer(br)
         br.align_to(16)
 
         self.name = br.read_string()

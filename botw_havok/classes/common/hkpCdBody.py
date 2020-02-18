@@ -17,9 +17,9 @@ class hkpCdBody:
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
-                hk.data.objects.remove(gr.dst_obj)
-                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
-                self.shape.deserialize(hk, br)
+                # hk.data.objects.remove(gr.dst_obj)
+                # self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                # self.shape.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)  # Points to a hkpShape
                 break

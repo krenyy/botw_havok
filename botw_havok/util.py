@@ -1,6 +1,3 @@
-import itertools
-
-
 class Vector3:
     x: int
     y: int
@@ -19,11 +16,22 @@ class Vector3:
     def __iter__(self):
         return iter((self.x, self.y, self.z))
 
+    def asdict(self):
+        return [self.x, self.y, self.z]
+
+    @classmethod
+    def fromdict(cls, d: list):
+        inst = cls()
+        inst.x = d[0]
+        inst.y = d[1]
+        inst.z = d[2]
+        return inst
+
 
 class Vector4(Vector3):
     w: int
 
-    def __init__(self, x, y, z, w, v3: Vector3 = None):
+    def __init__(self, x=None, y=None, z=None, w=None, v3: Vector3 = None):
         if isinstance(v3, Vector3):
             self.x = v3.x
             self.y = v3.y
@@ -38,7 +46,19 @@ class Vector4(Vector3):
         return False
 
     def __iter__(self):
-        return itertools.chain(super().__iter__(), iter((self.w)))
+        return iter((self.x, self.y, self.z, self.w))
+
+    def asdict(self):
+        return [self.x, self.y, self.z, self.w]
+
+    @classmethod
+    def fromdict(cls, d: list):
+        inst = cls()
+        inst.x = d[0]
+        inst.y = d[1]
+        inst.z = d[2]
+        inst.w = d[3]
+        return inst
 
 
 class Transform:
@@ -65,3 +85,20 @@ class Transform:
 
     def __iter__(self):
         return iter((self.translation, self.rotation, self.scale, self.shear))
+
+    def asdict(self):
+        return {
+            "translation": self.translation.asdict(),
+            "rotation": self.rotation.asdict(),
+            "scale": self.scale.asdict(),
+            "shear": self.shear.asdict(),
+        }
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        inst.translation = Vector4.fromdict(d["translation"])
+        inst.rotation = Vector4.fromdict(d["rotation"])
+        inst.scale = Vector4.fromdict(d["scale"])
+        inst.shear = Vector4.fromdict(d["shear"])
+        return inst

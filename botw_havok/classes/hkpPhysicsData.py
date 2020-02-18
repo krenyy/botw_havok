@@ -42,13 +42,13 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         br.align_to(16)
 
         # systems_offset = br.read()
-
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
-                system = hkpPhysicsSystem()
-                system.deserialize(hk, gr.dst_obj)
                 hk.data.objects.remove(gr.dst_obj)
+
+                system = hkpPhysicsSystem()
                 self.systems.append(system)
+                system.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)
         br.align_to(16)

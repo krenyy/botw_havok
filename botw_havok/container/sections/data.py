@@ -81,8 +81,8 @@ class HKDataSection(HKSection):
         for obj in self.objects:
             try:
                 hkcls = hk_class_map[obj.hkclass.name]()
-                hkcls.deserialize(hk, obj)
                 self.contents.append(hkcls)
+                hkcls.deserialize(hk, obj)
             except KeyError:
                 return "OK"  # for testing purposes
                 raise NotImplementedError(

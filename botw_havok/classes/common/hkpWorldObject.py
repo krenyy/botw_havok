@@ -17,7 +17,7 @@ class hkpWorldObject(hkReferencedObject):
     collidable: hkpLinkedCollidable
     multiThreadCheck: hkMultiThreadCheck
 
-    _name_offset: int  # for writing
+    _namePointer_offset: int  # for writing
     name: str
 
     properties: List[hkSimpleProperty]
@@ -44,6 +44,8 @@ class hkpWorldObject(hkReferencedObject):
 
         self.multiThreadCheck = hkMultiThreadCheck()
         self.multiThreadCheck.deserialize(hk, br)
+        if hk.header.padding_option:
+            br.align_to(16)
 
         for lfu in obj.local_fixups:
             if lfu.src == br.tell():
@@ -80,8 +82,10 @@ class hkpWorldObject(hkReferencedObject):
 
         self.collidable.serialize(hk, bw)
         self.multiThreadCheck.serialize(hk, bw)
+        if hk.header.padding_option:
+            bw.align_to(16)
 
-        self._name_offset = bw.tell()
+        self._namePointer_offset = bw.tell()
 
         propertiesCount_offset = bw.tell()
         hk._write_counter(bw, len(self.properties))

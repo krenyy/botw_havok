@@ -9,8 +9,11 @@ testhk = "/home/kreny/Desktop/hktestfiles/staticcompound/A-1-0_nx.hksc"
 
 hk = Havok.from_file(testhk)
 
-# hk.write("/home/kreny/Desktop/test.hkfile")
+hk.files[1].deserialize()
+
+# hk.to_file("/home/kreny/Desktop/test.hkfile")
 
 import pdb
 
 pdb.set_trace()
+

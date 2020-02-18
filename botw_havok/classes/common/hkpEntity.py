@@ -1,11 +1,13 @@
 from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
+from ...container.sections.util import LocalFixup
 from .hkLocalFrame import hkLocalFrame
 from .hkpConstraintInstance import hkpConstraintInstance
 from .hkpEntityExtendedListeners import hkpEntityExtendedListeners
-from .hkpEntitySmallArraySerializeOverrideType import \
-    hkpEntitySmallArraySerializeOverrideType
+from .hkpEntitySmallArraySerializeOverrideType import (
+    hkpEntitySmallArraySerializeOverrideType,
+)
 from .hkpEntitySpuCollisionCallback import hkpEntitySpuCollisionCallback
 from .hkpMaterial import hkpMaterial
 from .hkpMaxSizeMotion import hkpMaxSizeMotion
@@ -60,7 +62,7 @@ class hkpEntity(hkpWorldObject):
         self.material.deserialize(hk, br)
 
         if hk.header.padding_option:
-            br.align_to(16)
+            br.align_to(8)
 
         limitContactImpulseUtilAndFlag_offset = br.tell()
         hk._assert_pointer(br)  # limitContactImpulseUtilAndFlag
@@ -68,7 +70,7 @@ class hkpEntity(hkpWorldObject):
         self.damageMultiplier = br.read_single()
 
         if hk.header.padding_option:
-            br.align_to(16)
+            br.align_to(8)
 
         breakableBody_offset = br.tell()
         hk._assert_pointer(br)  # breakableBody
@@ -102,8 +104,14 @@ class hkpEntity(hkpWorldObject):
         self.spuCollisionCallback = hkpEntitySpuCollisionCallback()
         self.spuCollisionCallback.deserialize(hk, br)
 
+        if hk.header.padding_option:
+            br.align_to(16)
+
         self.motion = hkpMaxSizeMotion()
         self.motion.deserialize(hk, br)
+
+        if hk.header.padding_option:
+            br.align_to(16)
 
         self.contactListeners = hkpEntitySmallArraySerializeOverrideType()
         self.contactListeners.deserialize(hk, br)
@@ -133,7 +141,7 @@ class hkpEntity(hkpWorldObject):
         for _ in range(constraintRuntimeCount):
             self.constraintRuntime.append(br.read_uint8())"""
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hk, bw)
 
         self.material.serialize(hk, bw)
@@ -193,3 +201,10 @@ class hkpEntity(hkpWorldObject):
         # ----
 
         bw.write_uint32(self.npData)
+        bw.align_to(16)
+
+        name_offset = bw.tell()
+        bw.write_string(self.name)
+
+        obj.local_fixups.append(LocalFixup(self._namePointer_offset, name_offset))
+

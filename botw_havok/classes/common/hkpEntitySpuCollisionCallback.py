@@ -13,7 +13,7 @@ class hkpEntitySpuCollisionCallback:
 
     def deserialize(self, hk: "HK", br: BinaryReader):
         util_offset = br.tell()
-        hk._assert_pointer()
+        hk._assert_pointer(br)
 
         self.capacity = br.read_uint16()
         self.eventFilter = br.read_uint8()
@@ -24,7 +24,7 @@ class hkpEntitySpuCollisionCallback:
 
     def serialize(self, hk: "HK", bw: BinaryWriter):
         util_offset = bw.tell()
-        hk._write_empty_pointer()
+        hk._write_empty_pointer(bw)
 
         bw.write_uint16(self.capacity)
         bw.write_uint8(self.eventFilter)

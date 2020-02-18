@@ -1,8 +1,10 @@
+from typing import List
+
 from ...binary import BinaryReader, BinaryWriter
-from ..enums.MotionType import MotionType
-from .hkReferencedObject import hkReferencedObject
 from ...util import Vector4
+from ..enums.MotionType import MotionType
 from .hkMotionState import hkMotionState
+from .hkReferencedObject import hkReferencedObject
 
 if False:
     from ...hk import HK
@@ -12,7 +14,7 @@ if False:
 class hkpMotion(hkReferencedObject):
     type: int
     deactivationIntegrateCounter: int
-    deactivationNumInactiveFrames: int
+    deactivationNumInactiveFrames: List[int]
 
     motionState: hkMotionState
 
@@ -21,10 +23,10 @@ class hkpMotion(hkReferencedObject):
     linearVelocity: Vector4
     angularVelocity: Vector4
 
-    deactivationRefPosition: Vector4
+    deactivationRefPosition: List[Vector4]
     deactivationRefOrientation: int
 
-    savedMotion: "hkpMaxSizeMotion" = None
+    # savedMotion: "hkpMaxSizeMotion" = None
     savedQualityTypeIndex: int
 
     gravityFactor: float
@@ -34,8 +36,12 @@ class hkpMotion(hkReferencedObject):
 
         self.type = br.read_uint8()
         self.deactivationIntegrateCounter = br.read_uint8()
-        self.deactivationNumInactiveFrames = br.read_uint16()
+        self.deactivationNumInactiveFrames = [br.read_uint16() for _ in range(2)]
 
+        if hk.header.padding_option:
+            br.align_to(16)
+
+        self.motionState = hkMotionState()
         self.motionState.deserialize(hk, br)
 
         self.inertiaAndMassInv = br.read_vector4()
@@ -43,8 +49,11 @@ class hkpMotion(hkReferencedObject):
         self.linearVelocity = br.read_vector4()
         self.angularVelocity = br.read_vector4()
 
-        self.deactivationRefPosition = br.read_vector4()
+        self.deactivationRefPosition = [br.read_vector4() for _ in range(2)]
         self.deactivationRefOrientation = br.read_uint32()
+
+        if hk.header.padding_option:
+            br.align_to(8)
 
         savedMotion_offset = br.tell()
         hk._assert_pointer(br)
@@ -58,7 +67,10 @@ class hkpMotion(hkReferencedObject):
 
         bw.write_uint8(self.type)
         bw.write_uint8(self.deactivationIntegrateCounter)
-        bw.write_uint16(self.deactivationNumInactiveFrames)
+        [bw.write_uint16(frame) for frame in self.deactivationNumInactiveFrames]
+
+        if hk.header.padding_option:
+            bw.align_to(16)
 
         self.motionState.serialize(hk, bw)
 
@@ -84,13 +96,15 @@ class hkpMotion(hkReferencedObject):
                 "type": MotionType(self.type).name,
                 "deactivationIntegrateCounter": self.deactivationIntegrateCounter,
                 "deactivationNumInactiveFrames": self.deactivationNumInactiveFrames,
-                "motionState": self.motionState,
-                "inertiaAndMassInv": self.inertiaAndMassInv,
-                "linearVelocity": self.linearVelocity,
-                "angularVelocity": self.angularVelocity,
-                "deactivationRefPosition": self.deactivationRefPosition,
+                "motionState": self.motionState.asdict(),
+                "inertiaAndMassInv": self.inertiaAndMassInv.asdict(),
+                "linearVelocity": self.linearVelocity.asdict(),
+                "angularVelocity": self.angularVelocity.asdict(),
+                "deactivationRefPosition": [
+                    pos.asdict() for pos in self.deactivationRefPosition
+                ],
                 "deactivationRefOrientation": self.deactivationRefOrientation,
-                "savedMotion": self.savedMotion,
+                # "savedMotion": self.savedMotion.asdict(),
                 "savedQualityTypeIndex": self.savedQualityTypeIndex,
                 "gravityFactor": self.gravityFactor,
             }
@@ -104,12 +118,14 @@ class hkpMotion(hkReferencedObject):
         inst.type = getattr(MotionType, d["type"]).value
         inst.deactivationIntegrateCounter = d["deactivationIntegrateCounter"]
         inst.deactivationNumInactiveFrames = d["deactivationNumInactiveFrames"]
-        inst.motionState = d["motionState"]
-        inst.inertiaAndMassInv = d["inertiaAndMassInv"]
-        inst.linearVelocity = d["linearVelocity"]
-        inst.angularVelocity = d["angularVelocity"]
-        inst.deactivationRefPosition = d["deactivationRefPosition"]
+        inst.motionState = hkMotionState.fromdict(d["motionState"])
+        inst.inertiaAndMassInv = Vector4.fromdict(d["inertiaAndMassInv"])
+        inst.linearVelocity = Vector4.fromdict(d["linearVelocity"])
+        inst.angularVelocity = Vector4.fromdict(d["angularVelocity"])
+        inst.deactivationRefPosition = [
+            Vector4.fromdict(pos) for pos in d["deactivationRefPosition"]
+        ]
         inst.deactivationRefOrientation = d["deactivationRefPosition"]
-        inst.savedMotion = d["savedMotion"]
+        # inst.savedMotion = hkpMaxSizeMotion.fromdict(d["savedMotion"])
         inst.savedQualityTypeIndex = d["savedQualityTypeIndex"]
         inst.gravityFactor = d["gravityFactor"]

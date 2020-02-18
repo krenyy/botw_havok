@@ -65,10 +65,10 @@ class BinaryReader(BinaryBase):
     def read_transform(self) -> Transform:
         return Transform(
             [
-                self.read_vector4,
-                self.read_vector4,
-                self.read_vector4,
-                self.read_vector4,
+                self.read_vector4(),
+                self.read_vector4(),
+                self.read_vector4(),
+                self.read_vector4(),
             ]
         )
 

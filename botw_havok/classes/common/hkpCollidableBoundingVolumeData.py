@@ -41,8 +41,8 @@ class hkpCollidableBoundingVolumeData:
             br.align_to(8)
 
         # Empty pointers (?)
-        hk._assert_pointer()  # childShapeAabbs
-        hk._assert_pointer()  # childShapeKeys
+        hk._assert_pointer(br)  # childShapeAabbs
+        hk._assert_pointer(br)  # childShapeKeys
 
     def serialize(self, hk: "HK", bw: BinaryWriter):
         [bw.write_uint32(m) for m in self.min]
@@ -64,8 +64,8 @@ class hkpCollidableBoundingVolumeData:
             bw.align_to(8)
 
         # Empty pointers
-        hk._write_empty_pointer()
-        hk._write_empty_pointer()
+        hk._write_empty_pointer(bw)
+        hk._write_empty_pointer(bw)
 
     def asdict(self):
         return {

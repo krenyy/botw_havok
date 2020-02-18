@@ -31,8 +31,8 @@ class hkRootLevelContainer(HKBase):
         # namedVariants_offset = br.tell()
         for _ in range(namedVariantsCount):
             nv = hkRootLevelContainerNamedVariant()
-            nv.deserialize(hk, br, self.hkobj)
             self.namedVariants.append(nv)
+            nv.deserialize(hk, br, self.hkobj)
 
     def serialize(self, hk: "HK"):
         bw = BinaryWriter()
