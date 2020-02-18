@@ -31,12 +31,14 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
 
         # Read base referenced object data
         hkReferencedObject.deserialize(self, hk, br)
+        if hk.header.padding_option:
+            br.align_to(16)
 
         # worldCinfo_offset = br.tell()
         hk._assert_pointer(br)
 
         # systemCount_offset = br.tell()
-        systemCount = self.read_counter(hk, br)
+        systemCount = hk._read_counter(br)
         br.align_to(16)
 
         # systems_offset = br.read()
@@ -51,6 +53,7 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
                 hk._assert_pointer(br)
         br.align_to(16)
 
+        obj.local_fixups.clear()
         obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
@@ -58,6 +61,8 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         bw.big_endian = hk.header.endian == 0
 
         hkReferencedObject.serialize(hk, bw)
+        if hk.header.padding_option:
+            bw.align_to(16)
 
         # worldCinfo_offset = bw.tell()
         hk._write_empty_pointer(bw)
@@ -80,19 +85,32 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
             hk._write_empty_pointer(bw)
         bw.align_to(16)
 
+        self.hkobj.local_fixups = [LocalFixup(systemCount_offset, systems_offset)]
+
         HKBase.serialize(self, hk, bw)
 
     def asdict(self):
-        d = hkReferencedObject.asdict(self)
+        d = super().asdict()
+        d.update(hkReferencedObject.asdict(self))
         d.update(
             {
+                "memSizeAndRefCount": self.memSizeAndRefCount,
                 # "worldCinfo": self.worldCinfo,
                 "systems": [ps.asdict() for ps in self.systems],
             }
         )
 
+        return d
+
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+        inst.hkClass = d["hkClass"]
+        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         # inst.worldCinfo = d['worldCinfo']
         inst.systems = [hkpPhysicsSystem.fromdict(ps) for ps in d["systems"]]
+
+        return inst
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.systems})"

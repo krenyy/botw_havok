@@ -25,7 +25,7 @@ class StaticCompoundInfo(HKBase):
     def deserialize(self, hk: "HK", obj: "HKObject"):
         super().deserialize(hk, obj)
 
-        br = BinaryReader(self.hkobj.bytes)
+        br = BinaryReader(obj.bytes)
         br.big_endian = hk.header.endian == 0
 
         self.Offset = br.read_uint32()
@@ -33,8 +33,8 @@ class StaticCompoundInfo(HKBase):
         if not br.big_endian:
             br.seek_relative(+4)
 
-        ai_count = self.read_counter(hk, br)
-        si_count = self.read_counter(hk, br)
+        ai_count = hk._read_counter(br)
+        si_count = hk._read_counter(br)
         br.align_to(16)
 
         for _ in range(ai_count):
@@ -48,6 +48,9 @@ class StaticCompoundInfo(HKBase):
             si.read(br)
             self.ShapeInfo.append(si)
         br.align_to(16)
+
+        obj.local_fixups.clear()
+        obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
         bw = BinaryWriter()

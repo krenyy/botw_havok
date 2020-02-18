@@ -25,7 +25,7 @@ class hkRootLevelContainer(HKBase):
         br.big_endian = hk.header.endian == 0
 
         # namedVariantsCount_offset = br.tell()
-        namedVariantsCount = self.read_counter(hk, br)
+        namedVariantsCount = hk._read_counter(br)
         br.align_to(16)
 
         # namedVariants_offset = br.tell()

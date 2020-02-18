@@ -4,6 +4,8 @@ __all__ = ("BinaryWriter",)
 import struct
 import typing
 
+import numpy as np
+
 from ..util import Vector4
 from .base import BinaryBase
 
@@ -46,6 +48,9 @@ class BinaryWriter(BinaryBase):
     def write_uint64(self, num: int) -> int:
         return self.write_type("uint64", num)
 
+    def write_half(self, num: float) -> int:
+        return self.write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
+
     def write_single(self, num: float) -> int:
         return self.write_type("float", num)
 
@@ -68,7 +73,9 @@ class BinaryWriter(BinaryBase):
     # NAVIGATION
 
     def align_to(self, alignment: int, char=b"\x00"):
-        while self.tell() % 16:
+        if alignment <= 0:
+            raise Exception("Not possible")
+        while self.tell() % alignment:
             self.write(char)
 
     # RESERVE, FILL

@@ -7,8 +7,7 @@ testhk = "/home/kreny/Desktop/hktestfiles/staticcompound/A-1-0_nx.hksc"
 # testhk = "/home/kreny/Desktop/hktestfiles/navmesh/0-0_u.hknm2"
 # testhk = "/home/kreny/Desktop/model-box-long-name.bin"
 
-hk = Havok()
-hk.read(testhk)
+hk = Havok.from_file(testhk)
 
 # hk.write("/home/kreny/Desktop/test.hkfile")
 

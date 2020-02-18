@@ -188,7 +188,6 @@ class HKDataSection(HKSection):
 
     def asdict(self):
         return {
-            "id": self.id,
             "contents": [content.asdict() for content in self.contents],
         }
 
@@ -202,6 +201,6 @@ class HKDataSection(HKSection):
         return inst
 
     def __repr__(self):
-        if self.contents:
-            return f"<{self.__class__.__name__} [{', '.join([repr(obj) for obj in self.contents])}]>"
-        return f"<{self.__class__.__name__} [{', '.join([repr(obj) for obj in self.objects])}]>"
+        return "<{} [{}]>".format(
+            self.__class__.__name__, self.contents if self.contents else self.objects
+        )

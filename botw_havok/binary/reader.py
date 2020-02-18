@@ -3,6 +3,8 @@ __all__ = ("BinaryReader",)
 
 import struct
 
+import numpy as np
+
 from ..util import Vector4
 from .base import BinaryBase
 
@@ -41,6 +43,9 @@ class BinaryReader(BinaryBase):
 
     def read_uint64(self) -> int:
         return self.read_type(struct_type="uint64", value=self.read(8))
+
+    def read_half(self) -> float:
+        return np.frombuffer(self.read(2), dtype=f"{self.endian_char()}f2")[0]
 
     def read_single(self) -> float:
         return self.read_type(struct_type="float", value=self.read(4))
@@ -134,10 +139,12 @@ class BinaryReader(BinaryBase):
     # NAVIGATION
 
     def align_to(self, alignment: int):
-        dist = 16 - (self.tell() % 16)
-        if not dist == 16:
+        if alignment <= 0:
+            raise Exception("Not possible")
+        dist = alignment - (self.tell() % alignment)
+        if not dist == alignment:
             return self.seek_relative(dist)
-        print("Already aligned to 16, skipping instruction...")
+        print(f"Already aligned to {alignment}, skipping instruction...")
 
     def peek(self):
         ret = self.read(1)

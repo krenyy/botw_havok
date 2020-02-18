@@ -12,13 +12,11 @@ class hkReferencedObject(hkBaseObject):
         super().deserialize(hk, br)
 
         self.memSizeAndRefCount = br.read_uint32()
-        br.align_to(16)
 
     def serialize(self, hk: "HK", bw: BinaryWriter):
         super().serialize(hk, bw)
 
         bw.write_uint32(self.memSizeAndRefCount)
-        bw.align_to(16)
 
     def asdict(self):
         return {"memSizeAndRefCount": self.memSizeAndRefCount}

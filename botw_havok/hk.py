@@ -73,11 +73,20 @@ class HK:
         else:
             raise Exception("Wrong pointer size!")
 
+    def _read_counter(self, br: BinaryReader):
+        self._assert_pointer(br)
+        count = br.read_int32()  # 0x0000000X
+        br.assert_uint32(0x80000000 | count)  # 0x8000000X
+        return count
+
+    def _write_counter(self, bw: BinaryWriter, count: int):
+        self._write_empty_pointer(bw)
+        bw.write_int32(count)
+        bw.write_uint32(0x80000000 | count)
+
     def asdict(self):
         return {
             "header": self.header.asdict(),
-            "classnames": self.classnames.asdict(),
-            "types": self.types.asdict(),
             "data": self.data.asdict(),
         }
 
@@ -85,8 +94,6 @@ class HK:
     def fromdict(cls, d: dict):
         inst = cls()
         inst.header = HKHeader.fromdict(d["header"])
-        inst.classnames = HKClassnamesSection.fromdict(d["classnames"])
-        inst.types = HKTypesSection.fromdict(d["types"])
         inst.data = HKDataSection.fromdict(d["data"])
 
         return inst

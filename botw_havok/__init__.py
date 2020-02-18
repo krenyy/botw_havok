@@ -13,24 +13,22 @@ class Havok:
     def __init__(self, d: dict = None):
         self.files = []
 
-    def read(self, data: Union[str, BufferedIOBase]):
-        if isinstance(data, str):
-            with open(data, "rb") as f:
-                br = BinaryReader(f.read())
-        elif isinstance(data, BufferedIOBase):
-            br = BinaryReader(data.read())
-        else:
-            raise NotImplementedError("Invalid type passed!")
+    @classmethod
+    def from_file(cls, path: str):
+        inst = cls()
 
-        # ---------------------------------------
+        with open(path, "rb") as f:
+            br = BinaryReader(f.read())
 
         while br.tell() != len(br.getvalue()):
             br = BinaryReader(br.read())
             hk = HK()
             hk.read(br)
-            self.files.append(hk)
+            inst.files.append(hk)
 
-    def write(self, data: Union[str, BufferedIOBase]):
+        return inst
+
+    def to_file(self, path: str):
         bw = BinaryWriter()
 
         for file in self.files:
@@ -41,18 +39,15 @@ class Havok:
 
         # ---------------------------------------
 
-        if isinstance(data, str):
-            with open(data, "wb") as f:
-                f.write(bw.getvalue())
-        elif isinstance(data, BufferedIOBase):
-            data.write(bw.getvalue())
+        with open(path, "wb") as f:
+            f.write(bw.getvalue())
 
     @classmethod
-    def load(cls, path: str):
+    def from_json(cls, path: str):
         with open(path, "r") as f:
             return cls.fromdict(json.load(f))
 
-    def dump(self, path: str):
+    def to_json(self, path: str):
         [file.deserialize() for file in self.files if not file.data.contents]
 
         with open(path, "w") as f:
