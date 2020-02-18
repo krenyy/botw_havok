@@ -40,7 +40,7 @@ class hkpWorldObject(hkReferencedObject):
         # ----
 
         self.collidable = hkpLinkedCollidable()
-        self.collidable.deserialize(hk, br)
+        self.collidable.deserialize(hk, br, obj)
 
         self.multiThreadCheck = hkMultiThreadCheck()
         self.multiThreadCheck.deserialize(hk, br)
@@ -106,6 +106,7 @@ class hkpWorldObject(hkReferencedObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         inst.world = d["world"]
         inst.userData = d["userData"]
         inst.collidable = hkpLinkedCollidable.fromdict(d["collidable"])

@@ -18,8 +18,8 @@ class hkpLinkedCollidable(hkpCollidable):
 
         self.collisionEntries = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hk: "HK", br: BinaryReader, obj):
+        super().deserialize(hk, br, obj)
 
         collisionEntriesCount_offset = br.tell()
         collisionEntriesCount = hk._read_counter(br)

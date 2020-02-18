@@ -6,7 +6,7 @@ import typing
 
 import numpy as np
 
-from ..util import Vector4
+from ..util import Transform, Vector4
 from .base import BinaryBase
 
 
@@ -60,15 +60,15 @@ class BinaryWriter(BinaryBase):
     def write_vector4(self, vector: Vector4) -> int:
         return self.write(struct.pack(f"{self.endian_char()}4f", *vector))
 
+    def write_transform(self, transform: Transform) -> list:
+        return [self.write_vector4(v4) for v4 in transform]
+
     def write_string(self, string: str, size: int = None) -> str:
         if isinstance(string, str):
             string = string.encode()
         if not size:
             size = len(string) + 1
         return self.write(struct.pack(f"{self.endian_char()}{size}s", string))
-
-    def write_matrix4x4(self, matrix: typing.List[float]):
-        return [self.write_single(item) for _ in range(matrix)]
 
     # NAVIGATION
 

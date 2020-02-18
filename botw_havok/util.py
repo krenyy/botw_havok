@@ -1,29 +1,4 @@
-# https://stackoverflow.com/questions/1036409/recursively-convert-python-object-graph-to-dictionary
-def todict(obj, classkey=None):
-    if isinstance(obj, dict):
-        data = {}
-        for (k, v) in obj.items():
-            data[k] = todict(v, classkey)
-        return data
-    elif hasattr(obj, "asdict"):
-        return todict(obj.asdict())
-    elif hasattr(obj, "_ast"):
-        return todict(obj._ast())
-    elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-        return [todict(v, classkey) for v in obj]
-    elif hasattr(obj, "__dict__"):
-        data = dict(
-            [
-                (key, todict(value, classkey))
-                for key, value in obj.__dict__.items()
-                if not callable(value) and not key.startswith("_")
-            ]
-        )
-        if classkey is not None and hasattr(obj, "__class__"):
-            data[classkey] = obj.__class__.__name__
-        return data
-    else:
-        return obj
+import itertools
 
 
 class Vector3:
@@ -36,8 +11,8 @@ class Vector3:
         self.y = y
         self.z = z
 
-    def __eq__(self, value: "Vector4"):
-        if isinstance(value, Vector4):
+    def __eq__(self, value: "Vector3"):
+        if isinstance(value, Vector3):
             return (self.x == value.x) and (self.y == value.y) and (self.z == value.z)
         return False
 
@@ -48,18 +23,45 @@ class Vector3:
 class Vector4(Vector3):
     w: int
 
-    def __init__(self, x, y, z, w):
-        super().__init__(x, y, z)
+    def __init__(self, x, y, z, w, v3: Vector3 = None):
+        if isinstance(v3, Vector3):
+            self.x = v3.x
+            self.y = v3.y
+            self.z = v3.z
+        else:
+            super().__init__(x, y, z)
         self.w = w
 
     def __eq__(self, value: "Vector4"):
         if isinstance(value, Vector4):
-            return (
-                (self.x == value.x)
-                and (self.y == value.y)
-                and (self.z == value.z)
-                and (self.w == value.w)
-            )
+            return super().__eq__(value) and (self.w == value.w)
+        return False
 
     def __iter__(self):
-        return iter((self.x, self.y, self.z, self.w))
+        return itertools.chain(super().__iter__(), iter((self.w)))
+
+
+class Transform:
+    translation: Vector4
+    rotation: Vector4
+    scale: Vector4
+    shear: Vector4
+
+    def __init__(self, matrix):
+        self.translation = matrix[0]
+        self.rotation = matrix[1]
+        self.scale = matrix[2]
+        self.shear = matrix[3]
+
+    def __eq__(self, value: "Transform"):
+        if isinstance(value, Transform):
+            return (
+                (self.translation == value.translation)
+                and (self.rotation == value.rotation)
+                and (self.scale == value.scale)
+                and (self.shear == value.shear)
+            )
+        return False
+
+    def __iter__(self):
+        return iter((self.translation, self.rotation, self.scale, self.shear))

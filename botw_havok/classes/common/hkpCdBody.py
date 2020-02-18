@@ -1,8 +1,11 @@
 from .hkpShape import hkpShape
 from ...binary import BinaryReader, BinaryWriter
+import botw_havok.classes.util.class_map as util
+from ...container.sections.util import GlobalReference
 
 if False:
     from ...hk import HK
+    from ...container.sections.hkobject import HKObject
 
 
 class hkpCdBody:
@@ -11,9 +14,17 @@ class hkpCdBody:
     motion: None = None
     parent: "hkpCdBody" = None
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        shape_offset = br.tell()
-        hk._assert_pointer(br)  # Points to a hkpShape
+    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
+        for gr in obj.global_references:
+            if gr.src_rel_offset == br.tell():
+                hk.data.objects.remove(gr.dst_obj)
+                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.shape.deserialize(hk, br)
+
+                hk._assert_pointer(br)  # Points to a hkpShape
+                break
+        else:
+            raise Exception("Something is wrong")
 
         self.shapeKey = br.read_uint32()
         if hk.header.padding_option:
@@ -22,8 +33,14 @@ class hkpCdBody:
         hk._assert_pointer(br)  # motion, void
         hk._assert_pointer(br)  # points to parent hkpCdBody
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        shape_offset = bw.tell()
+    def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
+        # Shape reference
+        gr = GlobalReference()
+        gr.src_obj = obj
+        gr.src_rel_offset = bw.tell()
+        gr.dst_obj = self.shape.hkobj
+        obj.global_references.append(gr)
+
         hk._write_empty_pointer(bw)
 
         bw.write_uint32(self.shapeKey)

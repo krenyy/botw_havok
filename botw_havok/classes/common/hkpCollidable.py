@@ -16,8 +16,8 @@ class hkpCollidable(hkpCdBody):
     boundingVolumeData: hkpCollidableBoundingVolumeData
     allowedPenetrationDepth: float
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hk: "HK", br: BinaryReader, obj):
+        super().deserialize(hk, br, obj)
 
         self.ownerOffset = br.read_int8()
         self.forceCollideOntoPpu = br.read_uint8()

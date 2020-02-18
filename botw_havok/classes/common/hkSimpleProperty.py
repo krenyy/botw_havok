@@ -1,4 +1,6 @@
 from ...binary import BinaryReader, BinaryWriter
+from .hkSimplePropertyValue import hkSimplePropertyValue
+
 
 if False:
     from ...hk import HK
@@ -23,7 +25,7 @@ class hkSimpleProperty:
         if hk.header.padding_option:
             bw.write_uint32()
 
-        self.value.serialize(hk, br)
+        self.value.serialize(hk, bw)
 
     def asdict(self):
         return {"key": self.key, "value": self.value.asdict()}

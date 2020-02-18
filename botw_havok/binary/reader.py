@@ -5,7 +5,7 @@ import struct
 
 import numpy as np
 
-from ..util import Vector4
+from ..util import Vector3, Vector4, Transform
 from .base import BinaryBase
 
 
@@ -53,12 +53,24 @@ class BinaryReader(BinaryBase):
     def read_double(self) -> float:
         return self.read_type(struct_type="double", value=self.read(8))
 
-    def read_vector4(self) -> Vector4:
+    def read_vector3(self) -> Vector3:
         x: float = self.read_single()
         y: float = self.read_single()
         z: float = self.read_single()
-        w: float = self.read_single()
-        return Vector4(x, y, z, w)
+        return Vector3(x, y, z)
+
+    def read_vector4(self) -> Vector4:
+        return Vector4(v3=self.read_vector3(), w=self.read_single())
+
+    def read_transform(self) -> Transform:
+        return Transform(
+            [
+                self.read_vector4,
+                self.read_vector4,
+                self.read_vector4,
+                self.read_vector4,
+            ]
+        )
 
     def read_string(self, size: int = None, encoding: str = "utf-8") -> str:
         if not size:

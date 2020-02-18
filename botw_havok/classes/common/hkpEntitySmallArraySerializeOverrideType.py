@@ -1,0 +1,46 @@
+from ...binary import BinaryReader, BinaryWriter
+
+if False:
+    from ...hk import HK
+
+
+class hkpEntitySmallArraySerializeOverrideType:
+    data: None = None
+    size: int
+    capacityAndFlags: int
+
+    def deserialize(self, hk: "HK", br: BinaryReader):
+        data_offset = br.tell()
+        hk._assert_pointer(br)  # data
+
+        self.size = br.read_uint16()
+        self.capacityAndFlags = br.read_uint16()
+
+        if hk.header.padding_option:
+            br.read_uint32()
+
+    def serialize(self, hk: "HK", bw: BinaryWriter):
+        data_offset = bw.tell()
+        hk._write_empty_pointer(bw)
+
+        bw.write_uint16(self.size)
+        bw.write_uint16(self.capacityAndFlags)
+
+        if hk.header.padding_option:
+            bw.write_uint32(0x0)
+
+    def asdict(self):
+        return {
+            "data": self.data,
+            "size": self.size,
+            "capacityAndFlags": self.capacityAndFlags,
+        }
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        inst.data = d["data"]
+        inst.size = d["size"]
+        inst.capacityAndFlags = d["capacityAndFlags"]
+
+        return inst
