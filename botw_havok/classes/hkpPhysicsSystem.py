@@ -62,6 +62,8 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
             self.userData = br.read_uint64()
         elif hk.header.pointer_size == 4:
             self.userData = br.read_uint32()
+        else:
+            raise NotImplementedError()
 
         self.active = bool(br.read_int8())
         br.align_to(16)
@@ -86,6 +88,8 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
+        super().assign_class(hk)
+
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
@@ -96,11 +100,17 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         # ----
 
         rigidBodiesCount_offset = bw.tell()
-        self.write_counter(hk, bw, len(self.rigidBodies))
+        hk._write_counter(bw, len(self.rigidBodies))
 
-        # Constraints counter here
+        # TODO: Constraints
+        hk._write_counter(bw, 0)  # constraints
 
-        bw.align_to(16)
+        hk._write_counter(bw, 0)  # actions
+
+        hk._write_counter(bw, 0)  # phantoms
+
+        namePointer_offset = bw.tell()
+        hk._write_empty_pointer(bw)
 
         # ----
 
@@ -117,8 +127,8 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         # ----
 
         for rb in self.rigidBodies:
-            rb.serialize(hk, bw)
             hk.data.objects.append(rb.hkobj)
+            rb.serialize(hk)
 
             gr = GlobalReference()
             gr.src_obj = self.hkobj
@@ -137,7 +147,7 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         HKBase.serialize(self, hk, bw)
 
     def asdict(self):
-        d = super().asdict()
+        d = HKBase.asdict(self)
         d.update(hkReferencedObject.asdict(self))
         d.update(
             {
@@ -152,14 +162,15 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.hkClass = d["hkClass"]
-        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         inst.rigidBodies = [hkpRigidBody.fromdict(rb) for rb in d["rigidBodies"]]
         inst.name = d["name"]
         inst.userData = d["userData"]
         inst.active = d["active"]
 
-        return super().fromdict(d)
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
+
+        return inst
 
     def __repr__(self):
         return "<{}({}, {}, {}, {})>".format(

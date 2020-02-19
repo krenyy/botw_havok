@@ -59,7 +59,7 @@ class hkRootLevelContainerNamedVariant:
         bw.align_to(16)
 
         hk.data.objects.append(self.variant.hkobj)
-        self.variant.serialize(hk, bw)
+        self.variant.serialize(hk)
 
         # Local fixups
         obj.local_fixups.extend(

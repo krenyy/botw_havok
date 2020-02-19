@@ -38,8 +38,7 @@ class hkpMotion(hkReferencedObject):
         self.deactivationIntegrateCounter = br.read_uint8()
         self.deactivationNumInactiveFrames = [br.read_uint16() for _ in range(2)]
 
-        if hk.header.padding_option:
-            br.align_to(16)
+        br.align_to(16)  # TODO: Check if this is right
 
         self.motionState = hkMotionState()
         self.motionState.deserialize(hk, br)
@@ -52,8 +51,7 @@ class hkpMotion(hkReferencedObject):
         self.deactivationRefPosition = [br.read_vector4() for _ in range(2)]
         self.deactivationRefOrientation = br.read_uint32()
 
-        if hk.header.padding_option:
-            br.align_to(8)
+        br.align_to(8)  # FIXME: Not sure
 
         savedMotion_offset = br.tell()
         hk._assert_pointer(br)

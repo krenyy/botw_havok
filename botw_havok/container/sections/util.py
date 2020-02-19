@@ -7,8 +7,8 @@ if False:
 
 
 class LocalFixup:
-    src: int
-    dst: int
+    src: int = 0
+    dst: int = 0
 
     def __init__(self, src: int = None, dst: int = None):
         if src and dst:
@@ -96,10 +96,13 @@ class GlobalReference:
     dst_rel_offset: int = 0  # Should always point to the beginning
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.src_obj.hkclass.name}@{hex(self.src_rel_offset)}, "
-            f"{self.dst_obj.hkclass.name}@{hex(self.dst_rel_offset)})"
-        )
+        try:
+            return (
+                f"{self.__class__.__name__}({self.src_obj.hkclass.name}@{hex(self.src_rel_offset)}, "
+                f"{self.dst_obj.hkclass.name}@{hex(self.dst_rel_offset)})"
+            )
+        except:
+            return "{}".format(self.__class__.__name__)
 
     def __hash__(self):
         return hash(

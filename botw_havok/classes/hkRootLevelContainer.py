@@ -34,17 +34,22 @@ class hkRootLevelContainer(HKBase):
             self.namedVariants.append(nv)
             nv.deserialize(hk, br, self.hkobj)
 
+        obj.local_fixups.clear()
+        obj.global_references.clear()
+
     def serialize(self, hk: "HK"):
+        super().assign_class(hk)
+
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
         namedVariantsCounter_offset = bw.tell()
-        self.write_counter(hk, bw, len(self.namedVariants))
+        hk._write_counter(bw, len(self.namedVariants))
         bw.align_to(16)
 
         namedVariants_offset = bw.tell()
         for nv in self.namedVariants:
-            nv.serialize(hk, bw)
+            nv.serialize(hk, self.hkobj, bw)
 
         self.hkobj.local_fixups = [
             LocalFixup(namedVariantsCounter_offset, namedVariants_offset)
@@ -64,6 +69,7 @@ class hkRootLevelContainer(HKBase):
         inst.namedVariants = [
             hkRootLevelContainerNamedVariant.fromdict(nv) for nv in d["namedVariants"]
         ]
+        return inst
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.namedVariants})"

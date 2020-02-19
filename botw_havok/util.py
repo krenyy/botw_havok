@@ -21,11 +21,7 @@ class Vector3:
 
     @classmethod
     def fromdict(cls, d: list):
-        inst = cls()
-        inst.x = d[0]
-        inst.y = d[1]
-        inst.z = d[2]
-        return inst
+        return cls(d[0], d[1], d[2])
 
 
 class Vector4(Vector3):
@@ -53,12 +49,7 @@ class Vector4(Vector3):
 
     @classmethod
     def fromdict(cls, d: list):
-        inst = cls()
-        inst.x = d[0]
-        inst.y = d[1]
-        inst.z = d[2]
-        inst.w = d[3]
-        return inst
+        return cls(d[0], d[1], d[2], d[3])
 
 
 class Transform:
@@ -96,9 +87,11 @@ class Transform:
 
     @classmethod
     def fromdict(cls, d: dict):
-        inst = cls()
-        inst.translation = Vector4.fromdict(d["translation"])
-        inst.rotation = Vector4.fromdict(d["rotation"])
-        inst.scale = Vector4.fromdict(d["scale"])
-        inst.shear = Vector4.fromdict(d["shear"])
-        return inst
+        return cls(
+            [
+                Vector4.fromdict(d["translation"]),
+                Vector4.fromdict(d["rotation"]),
+                Vector4.fromdict(d["scale"]),
+                Vector4.fromdict(d["shear"]),
+            ]
+        )

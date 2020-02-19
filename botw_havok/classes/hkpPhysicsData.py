@@ -57,10 +57,12 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
+        super().assign_class(hk)
+
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
-        hkReferencedObject.serialize(hk, bw)
+        hkReferencedObject.serialize(self, hk, bw)
         if hk.header.padding_option:
             bw.align_to(16)
 
@@ -68,13 +70,13 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         hk._write_empty_pointer(bw)
 
         systemCount_offset = bw.tell()
-        self.write_counter(hk, bw, len(self.systems))
+        hk._write_counter(bw, len(self.systems))
         bw.align_to(16)
 
         systems_offset = bw.tell()
         for system in self.systems:
-            system.serialize(hk)
             hk.data.objects.append(system.hkobj)
+            system.serialize(hk)
 
             gr = GlobalReference()
             gr.src_obj = self.hkobj
@@ -94,7 +96,6 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         d.update(hkReferencedObject.asdict(self))
         d.update(
             {
-                "memSizeAndRefCount": self.memSizeAndRefCount,
                 # "worldCinfo": self.worldCinfo,
                 "systems": [ps.asdict() for ps in self.systems],
             }
@@ -105,10 +106,10 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.hkClass = d["hkClass"]
-        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         # inst.worldCinfo = d['worldCinfo']
         inst.systems = [hkpPhysicsSystem.fromdict(ps) for ps in d["systems"]]
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
 
         return inst
 

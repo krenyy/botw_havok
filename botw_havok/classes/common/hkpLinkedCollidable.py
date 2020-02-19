@@ -24,8 +24,8 @@ class hkpLinkedCollidable(hkpCollidable):
         collisionEntriesCount_offset = br.tell()
         collisionEntriesCount = hk._read_counter(br)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hk: "HK", bw: BinaryWriter, obj):
+        super().serialize(hk, bw, obj)
 
         collisionEntriesCount_offset = bw.tell()
         hk._write_counter(bw, len(self.collisionEntries))
@@ -39,21 +39,7 @@ class hkpLinkedCollidable(hkpCollidable):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.shape = d["shape"]
-        inst.shapeKey = d["shapeKey"]
-        inst.motion = d["motion"]
-        inst.parent = d["parent"]
-
-        inst.ownerOffset = d["ownerOffset"]
-        inst.forceCollideOntoPpu = getattr(
-            ForceCollideOntoPpuReasons, d["forceCollideOntoPpu"]
-        )
-        inst.shapeSizeOnSpu = d["shapeSizeOnSpu"]
-        inst.broadPhaseHandle = hkpTypedBroadPhaseHandle.fromdict(d["broadPhaseHandle"])
-        inst.boundingVolumeData = hkpCollidableBoundingVolumeData.fromdict(
-            d["boundingVolumeData"]
-        )
-        inst.allowedPenetrationDepth = d["allowedPenetrationDepth"]
+        inst.__dict__.update(super().fromdict(d).__dict__)
         inst.collisionEntries = d["collisionEntries"]
 
         return inst

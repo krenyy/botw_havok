@@ -3,12 +3,14 @@ from typing import List
 from ...binary import BinaryReader, BinaryWriter
 from ...container.sections.util import LocalFixup
 from .hkLocalFrame import hkLocalFrame
+from .hkMultiThreadCheck import hkMultiThreadCheck
 from .hkpConstraintInstance import hkpConstraintInstance
 from .hkpEntityExtendedListeners import hkpEntityExtendedListeners
 from .hkpEntitySmallArraySerializeOverrideType import (
     hkpEntitySmallArraySerializeOverrideType,
 )
 from .hkpEntitySpuCollisionCallback import hkpEntitySpuCollisionCallback
+from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkpMaterial import hkpMaterial
 from .hkpMaxSizeMotion import hkpMaxSizeMotion
 from .hkpWorldObject import hkpWorldObject
@@ -20,19 +22,19 @@ if False:
 
 class hkpEntity(hkpWorldObject):
     material: hkpMaterial
-    limitContactImpulseUtilAndFlag: None = None
+    # limitContactImpulseUtilAndFlag: None = None
     damageMultiplier: float
-    breakableBody: None = None
+    # breakableBody: None = None
 
     solverData: int
     storageIndex: int
     contactPointCallbackDelay: int
 
     constraintsMaster: hkpEntitySmallArraySerializeOverrideType
-    constraintsSlave: List[hkpConstraintInstance]
-    constraintRuntime: List[int]
+    # constraintsSlave: List[hkpConstraintInstance]
+    # constraintRuntime: List[int]
 
-    simulationIsland: None = None
+    # simulationIsland: None = None
 
     autoRemoveLevel: int
     numShapeKeysInContactPointProperties: int
@@ -44,8 +46,8 @@ class hkpEntity(hkpWorldObject):
     motion: hkpMaxSizeMotion
     contactListeners: hkpEntitySmallArraySerializeOverrideType
     actions: hkpEntitySmallArraySerializeOverrideType
-    localFrame: hkLocalFrame = None  # Pointer
-    extendedListeners: hkpEntityExtendedListeners = None  # Pointer
+    # localFrame: hkLocalFrame = None  # Pointer
+    # extendedListeners: hkpEntityExtendedListeners = None  # Pointer
 
     npData: int
 
@@ -97,21 +99,20 @@ class hkpEntity(hkpWorldObject):
         self.autoRemoveLevel = br.read_int8()
         self.numShapeKeysInContactPointProperties = br.read_uint8()
         self.responseModifierFlags = br.read_uint8()
-        br.read_uint8()  # Padding
+        br.align_to(2)
 
         self.uid = br.read_uint32()
 
         self.spuCollisionCallback = hkpEntitySpuCollisionCallback()
         self.spuCollisionCallback.deserialize(hk, br)
 
-        if hk.header.padding_option:
-            br.align_to(16)
+        br.align_to(16)  # TODO: Check if this is correct
 
         self.motion = hkpMaxSizeMotion()
         self.motion.deserialize(hk, br)
 
         if hk.header.padding_option:
-            br.align_to(16)
+            br.align_to(16)  # TODO: Check if right
 
         self.contactListeners = hkpEntitySmallArraySerializeOverrideType()
         self.contactListeners.deserialize(hk, br)
@@ -131,8 +132,10 @@ class hkpEntity(hkpWorldObject):
 
         self.npData = br.read_uint32()
 
+        br.align_to(16)  # Should be right
+
         # TODO: CONSTRAINTS
-        # FIXME: Put those at the end of RigidBody
+        # Write those eventually
         """for _ in range(constraintsSlaveCount):
             constr = hkpConstraintInstance()
             constr.deserialize(hk, br)
@@ -142,12 +145,12 @@ class hkpEntity(hkpWorldObject):
             self.constraintRuntime.append(br.read_uint8())"""
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
-        super().serialize(hk, bw)
+        super().serialize(hk, bw, obj)
 
         self.material.serialize(hk, bw)
 
         if hk.header.padding_option:
-            bw.align_to(16)
+            bw.align_to(8)
 
         limitContactImpulseUtilAndFlag_offset = bw.tell()
         hk._write_empty_pointer(bw)  # limitContactImpulseUtilAndFlag
@@ -155,7 +158,7 @@ class hkpEntity(hkpWorldObject):
         bw.write_single(self.damageMultiplier)
 
         if hk.header.padding_option:
-            bw.align_to(16)
+            bw.align_to(8)
 
         breakableBody_offset = bw.tell()
         hk._write_empty_pointer(bw)  # breakableBody
@@ -181,7 +184,7 @@ class hkpEntity(hkpWorldObject):
         bw.write_int8(self.autoRemoveLevel)
         bw.write_int8(self.numShapeKeysInContactPointProperties)
         bw.write_int8(self.responseModifierFlags)
-        bw.write_uint8(0x0)  # Padding
+        bw.align_to(2)
 
         bw.write_uint32(self.uid)
 
@@ -208,3 +211,57 @@ class hkpEntity(hkpWorldObject):
 
         obj.local_fixups.append(LocalFixup(self._namePointer_offset, name_offset))
 
+    def asdict(self):
+        d = super().asdict()
+        d.update(
+            {
+                "material": self.material.asdict(),
+                "damageMultiplier": self.damageMultiplier,
+                "solverData": self.solverData,
+                "storageIndex": self.storageIndex,
+                "contactPointCallbackDelay": self.contactPointCallbackDelay,
+                "constraintsMaster": self.constraintsMaster.asdict(),
+                # "constraintsSlave": [slave.asdict() for slave in self.constraintsSlave],
+                # "constraintRuntime": self.constraintRuntime,
+                "autoRemoveLevel": self.autoRemoveLevel,
+                "numShapeKeysInContactPointProperties": self.numShapeKeysInContactPointProperties,
+                "responseModifierFlags": self.responseModifierFlags,
+                "uid": self.uid,
+                "spuCollisionCallback": self.spuCollisionCallback.asdict(),
+                "motion": self.motion.asdict(),
+                "contactListeners": self.contactListeners.asdict(),
+                "actions": self.actions.asdict(),
+                "npData": self.npData,
+            }
+        )
+        return d
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        inst.material = hkpMaterial.fromdict(d["material"])
+        inst.damageMultiplier = d["damageMultiplier"]
+        inst.solverData = d["solverData"]
+        inst.storageIndex = d["storageIndex"]
+        inst.contactPointCallbackDelay = d["contactPointCallbackDelay"]
+        inst.constraintsMaster = hkpEntitySmallArraySerializeOverrideType.fromdict(
+            d["constraintsMaster"]
+        )
+        # inst.constraintsSlave = [hkpConstraintInstance.fromdict(slave) for slave in d["constraintsSlave"]]
+        # inst.constraintRuntime = d["constraintRuntime"]
+        inst.autoRemoveLevel = d["autoRemoveLevel"]
+        inst.numShapeKeysInContactPointProperties = d[
+            "numShapeKeysInContactPointProperties"
+        ]
+        inst.responseModifierFlags = d["responseModifierFlags"]
+        inst.uid = d["uid"]
+        inst.spuCollisionCallback = hkpEntitySpuCollisionCallback.fromdict(
+            d["spuCollisionCallback"]
+        )
+        inst.motion = hkpMaxSizeMotion.fromdict(d["motion"])
+        inst.contactListeners = hkpEntitySmallArraySerializeOverrideType.fromdict(
+            d["contactListeners"]
+        )
+        inst.actions = hkpEntitySmallArraySerializeOverrideType.fromdict(d["actions"])
+        inst.__dict__.update(super().fromdict(d).__dict__)
+        return inst

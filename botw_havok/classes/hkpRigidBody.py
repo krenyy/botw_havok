@@ -1,6 +1,15 @@
 from ..binary import BinaryReader, BinaryWriter
 from .base import HKBase
+from .common.hkMultiThreadCheck import hkMultiThreadCheck
+from .common.hkpConstraintInstance import hkpConstraintInstance
 from .common.hkpEntity import hkpEntity
+from .common.hkpEntitySmallArraySerializeOverrideType import (
+    hkpEntitySmallArraySerializeOverrideType,
+)
+from .common.hkpEntitySpuCollisionCallback import hkpEntitySpuCollisionCallback
+from .common.hkpLinkedCollidable import hkpLinkedCollidable
+from .common.hkpMaterial import hkpMaterial
+from .common.hkpMaxSizeMotion import hkpMaxSizeMotion
 
 if False:
     from ..hk import HK
@@ -16,11 +25,13 @@ class hkpRigidBody(HKBase, hkpEntity):
 
         hkpEntity.deserialize(self, hk, br, obj)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hk: "HK"):
+        super().assign_class(hk)
+
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
-        hkpEntity.serialize(self, hk, bw)
+        hkpEntity.serialize(self, hk, bw, self.hkobj)
 
         HKBase.serialize(self, hk, bw)
 
@@ -31,4 +42,7 @@ class hkpRigidBody(HKBase, hkpEntity):
 
     @classmethod
     def fromdict(cls, d: dict):
-        pass
+        inst = cls()
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkpEntity.fromdict(d).__dict__)
+        return inst

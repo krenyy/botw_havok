@@ -111,8 +111,7 @@ class HKDataSection(HKSection):
             self.serialize(hk)
 
         for obj in self.objects:
-            obj.write(hk, self, bw)
-            print(obj.reservations)
+            obj.write(hk, bw)
             bw.reservations.update(
                 {
                     k: v + obj.offset + self.absolute_offset
@@ -173,7 +172,6 @@ class HKDataSection(HKSection):
         # and other classes in the second one. There's an offset in there
         # that points to the beginning of the second hkfile
         for name in list(bw.reservations):
-            print(name)
             if name == "EOF:uint32":
                 bw.fill_uint32(
                     name.split(":")[0], self.absolute_offset + self.EOF_offset

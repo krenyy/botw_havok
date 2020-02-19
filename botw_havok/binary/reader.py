@@ -45,7 +45,7 @@ class BinaryReader(BinaryBase):
         return self.read_type(struct_type="uint64", value=self.read(8))
 
     def read_half(self) -> float:
-        return np.frombuffer(self.read(2), dtype=f"{self.endian_char()}f2")[0]
+        return float(np.frombuffer(self.read(2), dtype=f"{self.endian_char()}f2")[0])
 
     def read_single(self) -> float:
         return self.read_type(struct_type="float", value=self.read(4))

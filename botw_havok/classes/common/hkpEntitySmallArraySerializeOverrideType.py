@@ -5,19 +5,19 @@ if False:
 
 
 class hkpEntitySmallArraySerializeOverrideType:
-    data: None = None
+    # data: None = None
     size: int
     capacityAndFlags: int
 
     def deserialize(self, hk: "HK", br: BinaryReader):
         data_offset = br.tell()
-        hk._assert_pointer(br)  # data
+        hk._assert_pointer(br)  # 'data' pointer
 
         self.size = br.read_uint16()
         self.capacityAndFlags = br.read_uint16()
 
         if hk.header.padding_option:
-            br.read_uint32()
+            br.align_to(8)
 
     def serialize(self, hk: "HK", bw: BinaryWriter):
         data_offset = bw.tell()
@@ -27,11 +27,11 @@ class hkpEntitySmallArraySerializeOverrideType:
         bw.write_uint16(self.capacityAndFlags)
 
         if hk.header.padding_option:
-            bw.write_uint32(0x0)
+            bw.align_to(8)
 
     def asdict(self):
         return {
-            "data": self.data,
+            # "data": self.data,
             "size": self.size,
             "capacityAndFlags": self.capacityAndFlags,
         }
@@ -39,7 +39,7 @@ class hkpEntitySmallArraySerializeOverrideType:
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.data = d["data"]
+        # inst.data = d["data"]
         inst.size = d["size"]
         inst.capacityAndFlags = d["capacityAndFlags"]
 

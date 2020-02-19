@@ -12,6 +12,11 @@ class HK:
     types: HKTypesSection
     data: HKDataSection
 
+    def __init__(self):
+        self.classnames = HKClassnamesSection()
+        self.types = HKTypesSection()
+        self.data = HKDataSection()
+
     def read(self, br: BinaryReader):
         # Read the endian byte ahead
         br.step_in(0x11)
@@ -99,12 +104,14 @@ class HK:
         return inst
 
     def to_switch(self):
-        self.data.deserialize(self)
+        if self.data.objects:
+            self.data.deserialize(self)
         self.header.to_switch()
         self.data.serialize(self)
 
     def to_wiiu(self):
-        self.data.deserialize(self)
+        if self.data.objects:
+            self.data.deserialize(self)
         self.header.to_wiiu()
         self.data.serialize(self)
 

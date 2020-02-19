@@ -32,8 +32,8 @@ class hkpCollidable(hkpCdBody):
         self.allowedPenetrationDepth = br.read_single()
         br.align_to(16)  # Padding
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hk: "HK", bw: BinaryWriter, obj):
+        super().serialize(hk, bw, obj)
 
         bw.write_int8(self.ownerOffset)
         bw.write_uint8(self.forceCollideOntoPpu)
@@ -65,15 +65,11 @@ class hkpCollidable(hkpCdBody):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.shape = d["shape"]
-        inst.shapeKey = d["shapeKey"]
-        inst.motion = d["motion"]
-        inst.parent = d["parent"]
-
+        inst.__dict__.update(super().fromdict(d).__dict__)
         inst.ownerOffset = d["ownerOffset"]
         inst.forceCollideOntoPpu = getattr(
             ForceCollideOntoPpuReasons, d["forceCollideOntoPpu"]
-        )
+        ).value
         inst.shapeSizeOnSpu = d["shapeSizeOnSpu"]
         inst.broadPhaseHandle = hkpTypedBroadPhaseHandle.fromdict(d["broadPhaseHandle"])
         inst.boundingVolumeData = hkpCollidableBoundingVolumeData.fromdict(

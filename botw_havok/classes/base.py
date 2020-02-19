@@ -18,10 +18,18 @@ class HKBase:
         self.hkobj = obj
         self.hkClass = self.hkobj.hkclass.name
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def assign_class(self, hk: "HK"):
         self.hkobj.hkclass = hk.classnames.get(self.hkClass)
+
+    def serialize(self, hk: "HK", bw: BinaryWriter):
         self.hkobj.bytes = bw.getvalue()
         self.hkobj.size = len(self.hkobj.bytes)
 
     def asdict(self):
         return {"hkClass": self.hkClass}
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        inst = cls()
+        inst.hkClass = d["hkClass"]
+        return inst

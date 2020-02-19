@@ -49,7 +49,7 @@ class hkMotionState:
 
         self.deactivationClass = br.read_uint8()
 
-        br.align_to(16)
+        br.align_to(16)  # FIXME: Is this right?
 
     def serialize(self, hk, bw: BinaryWriter):
         bw.write_transform(self.transform)

@@ -5,7 +5,7 @@ if False:
 
 
 class hkpEntitySpuCollisionCallback:
-    util: None = None
+    # util: None = None
 
     capacity: int
     eventFilter: int
@@ -13,7 +13,7 @@ class hkpEntitySpuCollisionCallback:
 
     def deserialize(self, hk: "HK", br: BinaryReader):
         util_offset = br.tell()
-        hk._assert_pointer(br)
+        hk._assert_pointer(br)  # util pointer
 
         self.capacity = br.read_uint16()
         self.eventFilter = br.read_uint8()
@@ -35,7 +35,7 @@ class hkpEntitySpuCollisionCallback:
 
     def asdict(self):
         return {
-            "util": self.util,
+            # "util": self.util,
             "capacity": self.capacity,
             "eventFilter": self.eventFilter,
             "userFilter": self.userFilter,
@@ -44,7 +44,7 @@ class hkpEntitySpuCollisionCallback:
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.util = d["util"]
+        # inst.util = d["util"]
         inst.capacity = d["capacity"]
         inst.eventFilter = d["eventFilter"]
         inst.userFilter = d["userFilter"]

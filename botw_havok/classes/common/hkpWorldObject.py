@@ -24,6 +24,7 @@ class hkpWorldObject(hkReferencedObject):
 
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
         super().deserialize(hk, br)
+
         if hk.header.padding_option:
             br.align_to(16)
 
@@ -63,7 +64,7 @@ class hkpWorldObject(hkReferencedObject):
             prop = hkSimpleProperty()
             prop.deserialize(hk, br)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hk: "HK", bw: BinaryWriter, obj):
         super().serialize(hk, bw)
         if hk.header.padding_option:
             bw.align_to(16)
@@ -80,7 +81,7 @@ class hkpWorldObject(hkReferencedObject):
 
         # ----
 
-        self.collidable.serialize(hk, bw)
+        self.collidable.serialize(hk, bw, obj)
         self.multiThreadCheck.serialize(hk, bw)
         if hk.header.padding_option:
             bw.align_to(16)

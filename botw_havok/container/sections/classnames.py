@@ -116,6 +116,9 @@ class HKClassnamesSection(HKSection):
                 cls = HKClass()
                 cls.name = value
                 cls.signature = hk_signature_map[value]
+
+                self.classes.append(cls)
+                return cls
         else:
             raise NotImplementedError("Wrong value type provided")
 

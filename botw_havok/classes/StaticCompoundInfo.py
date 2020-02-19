@@ -53,6 +53,8 @@ class StaticCompoundInfo(HKBase):
         obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
+        super().assign_class(hk)
+
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0
 
@@ -62,10 +64,10 @@ class StaticCompoundInfo(HKBase):
             bw.write_uint32(0)
 
         ai_count_offset = bw.tell()
-        self.write_counter(hk, bw, len(self.ActorInfo))
+        hk._write_counter(bw, len(self.ActorInfo))
 
         si_count_offset = bw.tell()
-        self.write_counter(hk, bw, len(self.ShapeInfo))
+        hk._write_counter(bw, len(self.ShapeInfo))
         bw.align_to(16)
 
         ai_offset = bw.tell()
