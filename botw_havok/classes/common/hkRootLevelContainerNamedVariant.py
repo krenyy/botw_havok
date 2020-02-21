@@ -62,12 +62,8 @@ class hkRootLevelContainerNamedVariant:
         self.variant.serialize(hk)
 
         # Local fixups
-        obj.local_fixups.extend(
-            [
-                LocalFixup(namePointer_offset, name_offset),
-                LocalFixup(classNamePointer_offset, className_offset),
-            ]
-        )
+        obj.local_fixups.append(LocalFixup(namePointer_offset, name_offset))
+        obj.local_fixups.append(LocalFixup(classNamePointer_offset, className_offset))
 
         # Write reference to the nested object
         gr = GlobalReference()

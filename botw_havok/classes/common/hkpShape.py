@@ -32,11 +32,8 @@ class hkpShape(hkpShapeBase):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
-        inst.type = d["type"]
-        inst.dispatchType = d["dispatchType"]
-        inst.bitsPerKey = d["bitsPerKey"]
-        inst.shapeInfoCodecType = d["shapeInfoCodecType"]
+        inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.userData = d["userData"]
 
         return inst

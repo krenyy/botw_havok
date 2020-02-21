@@ -1,4 +1,5 @@
 from ...binary import BinaryReader, BinaryWriter
+from ..enums.SpuCollisionCallbackEventFilter import SpuCollisionCallbackEventFilter
 
 if False:
     from ...hk import HK
@@ -37,8 +38,8 @@ class hkpEntitySpuCollisionCallback:
         return {
             # "util": self.util,
             "capacity": self.capacity,
-            "eventFilter": self.eventFilter,
-            "userFilter": self.userFilter,
+            "eventFilter": SpuCollisionCallbackEventFilter(self.eventFilter).name,
+            "userFilter": SpuCollisionCallbackEventFilter(self.userFilter).name,
         }
 
     @classmethod
@@ -46,7 +47,7 @@ class hkpEntitySpuCollisionCallback:
         inst = cls()
         # inst.util = d["util"]
         inst.capacity = d["capacity"]
-        inst.eventFilter = d["eventFilter"]
-        inst.userFilter = d["userFilter"]
+        inst.eventFilter = SpuCollisionCallbackEventFilter[d["eventFilter"]].value
+        inst.userFilter = SpuCollisionCallbackEventFilter[d["userFilter"]].value
 
         return inst

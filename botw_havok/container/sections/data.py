@@ -136,6 +136,13 @@ class HKDataSection(HKSection):
 
             self.global_fixups.append(gfu)
 
+        # Sort fixups by source offset
+        # pylama:ignore=E731
+        key = lambda x: x.src
+        self.local_fixups.sort(key=key)
+        self.global_fixups.sort(key=key)
+        self.virtual_fixups.sort(key=key)
+
         # Write local fixups
         self.local_fixups_offset = bw.tell() - self.absolute_offset
         for lfu in self.local_fixups:

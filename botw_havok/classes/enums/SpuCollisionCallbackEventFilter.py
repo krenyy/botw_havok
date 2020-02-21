@@ -1,0 +1,9 @@
+from enum import Enum
+
+
+class SpuCollisionCallbackEventFilter(Enum):
+    SPU_SEND_NONE = 0
+    SPU_SEND_CONTACT_POINT_ADDED = 1
+    SPU_SEND_CONTACT_POINT_PROCESS = 2
+    SPU_SEND_CONTACT_POINT_ADDED_OR_PROCESS = 3
+    SPU_SEND_CONTACT_POINT_REMOVED = 4

@@ -26,7 +26,7 @@ class hkRootLevelContainer(HKBase):
 
         # namedVariantsCount_offset = br.tell()
         namedVariantsCount = hk._read_counter(br)
-        br.align_to(16)
+        br.align_to(16)  # TODO: Verify this
 
         # namedVariants_offset = br.tell()
         for _ in range(namedVariantsCount):
@@ -48,12 +48,14 @@ class hkRootLevelContainer(HKBase):
         bw.align_to(16)
 
         namedVariants_offset = bw.tell()
+        self.hkobj.local_fixups.append(
+            LocalFixup(namedVariantsCounter_offset, namedVariants_offset)
+        )
+
+        print(self.hkobj.local_fixups)
+
         for nv in self.namedVariants:
             nv.serialize(hk, self.hkobj, bw)
-
-        self.hkobj.local_fixups = [
-            LocalFixup(namedVariantsCounter_offset, namedVariants_offset)
-        ]
 
         super().serialize(hk, bw)
 
@@ -65,10 +67,12 @@ class hkRootLevelContainer(HKBase):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.hkClass = d["hkClass"]
+        inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.namedVariants = [
             hkRootLevelContainerNamedVariant.fromdict(nv) for nv in d["namedVariants"]
         ]
+
         return inst
 
     def __repr__(self):

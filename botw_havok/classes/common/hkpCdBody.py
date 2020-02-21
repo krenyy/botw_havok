@@ -9,17 +9,17 @@ if False:
 
 
 class hkpCdBody:
-    shape: hkpShape = None
+    shape: hkpShape
     shapeKey: int
-    motion: None = None
-    parent: "hkpCdBody" = None
+    # motion: None = None
+    # parent: "hkpCdBody" = None
 
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
-                # hk.data.objects.remove(gr.dst_obj)
-                # self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
-                # self.shape.deserialize(hk, gr.dst_obj)
+                hk.data.objects.remove(gr.dst_obj)
+                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.shape.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)  # Points to a hkpShape
                 break
@@ -53,18 +53,19 @@ class hkpCdBody:
 
     def asdict(self):
         return {
-            "shape": self.shape,
+            "shape": self.shape.asdict(),
             "shapeKey": self.shapeKey,
-            "motion": self.motion,
-            "parent": self.parent,
+            # "motion": self.motion,
+            # "parent": self.parent,
         }
 
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+
         inst.shape = d["shape"]
         inst.shapeKey = d["shapeKey"]
-        inst.motion = d["motion"]
-        inst.parent = d["parent"]
+        # inst.motion = d["motion"]
+        # inst.parent = d["parent"]
 
         return inst

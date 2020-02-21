@@ -54,7 +54,7 @@ class hkMotionState:
     def serialize(self, hk, bw: BinaryWriter):
         bw.write_transform(self.transform)
 
-        bw.write_vector4(self.sweptTransform)
+        [bw.write_vector4(st) for st in self.sweptTransform]
         bw.write_vector4(self.deltaAngle)
 
         bw.write_single(self.objectRadius)

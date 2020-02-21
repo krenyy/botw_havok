@@ -1,5 +1,6 @@
 from ...binary import BinaryReader, BinaryWriter
 from .hkpBroadPhaseHandle import hkpBroadPhaseHandle
+from ..enums.BroadPhaseType import BroadPhaseType
 
 if False:
     from ...hk import HK
@@ -35,7 +36,7 @@ class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
         d = super().asdict()
         d.update(
             {
-                "type": self.type,
+                "type": BroadPhaseType(self.type).name,
                 "ownerOffset": self.ownerOffset,
                 "objectQualityType": self.objectQualityType,
                 "collisionFilterInfo": self.collisionFilterInfo,
@@ -47,8 +48,11 @@ class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.id = d["id"]
-        inst.type = d["type"]
+        inst.__dict__.update(super().fromdict(d).__dict__)
+
+        inst.type = BroadPhaseType[d["type"]].value
         inst.ownerOffset = d["ownerOffset"]
         inst.objectQualityType = d["objectQualityType"]
         inst.collisionFilterInfo = d["collisionFilterInfo"]
+
+        return inst

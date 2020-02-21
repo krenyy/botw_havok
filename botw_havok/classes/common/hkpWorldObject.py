@@ -12,7 +12,7 @@ if False:
 
 
 class hkpWorldObject(hkReferencedObject):
-    world: None = None
+    # world: None = None
     userData: int
     collidable: hkpLinkedCollidable
     multiThreadCheck: hkMultiThreadCheck
@@ -21,6 +21,9 @@ class hkpWorldObject(hkReferencedObject):
     name: str
 
     properties: List[hkSimpleProperty]
+
+    def __init__(self):
+        self.properties = []
 
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
         super().deserialize(hk, br)
@@ -63,6 +66,7 @@ class hkpWorldObject(hkReferencedObject):
         for _ in range(propertiesCount):
             prop = hkSimpleProperty()
             prop.deserialize(hk, br)
+            self.properties.append(prop)
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj):
         super().serialize(hk, bw)
@@ -87,6 +91,7 @@ class hkpWorldObject(hkReferencedObject):
             bw.align_to(16)
 
         self._namePointer_offset = bw.tell()
+        hk._write_empty_pointer(bw)  # 'name' pointer
 
         propertiesCount_offset = bw.tell()
         hk._write_counter(bw, len(self.properties))
@@ -98,7 +103,7 @@ class hkpWorldObject(hkReferencedObject):
         d = super().asdict()
         d.update(
             {
-                "world": self.world,
+                # "world": self.world,
                 "userData": self.userData,
                 "collidable": self.collidable.asdict(),
                 "multiThreadCheck": self.multiThreadCheck.asdict(),
@@ -112,7 +117,7 @@ class hkpWorldObject(hkReferencedObject):
     def fromdict(cls, d: dict):
         inst = cls()
         inst.memSizeAndRefCount = d["memSizeAndRefCount"]
-        inst.world = d["world"]
+        # inst.world = d["world"]
         inst.userData = d["userData"]
         inst.collidable = hkpLinkedCollidable.fromdict(d["collidable"])
         inst.multiThreadCheck = hkMultiThreadCheck.fromdict(d["multiThreadCheck"])

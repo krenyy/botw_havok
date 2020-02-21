@@ -52,16 +52,43 @@ class Vector4(Vector3):
         return cls(d[0], d[1], d[2], d[3])
 
 
-class Transform:
+class QsTransform:
     translation: Vector4
     rotation: Vector4
     scale: Vector4
-    shear: Vector4
 
     def __init__(self, matrix):
         self.translation = matrix[0]
         self.rotation = matrix[1]
         self.scale = matrix[2]
+
+    def __iter__(self):
+        return iter((self.translation, self.rotation, self.scale))
+
+    def asdict(self):
+        return {
+            "translation": self.translation.asdict(),
+            "rotation": self.rotation.asdict(),
+            "scale": self.scale.asdict(),
+        }
+
+    @classmethod
+    def fromdict(cls, d: dict):
+        return cls(
+            [
+                Vector4.fromdict(d["translation"]),
+                Vector4.fromdict(d["rotation"]),
+                Vector4.fromdict(d["scale"]),
+            ]
+        )
+
+
+class Transform(QsTransform):
+    shear: Vector4
+
+    def __init__(self, matrix):
+        super().__init__(matrix)
+
         self.shear = matrix[3]
 
     def __eq__(self, value: "Transform"):
@@ -78,12 +105,12 @@ class Transform:
         return iter((self.translation, self.rotation, self.scale, self.shear))
 
     def asdict(self):
-        return {
-            "translation": self.translation.asdict(),
-            "rotation": self.rotation.asdict(),
-            "scale": self.scale.asdict(),
-            "shear": self.shear.asdict(),
-        }
+        d = super().asdict()
+        d.update(
+            {"shear": self.shear.asdict(),}
+        )
+
+        return d
 
     @classmethod
     def fromdict(cls, d: dict):

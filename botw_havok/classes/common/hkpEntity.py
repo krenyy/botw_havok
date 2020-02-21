@@ -189,7 +189,14 @@ class hkpEntity(hkpWorldObject):
         bw.write_uint32(self.uid)
 
         self.spuCollisionCallback.serialize(hk, bw)
+
+        bw.align_to(16)  # TODO: Check if correct
+
         self.motion.serialize(hk, bw)
+
+        if hk.header.padding_option:
+            bw.align_to(16)
+
         self.contactListeners.serialize(hk, bw)
         self.actions.serialize(hk, bw)
 
@@ -208,6 +215,7 @@ class hkpEntity(hkpWorldObject):
 
         name_offset = bw.tell()
         bw.write_string(self.name)
+        bw.align_to(16)
 
         obj.local_fixups.append(LocalFixup(self._namePointer_offset, name_offset))
 
@@ -239,6 +247,8 @@ class hkpEntity(hkpWorldObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+        inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.material = hkpMaterial.fromdict(d["material"])
         inst.damageMultiplier = d["damageMultiplier"]
         inst.solverData = d["solverData"]
@@ -263,5 +273,6 @@ class hkpEntity(hkpWorldObject):
             d["contactListeners"]
         )
         inst.actions = hkpEntitySmallArraySerializeOverrideType.fromdict(d["actions"])
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.npData = d["npData"]
+
         return inst

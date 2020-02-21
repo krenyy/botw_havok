@@ -19,6 +19,7 @@ class hkpBroadPhaseHandle:
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+
         inst.id = d["id"]
 
         return inst

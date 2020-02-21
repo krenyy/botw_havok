@@ -26,6 +26,3 @@ class hkReferencedObject(hkBaseObject):
         inst = cls()
         inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         return inst
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.memSizeAndRefCount})"

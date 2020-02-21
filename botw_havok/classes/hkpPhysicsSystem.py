@@ -17,8 +17,8 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
 
     rigidBodies: List[hkpRigidBody]
     # constraints: List[hkpConstraintInstance] TODO: CONSTRAINTS
-    # actions: List[hkpAction] # Doesn't seem used
-    # phantoms: List[hkpPhantom] # Doesn't seem used
+    # actions: List[hkpAction]  # Looks unused
+    # phantoms: List[hkpPhantom]  # Looks unused
 
     name: str
     userData: int
@@ -103,10 +103,13 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         hk._write_counter(bw, len(self.rigidBodies))
 
         # TODO: Constraints
+        constraintsCount_offset = bw.tell()
         hk._write_counter(bw, 0)  # constraints
 
+        actionsCount_offset = bw.tell()
         hk._write_counter(bw, 0)  # actions
 
+        phantomsCount_offset = bw.tell()
         hk._write_counter(bw, 0)  # phantoms
 
         namePointer_offset = bw.tell()
@@ -114,6 +117,7 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
 
         # ----
 
+        # TODO: Verify if this is correct
         if hk.header.pointer_size == 8:
             bw.write_uint64(self.userData)
         elif hk.header.pointer_size == 4:
@@ -126,20 +130,28 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
 
         # ----
 
-        for rb in self.rigidBodies:
-            hk.data.objects.append(rb.hkobj)
-            rb.serialize(hk)
+        if self.rigidBodies:
+            self.hkobj.local_fixups.append(
+                LocalFixup(rigidBodiesCount_offset, bw.tell())
+            )
 
-            gr = GlobalReference()
-            gr.src_obj = self.hkobj
-            gr.src_rel_offset = bw.tell()
-            gr.dst_obj = rb.hkobj
-            self.hkobj.global_references.append(gr)
+            for rb in self.rigidBodies:
+                hk.data.objects.append(rb.hkobj)
+                rb.serialize(hk)
 
-            hk._write_empty_pointer(bw)
-        bw.align_to(16)
+                gr = GlobalReference()
+                gr.src_obj = self.hkobj
+                gr.src_rel_offset = bw.tell()
+                gr.dst_obj = rb.hkobj
+                self.hkobj.global_references.append(gr)
 
-        # Constraints data here
+                hk._write_empty_pointer(bw)
+            bw.align_to(16)
+
+        """if len(self.constraints):
+            pass"""
+
+        self.hkobj.local_fixups.append(LocalFixup(namePointer_offset, bw.tell()))
 
         bw.write_string(self.name)
         bw.align_to(16)
@@ -152,6 +164,9 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
         d.update(
             {
                 "rigidBodies": [rb.asdict() for rb in self.rigidBodies],
+                # "constraints": [c.asdict() for c in self.constraints],
+                # "actions": [a.asdict() for a in self.actions],
+                # "phantoms": [p.asdict() for p in self.phantoms],
                 "name": self.name,
                 "userData": self.userData,
                 "active": self.active,
@@ -162,13 +177,14 @@ class hkpPhysicsSystem(HKBase, hkReferencedObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
+
         inst.rigidBodies = [hkpRigidBody.fromdict(rb) for rb in d["rigidBodies"]]
+        # inst.constraints = [hkpConstraintInstance.fromdict(c) for c in d["constraints"]]
         inst.name = d["name"]
         inst.userData = d["userData"]
         inst.active = d["active"]
-
-        inst.__dict__.update(HKBase.fromdict(d).__dict__)
-        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
 
         return inst
 

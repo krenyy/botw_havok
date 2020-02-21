@@ -1,5 +1,7 @@
-from .hkReferencedObject import hkReferencedObject
 from ...binary import BinaryReader, BinaryWriter
+from ..enums.ShapeDispatchTypeEnum import ShapeDispatchTypeEnum
+from ..enums.ShapeInfoCodecTypeEnum import ShapeInfoCodecTypeEnum
+from .hkReferencedObject import hkReferencedObject
 
 if False:
     from ...hk import HK
@@ -32,9 +34,11 @@ class hkcdShape(hkReferencedObject):
         d.update(
             {
                 "type": self.type,
-                "dispatchType": self.dispatchType,
+                "dispatchType": ShapeDispatchTypeEnum(self.dispatchType).name,
                 "bitsPerKey": self.bitsPerKey,
-                "shapeInfoCodecType": self.shapeInfoCodecType,
+                "shapeInfoCodecType": ShapeInfoCodecTypeEnum(
+                    self.shapeInfoCodecType
+                ).name,
             }
         )
 
@@ -43,10 +47,11 @@ class hkcdShape(hkReferencedObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
+        inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.type = d["type"]
-        inst.dispatchType = d["dispatchType"]
+        inst.dispatchType = ShapeDispatchTypeEnum[d["dispatchType"]].value
         inst.bitsPerKey = d["bitsPerKey"]
-        inst.shapeInfoCodecType = d["shapeInfoCodecType"]
+        inst.shapeInfoCodecType = ShapeInfoCodecTypeEnum[d["shapeInfoCodecType"]].value
 
         return inst

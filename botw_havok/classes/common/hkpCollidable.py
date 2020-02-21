@@ -66,6 +66,7 @@ class hkpCollidable(hkpCdBody):
     def fromdict(cls, d: dict):
         inst = cls()
         inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.ownerOffset = d["ownerOffset"]
         inst.forceCollideOntoPpu = getattr(
             ForceCollideOntoPpuReasons, d["forceCollideOntoPpu"]

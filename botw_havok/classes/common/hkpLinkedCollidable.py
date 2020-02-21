@@ -32,6 +32,7 @@ class hkpLinkedCollidable(hkpCollidable):
 
     def asdict(self):
         d = super().asdict()
+
         d.update({"collisionEntries": self.collisionEntries})
 
         return d
@@ -40,6 +41,7 @@ class hkpLinkedCollidable(hkpCollidable):
     def fromdict(cls, d: dict):
         inst = cls()
         inst.__dict__.update(super().fromdict(d).__dict__)
+
         inst.collisionEntries = d["collisionEntries"]
 
         return inst
