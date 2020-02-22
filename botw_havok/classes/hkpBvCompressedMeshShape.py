@@ -78,12 +78,14 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
         br.align_to(16)
 
         for lfu in self.hkobj.local_fixups:
+            br.step_in(lfu.dst)
             if lfu.src == userStringPaletteCount_offset:
-                br.step_in(lfu.dst)
-                hk._assert_pointer(br)
+                for _ in range(userStringPaletteCount):
+                    hk._assert_pointer(br)
                 for _ in range(userStringPaletteCount):
                     self.userStringPalette.append(br.read_string())
-                br.step_out()
+                    br.align_to(8)
+            br.step_out()
         br.align_to(16)
 
         self.tree = hkpBvCompressedMeshShapeTree()
@@ -117,6 +119,7 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
 
         userStringPaletteCount_offset = bw.tell()
         hk._write_counter(bw, len(self.userStringPalette))
+        bw.align_to(16)
 
         self.tree.serialize(hk, bw)
         bw.align_to(16)
@@ -146,111 +149,122 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
 
         # ----
 
-        userStringPalette_offset = bw.tell()
-        userString_sources = []  # Messy as heck but I don't care
-        userString_destinations = []
-        for userString in self.userStringPalette:
-            userString_sources.append(bw.tell())
-            hk._write_empty_pointer(bw)
-        for userString in self.userStringPalette:
-            userString_destinations.append(bw.tell())
-            bw.write_string(userString)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(userStringPaletteCount_offset, userStringPalette_offset)
-        )
-
-        for src, dst in zip(userString_sources, userString_destinations):
-            self.hkobj.local_fixups.append(LocalFixup(src, dst))
-
-        # ----
-
-        nodes_offset = bw.tell()
-        for node in self.tree.nodes:
-            node.serialize(hk, bw, self.hkobj)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(self.tree._nodesCount_offset, nodes_offset)
-        )
-
-        # ----
-        # ----
-
-        sections_offset = bw.tell()
-        for section in self.tree.sections:
-            section.serialize(hk, bw, self.hkobj)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(self.tree._sectionsCount_offset, sections_offset)
-        )
-
-        for section in self.tree.sections:
-            section_nodes_offset = bw.tell()
-            for node in section.nodes:
-                node.serialize(hk, bw, self.hkobj)
-            self.hkobj.local_fixups.append(
-                LocalFixup(section._nodesCount_offset, section_nodes_offset)
-            )
+        if self.userStringPalette:
+            userStringPalette_offset = bw.tell()
+            userString_sources = []  # Messy as heck but I don't care
+            userString_destinations = []
+            for userString in self.userStringPalette:
+                userString_sources.append(bw.tell())
+                hk._write_empty_pointer(bw)
+            for userString in self.userStringPalette:
+                userString_destinations.append(bw.tell())
+                bw.write_string(userString)
+                bw.align_to(8)
             bw.align_to(16)
 
-        # ----
-
-        primitives_offset = bw.tell()
-        for primitive in self.tree.primitives:
-            primitive.serialize(hk, bw, self.hkobj)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(self.tree._primitivesCount_offset, primitives_offset)
-        )
-
-        # ----
-
-        sharedVerticesIndex_offset = bw.tell()
-        for sVI in self.tree.sharedVerticesIndex:
-            bw.write_uint16(sVI)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(
-                self.tree._sharedVerticesIndexCount_offset, sharedVerticesIndex_offset
+            self.hkobj.local_fixups.append(
+                LocalFixup(userStringPaletteCount_offset, userStringPalette_offset)
             )
-        )
+
+            for src, dst in zip(userString_sources, userString_destinations):
+                self.hkobj.local_fixups.append(LocalFixup(src, dst))
 
         # ----
-        # ----
 
-        packedVertices_offset = bw.tell()
-        for pV in self.tree.packedVertices:
-            bw.write_uint32(pV)
-        bw.align_to(16)
+        if self.tree.nodes:
+            nodes_offset = bw.tell()
+            for node in self.tree.nodes:
+                node.serialize(hk, bw, self.hkobj)
+            bw.align_to(16)
 
-        self.hkobj.local_fixups.append(
-            LocalFixup(self.tree._packedVerticesCount_offset, packedVertices_offset)
-        )
-
-        sharedVertices_offset = bw.tell()
-        for sV in self.tree.sharedVertices:
-            bw.write_uint64(sV)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(self.tree._sharedVerticesCount_offset, sharedVertices_offset)
-        )
-
-        primitiveDataRuns_offset = bw.tell()
-        for dataRun in self.tree.primitiveDataRuns:
-            dataRun.serialize(hk, bw)
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.append(
-            LocalFixup(
-                self.tree._primitiveDataRunsCount_offset, primitiveDataRuns_offset
+            self.hkobj.local_fixups.append(
+                LocalFixup(self.tree._nodesCount_offset, nodes_offset)
             )
-        )
+
+        # ----
+        # ----
+
+        if self.tree.sections:
+            sections_offset = bw.tell()
+            for section in self.tree.sections:
+                section.serialize(hk, bw, self.hkobj)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(self.tree._sectionsCount_offset, sections_offset)
+            )
+
+            for section in self.tree.sections:
+                if section.nodes:
+                    section_nodes_offset = bw.tell()
+                    for node in section.nodes:
+                        node.serialize(hk, bw, self.hkobj)
+                    self.hkobj.local_fixups.append(
+                        LocalFixup(section._nodesCount_offset, section_nodes_offset)
+                    )
+                    bw.align_to(16)
+
+        # ----
+
+        if self.tree.primitives:
+            primitives_offset = bw.tell()
+            for primitive in self.tree.primitives:
+                primitive.serialize(hk, bw, self.hkobj)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(self.tree._primitivesCount_offset, primitives_offset)
+            )
+
+        # ----
+
+        if self.tree.sharedVerticesIndex:
+            sharedVerticesIndex_offset = bw.tell()
+            for sVI in self.tree.sharedVerticesIndex:
+                bw.write_uint16(sVI)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(
+                    self.tree._sharedVerticesIndexCount_offset,
+                    sharedVerticesIndex_offset,
+                )
+            )
+
+        # ----
+        # ----
+
+        if self.tree.packedVertices:
+            packedVertices_offset = bw.tell()
+            for pV in self.tree.packedVertices:
+                bw.write_uint32(pV)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(self.tree._packedVerticesCount_offset, packedVertices_offset)
+            )
+
+        if self.tree.sharedVertices:
+            sharedVertices_offset = bw.tell()
+            for sV in self.tree.sharedVertices:
+                bw.write_uint64(sV)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(self.tree._sharedVerticesCount_offset, sharedVertices_offset)
+            )
+
+        if self.tree.primitiveDataRuns:
+            primitiveDataRuns_offset = bw.tell()
+            for dataRun in self.tree.primitiveDataRuns:
+                dataRun.serialize(hk, bw)
+            bw.align_to(16)
+
+            self.hkobj.local_fixups.append(
+                LocalFixup(
+                    self.tree._primitiveDataRunsCount_offset, primitiveDataRuns_offset
+                )
+            )
 
         HKBase.serialize(self, hk, bw)
 

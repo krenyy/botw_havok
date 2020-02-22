@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
-# with open("README.md", "r", encoding="utf-8") as readme:
-# long_description = readme.read()
+with open("README.md", "r", encoding="utf-8") as readme:
+    long_description = readme.read()
 
 setup(
     name="botw_havok",
@@ -9,9 +9,9 @@ setup(
     author="kreny",
     author_email="kronerm9@gmail.com",
     description="A library for manipulating Breath of the Wild Havok files",
-    # long_description=long_description,
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    # url="https://github.com/23kreny/bakalib",
+    url="https://github.com/23kreny/botw_havok",
     include_package_data=True,
     packages=find_packages(),
     classifiers=[
@@ -20,5 +20,10 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    # install_requires=["cachetools", "lxml", "requests", "xmltodict"],
+    entry_points={
+        "console_scripts": [
+            "hk_to_json = botw_havok.cli.hk_to_json:main",
+            "json_to_hk = botw_havok.cli.json_to_hk:main",
+        ]
+    },
 )

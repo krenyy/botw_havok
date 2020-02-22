@@ -18,6 +18,8 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis4:
         nodesCount_offset = br.tell()
         nodesCount = hk._read_counter(br)
 
+        br.align_to(16)
+
         for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
 
@@ -32,6 +34,8 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis4:
     def serialize(self, hk: "HK", bw: BinaryWriter):
         self._nodesCount_offset = bw.tell()
         hk._write_counter(bw, len(self.nodes))
+
+        bw.align_to(16)
 
         # Nodes get written later
 

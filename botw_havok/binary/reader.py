@@ -156,7 +156,6 @@ class BinaryReader(BinaryBase):
         dist = alignment - (self.tell() % alignment)
         if not dist == alignment:
             return self.seek_relative(dist)
-        print(f"Already aligned to {alignment}, skipping instruction...")
 
     def peek(self):
         ret = self.read(1)
