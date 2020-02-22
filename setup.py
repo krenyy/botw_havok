@@ -8,7 +8,7 @@ setup(
     version="0.1",
     author="kreny",
     author_email="kronerm9@gmail.com",
-    description="A library for manipulating Breath of the Wild Havok files",
+    description="A library for converting Breath of the Wild Havok packfiles to JSON and back",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/23kreny/botw_havok",
