@@ -1,0 +1,9 @@
+from enum import Enum
+
+
+class PrimitiveType(Enum):
+    PRIMITIVE_TYPE_BOX = 0
+    PRIMITIVE_TYPE_HULL = 1
+    PRIMITIVE_TYPE_SPHERE = 2
+    PRIMITIVE_TYPE_CAPSULE = 3
+    PRIMITIVE_TYPE_CYLINDER = 4

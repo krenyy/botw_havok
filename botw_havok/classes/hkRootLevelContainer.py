@@ -52,8 +52,6 @@ class hkRootLevelContainer(HKBase):
             LocalFixup(namedVariantsCounter_offset, namedVariants_offset)
         )
 
-        print(self.hkobj.local_fixups)
-
         for nv in self.namedVariants:
             nv.serialize(hk, self.hkobj, bw)
 

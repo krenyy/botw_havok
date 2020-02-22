@@ -59,16 +59,18 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
             if lfu.src == instancesCount_offset:
                 br.step_in(lfu.dst)
 
-                inst = hkpStaticCompoundShapeInstance()
-                self.instances.append(inst)
-                inst.deserialize(hk, br, obj)
+                for _ in range(instancesCount):
+                    inst = hkpStaticCompoundShapeInstance()
+                    self.instances.append(inst)
+                    inst.deserialize(hk, br, obj)
 
                 br.step_out()
 
             if lfu.src == instanceExtraInfosCount_offset:
                 br.step_in(lfu.dst)
 
-                self.instanceExtraInfos.append(br.read_uint16())
+                for _ in range(instanceExtraInfosCount):
+                    self.instanceExtraInfos.append(br.read_uint16())
 
                 br.step_out()
 
@@ -133,10 +135,12 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
                 LocalFixup(self.tree._nodesCount_offset, nodes_offset)
             )
 
+        bw.align_to(16)
+
         HKBase.serialize(self, hk, bw)
 
     def asdict(self):
-        d = super().asdict()
+        d = HKBase.asdict(self)
         d.update(hkpBvTreeShape.asdict(self))
         d.update(
             {
@@ -164,5 +168,10 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
         inst.instances = [
             hkpStaticCompoundShapeInstance.fromdict(inst) for inst in d["instances"]
         ]
+        inst.instanceExtraInfos = d["instanceExtraInfos"]
+        inst.disabledLargeShapeKeyTable = hkpShapeKeyTable.fromdict(
+            d["disabledLargeShapeKeyTable"]
+        )
+        inst.tree = hkcdStaticTreeDefaultTreeStorage6.fromdict(d["tree"])
 
         return inst

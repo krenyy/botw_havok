@@ -1,0 +1,8 @@
+from enum import Enum
+
+
+class PerPrimitiveDataMode(Enum):
+    PER_PRIMITIVE_DATA_NONE = 0
+    PER_PRIMITIVE_DATA_8_BIT = 1
+    PER_PRIMITIVE_DATA_PALETTE = 2
+    PER_PRIMITIVE_DATA_STRING_PALETTE = 3

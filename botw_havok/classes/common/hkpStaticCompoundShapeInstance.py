@@ -24,10 +24,10 @@ class hkpStaticCompoundShapeInstance:
 
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
-                # hk.data.objects.remove(gr.dst_obj)
+                hk.data.objects.remove(gr.dst_obj)
 
-                # self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
-                # self.shape.deserialize(hk, gr.dst_obj)
+                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.shape.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)
                 break
@@ -55,9 +55,9 @@ class hkpStaticCompoundShapeInstance:
         gr.dst_obj = self.shape.hkobj
         gr.dst_rel_offset = 0
         obj.global_references.append(gr)
-
         hk.data.objects.append(self.shape.hkobj)
         self.shape.serialize(hk)
+
         hk._write_empty_pointer(bw)
 
         bw.write_uint32(self.filterInfo)
@@ -76,7 +76,7 @@ class hkpStaticCompoundShapeInstance:
     def asdict(self):
         return {
             "transform": self.transform.asdict(),
-            # "shape": self.shape.asdict(),
+            "shape": self.shape.asdict(),
             "filterInfo": self.filterInfo,
             "childFilterInfoMask": self.childFilterInfoMask,
             "userData": self.userData,
@@ -86,8 +86,8 @@ class hkpStaticCompoundShapeInstance:
     def fromdict(cls, d: dict):
         inst = cls()
 
-        inst.transform = QsTransform.fromdict(d)
-        # inst.shape = util.hk_class_map[d["shape"]["hkClass"]].fromdict(d["shape"])
+        inst.transform = QsTransform.fromdict(d["transform"])
+        inst.shape = util.hk_class_map[d["shape"]["hkClass"]].fromdict(d["shape"])
         inst.filterInfo = d["filterInfo"]
         inst.childFilterInfoMask = d["childFilterInfoMask"]
         inst.userData = d["userData"]

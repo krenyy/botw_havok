@@ -35,12 +35,14 @@ class hkpCdBody:
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
         # Shape reference
-        """ FIXME: Finish this
         gr = GlobalReference()
         gr.src_obj = obj
         gr.src_rel_offset = bw.tell()
         gr.dst_obj = self.shape.hkobj
-        obj.global_references.append(gr)"""
+        obj.global_references.append(gr)
+
+        hk.data.objects.append(self.shape.hkobj)
+        self.shape.serialize(hk)
 
         hk._write_empty_pointer(bw)
 
@@ -63,7 +65,7 @@ class hkpCdBody:
     def fromdict(cls, d: dict):
         inst = cls()
 
-        inst.shape = d["shape"]
+        inst.shape = util.hk_class_map[d["shape"]["hkClass"]].fromdict(d["shape"])
         inst.shapeKey = d["shapeKey"]
         # inst.motion = d["motion"]
         # inst.parent = d["parent"]

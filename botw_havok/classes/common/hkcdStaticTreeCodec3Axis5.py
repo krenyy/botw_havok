@@ -1,32 +1,25 @@
-from ...binary import BinaryReader, BinaryWriter
-from ...container.sections.hkobject import HKObject
 from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
 
-if False:
-    from ...hk import HK
 
-
-class hkcdStaticTreeCodec3Axis6(hkcdStaticTreeCodec3Axis):
+class hkcdStaticTreeCodec3Axis5(hkcdStaticTreeCodec3Axis):
     hiData: int
     loData: int
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
+    def deserialize(self, hk, br, obj):
         super().deserialize(hk, br, obj)
 
         self.hiData = br.read_uint8()
-        self.loData = br.read_uint16()
+        self.loData = br.read_uint8()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
+    def serialize(self, hk, bw, obj):
         super().serialize(hk, bw, obj)
 
         bw.write_uint8(self.hiData)
-        bw.write_uint16(self.loData)
+        bw.write_uint8(self.loData)
 
     def asdict(self):
         d = super().asdict()
-        d.update(
-            {"hiData": self.hiData, "loData": self.loData,}
-        )
+        d.update({"hiData": self.hiData, "loData": self.loData})
         return d
 
     @classmethod

@@ -7,7 +7,7 @@ from ..hkRootLevelContainer import hkRootLevelContainer
 from ..StaticCompoundInfo import StaticCompoundInfo
 
 hk_class_map = {
-    # "hkpBvCompressedMeshShape": hkpBvCompressedMeshShape,
+    "hkpBvCompressedMeshShape": hkpBvCompressedMeshShape,
     "hkpRigidBody": hkpRigidBody,
     "hkpPhysicsData": hkpPhysicsData,
     "hkpPhysicsSystem": hkpPhysicsSystem,
