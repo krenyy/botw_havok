@@ -2,8 +2,7 @@ __all__ = ("Havok",)
 
 import json
 from .hk import HK
-from typing import List, Union
-from io import BufferedIOBase
+from typing import List
 from .binary import BinaryReader, BinaryWriter
 
 
