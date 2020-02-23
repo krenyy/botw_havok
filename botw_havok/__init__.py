@@ -47,11 +47,14 @@ class Havok:
         with open(path, "r") as f:
             return cls.fromdict(json.load(f))
 
-    def to_json(self, path: str):
+    def to_json(self, path: str, pretty_print: bool = False):
         [file.deserialize() for file in self.files if not file.data.contents]
 
         with open(path, "w") as f:
-            return f.write(json.dumps(self.asdict(), indent=4))
+            if pretty_print:
+                return f.write(json.dumps(self.asdict(), indent=4))
+            else:
+                return json.dump(self.asdict(), f)
 
     def deserialize(self):
         for file in self.files:
