@@ -2,7 +2,7 @@ import typing
 
 from ...binary import BinaryReader, BinaryWriter
 from .base import HKSection
-from ...classes import hk_signature_map
+from ...classes.util.signature_map import hk_signature_map
 
 
 class HKClass:

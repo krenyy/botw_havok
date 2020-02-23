@@ -34,7 +34,7 @@ class hkRootLevelContainerNamedVariant:
 
         for gr in obj.global_references:
             if gr.src_rel_offset == variant_offset:
-                self.variant = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.variant = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
                 self.variant.deserialize(hk, gr.dst_obj)
                 hk.data.objects.remove(gr.dst_obj)
 
@@ -86,7 +86,7 @@ class hkRootLevelContainerNamedVariant:
         inst = cls()
         inst.name = d["name"]
         inst.className = d["className"]
-        inst.variant = util.hk_class_map[d["className"]].fromdict(d["variant"])
+        inst.variant = util.HKClassMap.get(d["className"]).fromdict(d["variant"])
 
         return inst
 

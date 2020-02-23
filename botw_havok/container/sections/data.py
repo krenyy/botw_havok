@@ -1,7 +1,7 @@
 import typing
 
 from ...binary import BinaryReader, BinaryWriter
-from ...classes import hk_class_map
+import botw_havok.classes.util.class_map as util
 from .base import HKSection
 from .classnames import HKClass
 from .util import GlobalFixup, GlobalReference, LocalFixup
@@ -80,7 +80,7 @@ class HKDataSection(HKSection):
     def deserialize(self, hk: "HK"):
         for obj in self.objects:
             try:
-                hkcls = hk_class_map[obj.hkclass.name]()
+                hkcls = util.HKClassMap.get(obj.hkclass.name)()
                 self.contents.append(hkcls)
             except KeyError:
                 # return "OK"  # for testing purposes
@@ -201,7 +201,7 @@ class HKDataSection(HKSection):
     def fromdict(cls, d: dict):
         inst = cls()
         inst.contents = [
-            hk_class_map[content["hkClass"]].fromdict(content)
+            util.HKClassMap.get(content["hkClass"]).fromdict(content)
             for content in d["contents"]
         ]
         return inst

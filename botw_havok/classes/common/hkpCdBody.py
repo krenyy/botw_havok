@@ -18,7 +18,7 @@ class hkpCdBody:
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
                 hk.data.objects.remove(gr.dst_obj)
-                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.shape = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
                 self.shape.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)  # Points to a hkpShape
@@ -65,7 +65,7 @@ class hkpCdBody:
     def fromdict(cls, d: dict):
         inst = cls()
 
-        inst.shape = util.hk_class_map[d["shape"]["hkClass"]].fromdict(d["shape"])
+        inst.shape = util.HKClassMap.get(d["shape"]["hkClass"]).fromdict(d["shape"])
         inst.shapeKey = d["shapeKey"]
         # inst.motion = d["motion"]
         # inst.parent = d["parent"]

@@ -26,7 +26,7 @@ class hkpStaticCompoundShapeInstance:
             if gr.src_rel_offset == br.tell():
                 hk.data.objects.remove(gr.dst_obj)
 
-                self.shape = util.hk_class_map[gr.dst_obj.hkclass.name]()
+                self.shape = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
                 self.shape.deserialize(hk, gr.dst_obj)
 
                 hk._assert_pointer(br)
@@ -87,7 +87,7 @@ class hkpStaticCompoundShapeInstance:
         inst = cls()
 
         inst.transform = QsTransform.fromdict(d["transform"])
-        inst.shape = util.hk_class_map[d["shape"]["hkClass"]].fromdict(d["shape"])
+        inst.shape = util.HKClassMap.get(d["shape"]["hkClass"]).fromdict(d["shape"])
         inst.filterInfo = d["filterInfo"]
         inst.childFilterInfoMask = d["childFilterInfoMask"]
         inst.userData = d["userData"]
