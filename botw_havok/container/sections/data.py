@@ -82,12 +82,13 @@ class HKDataSection(HKSection):
             try:
                 hkcls = hk_class_map[obj.hkclass.name]()
                 self.contents.append(hkcls)
-                hkcls.deserialize(hk, obj)
             except KeyError:
                 # return "OK"  # for testing purposes
                 raise NotImplementedError(
                     f"Class '{obj.hkclass.name}' is not mapped out yet."
                 )
+
+            hkcls.deserialize(hk, obj)
 
         self.objects.clear()
 
