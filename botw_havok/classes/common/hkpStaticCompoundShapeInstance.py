@@ -24,7 +24,13 @@ class hkpStaticCompoundShapeInstance:
 
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
-                hk.data.objects.remove(gr.dst_obj)
+                try:
+                    hk.data.objects.remove(gr.dst_obj)
+                except ValueError:
+                    raise Exception(
+                        "File links multiple StaticCompound instances to a single Havok object, this is probably done to link multiple HashIds and SRTHashes to a single piece of geometry.\n"
+                        "The file can be read but cannot be reconstructed as of yet."
+                    )
 
                 self.shape = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
                 self.shape.deserialize(hk, gr.dst_obj)
