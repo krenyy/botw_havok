@@ -2,7 +2,7 @@ import typing
 
 from ...binary import BinaryReader, BinaryWriter
 from .base import HKSection
-from ...classes.util.signature_map import hk_signature_map
+from ...classes.util.signature_map import HKSignatureMap
 
 
 class HKClass:
@@ -26,7 +26,7 @@ class HKClass:
     def from_name(cls, name):
         inst = cls()
         inst.name = name
-        inst.signature = hk_signature_map[name]
+        inst.signature = HKSignatureMap.get(name)
 
         return inst
 
@@ -115,7 +115,7 @@ class HKClassnamesSection(HKSection):
             else:
                 cls = HKClass()
                 cls.name = value
-                cls.signature = hk_signature_map[value]
+                cls.signature = HKSignatureMap.get(value)
 
                 self.classes.append(cls)
                 return cls
