@@ -27,10 +27,11 @@ class hkpStaticCompoundShapeInstance:
                 try:
                     hk.data.objects.remove(gr.dst_obj)
                 except ValueError:
-                    raise Exception(
+                    # raise Exception
+                    print(
                         "File links multiple StaticCompound instances to a single Havok object, "
                         "this is probably done to link multiple HashIds and SRTHashes to a single piece of geometry."
-                        "\nThe file can be read but cannot be reconstructed as of yet."
+                        "\nThis file cannot be correctly interpreted as of yet."
                     )
 
                 self.shape = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
