@@ -71,7 +71,7 @@ class Matrix3:
         return iter((self._matrix3))
 
     def asdict(self):
-        return self._matrix3
+        return [v4.asdict() for v4 in self._matrix3]
 
     @classmethod
     def fromdict(cls, d: list):

@@ -17,6 +17,7 @@ class hkpBoxShape(HKBase, hkpConvexShape):
         br.big_endian = hk.header.endian == 0
 
         hkpConvexShape.deserialize(self, hk, br, obj)
+        br.align_to(16)
 
         self.halfExtents = br.read_vector4()
 
@@ -27,6 +28,7 @@ class hkpBoxShape(HKBase, hkpConvexShape):
         bw.big_endian = hk.header.endian == 0
 
         hkpConvexShape.serialize(self, hk, bw, self.hkobj)
+        bw.align_to(16)
 
         bw.write_vector4(self.halfExtents)
 

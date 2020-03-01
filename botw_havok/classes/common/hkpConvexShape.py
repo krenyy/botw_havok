@@ -9,13 +9,11 @@ class hkpConvexShape(hkpSphereRepShape):
         super().deserialize(hk, br)
 
         self.radius = br.read_single()
-        br.align_to(16)  # TODO: Check if correct
 
     def serialize(self, hk, bw: BinaryWriter, obj):
         super().serialize(hk, bw, obj)
 
         bw.write_single(self.radius)
-        bw.align_to(16)
 
     def asdict(self):
         d = super().asdict()

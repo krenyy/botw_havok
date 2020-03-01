@@ -21,7 +21,7 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
 
     planeEquations: List[Vector4]
 
-    connectivity = None  # hkpConvexVerticesConnectivity
+    # connectivity: hkpConvexVerticesConnectivity = None
 
     def __init__(self):
         HKBase.__init__(self)
@@ -37,6 +37,7 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
         br.big_endian = hk.header.endian == 0
 
         hkpConvexShape.deserialize(self, hk, br, obj)
+        br.align_to(16)
 
         self.aabbHalfExtents = br.read_vector4()
         self.aabbCenter = br.read_vector4()
@@ -83,6 +84,7 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
         bw.big_endian = hk.header.endian == 0
 
         hkpConvexShape.serialize(self, hk, bw, self.hkobj)
+        bw.align_to(16)
 
         bw.write_vector4(self.aabbHalfExtents)
         bw.write_vector4(self.aabbCenter)
@@ -120,7 +122,17 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
     def asdict(self):
         d = HKBase.asdict(self)
         d.update(hkpConvexShape.asdict(self))
-        d.update({"vertexA": self.vertexA.asdict(), "vertexB": self.vertexB.asdict()})
+        d.update(
+            {
+                "aabbHalfExtents": self.aabbHalfExtents.asdict(),
+                "aabbCenter": self.aabbCenter.asdict(),
+                "rotatedVertices": [rv.asdict() for rv in self.rotatedVertices],
+                "numVertices": self.numVertices,
+                "useSpuBuffer": self.useSpuBuffer,
+                "planeEquations": [pe.asdict() for pe in self.planeEquations],
+                # "connectivity": self.connectivity.asdict(),
+            }
+        )
 
         return d
 
@@ -130,7 +142,12 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
         inst.__dict__.update(HKBase.fromdict(d).__dict__)
         inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
 
-        inst.vertexA = Vector4.fromdict(d["vertexA"])
-        inst.vertexB = Vector4.fromdict(d["vertexB"])
+        inst.aabbHalfExtents = Vector4.fromdict(d["aabbHalfExtents"])
+        inst.aabbCenter = Vector4.fromdict(d["aabbCenter"])
+        inst.rotatedVertices = [Matrix3.fromdict(rv) for rv in d["rotatedVertices"]]
+        inst.numVertices = d["numVertices"]
+        inst.useSpuBuffer = d["useSpuBuffer"]
+        inst.planeEquations = d["planeEquations"]
+        # inst.connectivity = hkpConvexVerticesConnectivity.fromdict(d["connectivity"])
 
         return inst
