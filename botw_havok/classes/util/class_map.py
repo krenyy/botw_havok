@@ -2,6 +2,7 @@ from ..base import HKBase
 from ..hkpBoxShape import hkpBoxShape
 from ..hkpBvCompressedMeshShape import hkpBvCompressedMeshShape
 from ..hkpCapsuleShape import hkpCapsuleShape
+from ..hkpConvexVerticesShape import hkpConvexVerticesShape
 from ..hkpPhysicsData import hkpPhysicsData
 from ..hkpPhysicsSystem import hkpPhysicsSystem
 from ..hkpRigidBody import hkpRigidBody
@@ -15,6 +16,7 @@ class HKClassMap:
         "hkpBoxShape": hkpBoxShape,
         "hkpBvCompressedMeshShape": hkpBvCompressedMeshShape,
         "hkpCapsuleShape": hkpCapsuleShape,
+        "hkpConvexVerticesShape": hkpConvexVerticesShape,
         "hkpPhysicsData": hkpPhysicsData,
         "hkpPhysicsSystem": hkpPhysicsSystem,
         "hkpRigidBody": hkpRigidBody,

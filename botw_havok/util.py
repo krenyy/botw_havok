@@ -1,3 +1,6 @@
+from typing import List
+
+
 class Vector3:
     x: int
     y: int
@@ -50,6 +53,32 @@ class Vector4(Vector3):
     @classmethod
     def fromdict(cls, d: list):
         return cls(d[0], d[1], d[2], d[3])
+
+    def __repr__(self):
+        return f"Vector4({self.x}, {self.y}, {self.z}, {self.w})"
+
+
+class Matrix3:
+    _matrix3: List[Vector4]
+
+    def __init__(self, matrix):
+        if len(matrix) == 3:
+            self._matrix3 = matrix
+        else:
+            raise Exception("Matrix3 only accepts lists of length 3")
+
+    def __iter__(self):
+        return iter((self._matrix3))
+
+    def asdict(self):
+        return self._matrix3
+
+    @classmethod
+    def fromdict(cls, d: list):
+        return cls(d)
+
+    def __repr__(self):
+        return f"Matrix3({self._matrix3})"
 
 
 class QsTransform:
