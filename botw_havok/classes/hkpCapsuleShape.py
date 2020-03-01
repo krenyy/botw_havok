@@ -34,17 +34,19 @@ class hkpCapsuleShape(HKBase, hkpConvexShape):
         bw.write_vector4(self.vertexB)
 
     def asdict(self):
-        d = super().asdict()
-        d.update({"vertexA": self.vertexA, "vertexB": self.vertexB})
+        d = HKBase.asdict(self)
+        d.update(hkpConvexShape.asdict(self))
+        d.update({"vertexA": self.vertexA.asdict(), "vertexB": self.vertexB.asdict()})
 
         return d
 
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
 
-        inst.vertexA = d["vertexA"]
-        inst.vertexB = d["vertexB"]
+        inst.vertexA = Vector4.fromdict(d["vertexA"])
+        inst.vertexB = Vector4.fromdict(d["vertexB"])
 
         return inst

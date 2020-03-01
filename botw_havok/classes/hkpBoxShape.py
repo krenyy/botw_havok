@@ -31,16 +31,18 @@ class hkpBoxShape(HKBase, hkpConvexShape):
         bw.write_vector4(self.halfExtents)
 
     def asdict(self):
-        d = super().asdict()
-        d.update({"halfExtents": self.halfExtents})
+        d = HKBase.asdict(self)
+        d.update(hkpConvexShape.asdict(self))
+        d.update({"halfExtents": self.halfExtents.asdict()})
 
         return d
 
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
 
-        inst.halfExtents = d["halfExtents"]
+        inst.halfExtents = Vector4.fromdict(d["halfExtents"])
 
         return inst
