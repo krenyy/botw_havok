@@ -84,7 +84,7 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
                     hk._assert_pointer(br)
                 for _ in range(userStringPaletteCount):
                     self.userStringPalette.append(br.read_string())
-                    br.align_to(8)
+                    br.align_to(2)
             br.step_out()
         br.align_to(16)
 
@@ -159,7 +159,7 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
             for userString in self.userStringPalette:
                 userString_destinations.append(bw.tell())
                 bw.write_string(userString)
-                bw.align_to(8)
+                bw.align_to(2)  # TODO: Check if correct
             bw.align_to(16)
 
             self.hkobj.local_fixups.append(
