@@ -1,5 +1,7 @@
 from ..base import HKBase
+from ..hkpBoxShape import hkpBoxShape
 from ..hkpBvCompressedMeshShape import hkpBvCompressedMeshShape
+from ..hkpCapsuleShape import hkpCapsuleShape
 from ..hkpPhysicsData import hkpPhysicsData
 from ..hkpPhysicsSystem import hkpPhysicsSystem
 from ..hkpRigidBody import hkpRigidBody
@@ -10,13 +12,15 @@ from ..StaticCompoundInfo import StaticCompoundInfo
 
 class HKClassMap:
     hk_class_map = {
+        "hkpBoxShape": hkpBoxShape,
         "hkpBvCompressedMeshShape": hkpBvCompressedMeshShape,
-        "hkpRigidBody": hkpRigidBody,
+        "hkpCapsuleShape": hkpCapsuleShape,
         "hkpPhysicsData": hkpPhysicsData,
         "hkpPhysicsSystem": hkpPhysicsSystem,
+        "hkpRigidBody": hkpRigidBody,
+        "hkpStaticCompoundShape": hkpStaticCompoundShape,
         "hkRootLevelContainer": hkRootLevelContainer,
         "StaticCompoundInfo": StaticCompoundInfo,
-        "hkpStaticCompoundShape": hkpStaticCompoundShape,
     }
 
     def __new__(cls):
