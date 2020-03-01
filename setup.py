@@ -20,6 +20,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
+    install_requires=["numpy"],
     entry_points={
         "console_scripts": [
             "hk_to_json = botw_havok.cli.hk_to_json:main",
