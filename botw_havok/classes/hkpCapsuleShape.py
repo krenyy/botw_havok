@@ -35,6 +35,8 @@ class hkpCapsuleShape(HKBase, hkpConvexShape):
         bw.write_vector4(self.vertexA)
         bw.write_vector4(self.vertexB)
 
+        HKBase.serialize(self, hk, bw)
+
     def asdict(self):
         d = HKBase.asdict(self)
         d.update(hkpConvexShape.asdict(self))

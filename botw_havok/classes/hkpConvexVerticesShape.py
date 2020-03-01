@@ -119,6 +119,8 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
             ]
         )
 
+        HKBase.serialize(self, hk, bw)
+
     def asdict(self):
         d = HKBase.asdict(self)
         d.update(hkpConvexShape.asdict(self))

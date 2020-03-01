@@ -32,6 +32,8 @@ class hkpBoxShape(HKBase, hkpConvexShape):
 
         bw.write_vector4(self.halfExtents)
 
+        HKBase.serialize(self, hk, bw)
+
     def asdict(self):
         d = HKBase.asdict(self)
         d.update(hkpConvexShape.asdict(self))

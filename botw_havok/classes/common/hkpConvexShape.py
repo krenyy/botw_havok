@@ -11,7 +11,7 @@ class hkpConvexShape(hkpSphereRepShape):
         self.radius = br.read_single()
 
     def serialize(self, hk, bw: BinaryWriter, obj):
-        super().serialize(hk, bw, obj)
+        super().serialize(hk, bw)
 
         bw.write_single(self.radius)
 

@@ -51,6 +51,8 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
         bw.write_vector4(self.perpendicular1)
         bw.write_vector4(self.perpendicular2)
 
+        HKBase.serialize(self, hk, bw)
+
     def asdict(self):
         d = HKBase.asdict(self)
         d.update(hkpConvexShape.asdict(self))
