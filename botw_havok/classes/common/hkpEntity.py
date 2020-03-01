@@ -134,15 +134,7 @@ class hkpEntity(hkpWorldObject):
 
         br.align_to(16)  # Should be right
 
-        # TODO: CONSTRAINTS
-        # Write those eventually
-        """for _ in range(constraintsSlaveCount):
-            constr = hkpConstraintInstance()
-            constr.deserialize(hk, br)
-            self.constraintsSlave.append(constr)
-
-        for _ in range(constraintRuntimeCount):
-            self.constraintRuntime.append(br.read_uint8())"""
+        # TODO: Figure out, what do the commented structs do and read them
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hk, bw, obj)
