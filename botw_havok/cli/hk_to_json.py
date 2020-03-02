@@ -1,5 +1,7 @@
-from .. import Havok
 import argparse
+
+from .. import Havok
+from .util import Messages, bcolors, change_extension, check_if_exists
 
 
 def main():
@@ -14,10 +16,20 @@ def main():
     if args.out:
         jsonFile = args.out
     else:
-        jsonFile = ".".join(args.hkFile.split(".")[:-1]) + ".json"
+        jsonFile = change_extension(args.hkFile, "json")
 
+        check_if_exists(jsonFile)
+
+    Messages.loading(args.hkFile)
     hk = Havok.from_file(args.hkFile)
+
+    print(f"{bcolors.OKBLUE}Deserializing{bcolors.ENDC}")
+    hk.deserialize()
+
+    Messages.writing(jsonFile)
     hk.to_json(jsonFile, args.pretty_print)
+
+    Messages.done()
 
 
 if __name__ == "__main__":

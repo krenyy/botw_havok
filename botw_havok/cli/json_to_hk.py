@@ -1,5 +1,7 @@
-from .. import Havok
 import argparse
+
+from .. import Havok
+from .util import Messages, bcolors, change_extension, check_if_exists
 
 
 def main():
@@ -13,20 +15,27 @@ def main():
     parser.add_argument("-o", "--out", help="Path to destination Havok packfile")
     args = parser.parse_args()
 
-    hk = Havok.from_json(args.jsonFile)
-
     if args.out:
         hkFile = args.out
     else:
-        hkFile = ".".join(args.jsonFile.split(".")[:-1]) + ".hkx"
+        hkFile = change_extension(args.jsonFile, "hkx")
+
+        check_if_exists(hkFile)
+
+    Messages.loading(args.jsonFile)
+    hk = Havok.from_json(args.jsonFile)
 
     if args.nx:
+        print(f"{bcolors.OKBLUE}--nx flag set, outputting as Switch{bcolors.ENDC}")
         hk.to_switch()
     else:
+        print(f"{bcolors.OKBLUE}--nx flag not set, outputting as Wii U{bcolors.ENDC}")
         hk.to_wiiu()
 
+    Messages.writing(hkFile)
     hk.to_file(hkFile)
 
+    Messages.done()
 
 if __name__ == "__main__":
     main()
