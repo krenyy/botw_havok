@@ -278,8 +278,10 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
                 "weldingType": WeldingType(self.weldingType).name,
                 "hasPerPrimitiveCollisionFilterInfo": self.hasPerPrimitiveCollisionFilterInfo,
                 "hasPerPrimitiveUserData": self.hasPerPrimitiveUserData,
-                "collisionFilterInfoPalette": self.collisionFilterInfoPalette,
-                "userDataPalette": self.userDataPalette,
+                "collisionFilterInfoPalette": [
+                    hex(i) for i in self.collisionFilterInfoPalette
+                ],
+                "userDataPalette": [hex(i) for i in self.userDataPalette],
                 "userStringPalette": self.userStringPalette,
                 "tree": self.tree.asdict(),
             }
@@ -299,8 +301,10 @@ class hkpBvCompressedMeshShape(HKBase, hkpBvTreeShape):
             "hasPerPrimitiveCollisionFilterInfo"
         ]
         inst.hasPerPrimitiveUserData = d["hasPerPrimitiveUserData"]
-        inst.collisionFilterInfoPalette = d["collisionFilterInfoPalette"]
-        inst.userDataPalette = d["userDataPalette"]
+        inst.collisionFilterInfoPalette = [
+            int(i, base=16) for i in d["collisionFilterInfoPalette"]
+        ]
+        inst.userDataPalette = [int(i, base=16) for i in d["userDataPalette"]]
         inst.userStringPalette = d["userStringPalette"]
         inst.tree = hkpBvCompressedMeshShapeTree.fromdict(d["tree"])
 
