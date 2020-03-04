@@ -64,15 +64,18 @@ class Matrix:
     def __init__(self, matrix):
         self._matrix = matrix
 
-    def __iter__(self):
-        return iter((self._matrix))
-
     def asdict(self):
         return [v4.asdict() for v4 in self._matrix]
 
     @classmethod
     def fromdict(cls, d: list):
         return cls(d)
+
+    def __getitem__(self, idx: int):
+        return self._matrix[idx]
+
+    def __iter__(self):
+        return iter((self._matrix))
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self._matrix})"
