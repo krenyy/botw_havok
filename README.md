@@ -9,7 +9,8 @@ HKX -> JSON conversion:
 from botw_havok import Havok
 
 hk = Havok.from_file('A-1-0.hksc')
-hk.to_json('A-1-0.json')
+hk.deserialize()
+hk.to_json('A-1-0.json', pretty_print=True)
 ```
 
 JSON -> HKX conversion:
@@ -18,6 +19,7 @@ from botw_havok import Havok
 
 hk = Havok.from_json('A-1-0.json')
 hk.to_switch() # or hk.to_wiiu()
+hk.serialize()
 hk.to_file('A-1-0.hksc')
 ```
 
@@ -27,7 +29,7 @@ You can learn how to use them by appending `--help` flag
 
 ---
 
-At the moment, only Havok Physics files (.hksc, .hkrb, .hktmrb) work. All of them should deserialize and serialize flawlessly and should be nearly identical to the originals (except the pointer section ordering which should be irrelevant).
+At the moment, only Havok Physics files (.hksc, .hkrb, .hktmrb) work. Most of them should deserialize and serialize flawlessly and should be nearly identical to the originals (except the pointer section ordering which should be irrelevant).
 
 The library is currently highly experimental, so expect bugs!
 
