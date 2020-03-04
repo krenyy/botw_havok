@@ -2,7 +2,7 @@ import botw_havok.classes.util.class_map as util
 
 from ...binary import BinaryReader, BinaryWriter
 from ...container.sections.util import GlobalReference
-from ...util import QsTransform
+from ...util import Matrix
 from .hkpShape import hkpShape
 
 if False:
@@ -11,16 +11,14 @@ if False:
 
 
 class hkpStaticCompoundShapeInstance:
-    transform: QsTransform
-    shape: hkpShape = None  # finish this
+    transform: Matrix
+    shape: hkpShape
     filterInfo: int
     childFilterInfoMask: int
     userData: int
 
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        self.transform = QsTransform(
-            [br.read_vector4(), br.read_vector4(), br.read_vector4()]
-        )
+        self.transform = br.read_matrix(3)
 
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
@@ -54,7 +52,7 @@ class hkpStaticCompoundShapeInstance:
             br.align_to(16)
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
-        [bw.write_vector4(v4) for v4 in self.transform]
+        bw.write_matrix(self.transform)
 
         gr = GlobalReference()
         gr.src_obj = obj
@@ -94,7 +92,7 @@ class hkpStaticCompoundShapeInstance:
     def fromdict(cls, d: dict):
         inst = cls()
 
-        inst.transform = QsTransform.fromdict(d["transform"])
+        inst.transform = Matrix.fromdict(d["transform"])
         inst.shape = util.HKClassMap.get(d["shape"]["hkClass"]).fromdict(d["shape"])
         inst.filterInfo = d["filterInfo"]
         inst.childFilterInfoMask = d["childFilterInfoMask"]

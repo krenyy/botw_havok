@@ -51,7 +51,7 @@ class BinaryWriter(BinaryBase):
     def write_floatu8(self, num: float) -> int:
         if num > 1 or num < 0:
             raise Exception("FloatU8 can only be between 0 and 1")
-        return self.write_uint8(round((num * 127) / 1))
+        return self.write_uint8(round((num * 0xFF) / 1))
 
     def write_half(self, num: float) -> int:
         return self.write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
