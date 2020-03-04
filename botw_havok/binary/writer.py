@@ -6,7 +6,7 @@ import typing
 
 import numpy as np
 
-from ..util import Matrix, Vector4
+from ..util import Matrix, Vector3, Vector4
 from .base import BinaryBase
 
 
@@ -61,6 +61,9 @@ class BinaryWriter(BinaryBase):
 
     def write_double(self, num: float) -> int:
         return self.write_type("double", num)
+
+    def write_vector3(self, vector: Vector3) -> int:
+        return self.write(struct.pack(f"{self.endian_char()}3f", *vector))
 
     def write_vector4(self, vector: Vector4) -> int:
         return self.write(struct.pack(f"{self.endian_char()}4f", *vector))
