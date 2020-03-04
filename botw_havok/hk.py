@@ -104,16 +104,10 @@ class HK:
         return inst
 
     def to_switch(self):
-        if self.data.objects:
-            self.data.deserialize(self)
         self.header.to_switch()
-        self.data.serialize(self)
 
     def to_wiiu(self):
-        if self.data.objects:
-            self.data.deserialize(self)
         self.header.to_wiiu()
-        self.data.serialize(self)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} ({self.header})>"
