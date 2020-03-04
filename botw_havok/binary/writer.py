@@ -6,7 +6,7 @@ import typing
 
 import numpy as np
 
-from ..util import Transform, Vector4
+from ..util import Matrix, Vector4
 from .base import BinaryBase
 
 
@@ -48,6 +48,11 @@ class BinaryWriter(BinaryBase):
     def write_uint64(self, num: int) -> int:
         return self.write_type("uint64", num)
 
+    def write_floatu8(self, num: float) -> int:
+        if num > 1 or num < 0:
+            raise Exception("FloatU8 can only be between 0 and 1")
+        return self.write_uint8(round((num * 127) / 1))
+
     def write_half(self, num: float) -> int:
         return self.write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
 
@@ -60,8 +65,8 @@ class BinaryWriter(BinaryBase):
     def write_vector4(self, vector: Vector4) -> int:
         return self.write(struct.pack(f"{self.endian_char()}4f", *vector))
 
-    def write_transform(self, transform: Transform) -> list:
-        return [self.write_vector4(v4) for v4 in transform]
+    def write_matrix(self, matrix: Matrix) -> list:
+        return [self.write_vector4(v4) for v4 in matrix]
 
     def write_string(self, string: str, size: int = None) -> str:
         if isinstance(string, str):

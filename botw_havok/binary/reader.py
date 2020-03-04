@@ -5,7 +5,7 @@ import struct
 
 import numpy as np
 
-from ..util import Vector3, Vector4, Transform
+from ..util import Matrix, Vector3, Vector4
 from .base import BinaryBase
 
 
@@ -44,6 +44,9 @@ class BinaryReader(BinaryBase):
     def read_uint64(self) -> int:
         return self.read_type(struct_type="uint64", value=self.read(8))
 
+    def read_floatu8(self) -> float:
+        return (self.read_uint8() * 1) / 127
+
     def read_half(self) -> float:
         return float(np.frombuffer(self.read(2), dtype=f"{self.endian_char()}f2")[0])
 
@@ -62,15 +65,8 @@ class BinaryReader(BinaryBase):
     def read_vector4(self) -> Vector4:
         return Vector4(v3=self.read_vector3(), w=self.read_single())
 
-    def read_transform(self) -> Transform:
-        return Transform(
-            [
-                self.read_vector4(),
-                self.read_vector4(),
-                self.read_vector4(),
-                self.read_vector4(),
-            ]
-        )
+    def read_matrix(self, size: int) -> Matrix:
+        return Matrix([self.read_vector4() for _ in range(size)])
 
     def read_string(self, size: int = None, encoding: str = "utf-8") -> str:
         if not size:

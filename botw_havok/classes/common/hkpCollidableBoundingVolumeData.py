@@ -17,8 +17,8 @@ class hkpCollidableBoundingVolumeData:
 
     numChildShapeAabbs: int
     capacityChildShapeAabbs: int
-    childShapeAabbs: None = None
-    childShapeKeys: None = None
+    # childShapeAabbs: None = None
+    # childShapeKeys: None = None
 
     def deserialize(self, hk: "HK", br: BinaryReader):
         self.min = [br.read_uint32() for _ in range(3)]
@@ -64,8 +64,8 @@ class hkpCollidableBoundingVolumeData:
             bw.align_to(8)
 
         # Empty pointers
-        hk._write_empty_pointer(bw)
-        hk._write_empty_pointer(bw)
+        hk._write_empty_pointer(bw)  # childShapeAabbs
+        hk._write_empty_pointer(bw)  # childShapeKeys
 
     def asdict(self):
         return {
@@ -76,8 +76,8 @@ class hkpCollidableBoundingVolumeData:
             "expansionMax": self.expansionMax,
             "numChildShapeAabbs": self.numChildShapeAabbs,
             "capacityChildShapeAabbs": self.capacityChildShapeAabbs,
-            "childShapeAabbs": self.childShapeAabbs,
-            "childShapeKeys": self.childShapeKeys,
+            # "childShapeAabbs": self.childShapeAabbs,
+            # "childShapeKeys": self.childShapeKeys,
         }
 
     @classmethod
@@ -90,7 +90,7 @@ class hkpCollidableBoundingVolumeData:
         inst.expansionMax = d["expansionMax"]
         inst.numChildShapeAabbs = d["numChildShapeAabbs"]
         inst.capacityChildShapeAabbs = d["capacityChildShapeAabbs"]
-        inst.childShapeAabbs = d["childShapeAabbs"]
-        inst.childShapeKeys = d["childShapeKeys"]
+        # inst.childShapeAabbs = d["childShapeAabbs"]
+        # inst.childShapeKeys = d["childShapeKeys"]
 
         return inst

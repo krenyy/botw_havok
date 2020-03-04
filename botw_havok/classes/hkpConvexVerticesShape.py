@@ -2,7 +2,7 @@ from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
 from ..container.sections.util import LocalFixup
-from ..util import Matrix3, Vector4
+from ..util import Matrix, Vector4
 from .base import HKBase
 from .common.hkpConvexShape import hkpConvexShape
 
@@ -14,12 +14,12 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
     aabbHalfExtents: Vector4
     aabbCenter: Vector4
 
-    rotatedVertices: List[Matrix3]
+    rotatedVertices: List[Matrix]
 
     numVertices: int
     useSpuBuffer: bool
 
-    planeEquations: List[Vector4]
+    planeEquations: Matrix
 
     # connectivity: hkpConvexVerticesConnectivity = None
 
@@ -61,13 +61,10 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
 
             if lfu.src == rotatedVerticesCount_offset:
                 for _ in range(rotatedVerticesCount):
-                    self.rotatedVertices.append(
-                        Matrix3([br.read_vector4() for _ in range(3)])
-                    )
+                    self.rotatedVertices.append(br.read_matrix(3))
 
             if lfu.src == planeEquationsCount_offset:
-                for _ in range(planeEquationsCount):
-                    self.planeEquations.append(br.read_vector4())
+                self.planeEquations = br.read_matrix(planeEquationsCount)
 
             br.step_out()
 
@@ -105,12 +102,11 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
 
         rotatedVertices_offset = bw.tell()
         for rv in self.rotatedVertices:
-            [bw.write_vector4(v4) for v4 in rv]
+            bw.write_matrix(rv)
         bw.align_to(16)
 
         planeEquations_offset = bw.tell()
-        for pe in self.planeEquations:
-            bw.write_vector4(pe)
+        bw.write_matrix(self.planeEquations)
 
         self.hkobj.local_fixups.extend(
             [
@@ -131,7 +127,7 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
                 "rotatedVertices": [rv.asdict() for rv in self.rotatedVertices],
                 "numVertices": self.numVertices,
                 "useSpuBuffer": self.useSpuBuffer,
-                "planeEquations": [pe.asdict() for pe in self.planeEquations],
+                "planeEquations": self.planeEquations.asdict(),
                 # "connectivity": self.connectivity.asdict(),
             }
         )
@@ -146,10 +142,10 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
 
         inst.aabbHalfExtents = Vector4.fromdict(d["aabbHalfExtents"])
         inst.aabbCenter = Vector4.fromdict(d["aabbCenter"])
-        inst.rotatedVertices = [Matrix3.fromdict(rv) for rv in d["rotatedVertices"]]
+        inst.rotatedVertices = [Matrix.fromdict(rv) for rv in d["rotatedVertices"]]
         inst.numVertices = d["numVertices"]
         inst.useSpuBuffer = d["useSpuBuffer"]
-        inst.planeEquations = d["planeEquations"]
+        inst.planeEquations = Matrix.fromdict(d["planeEquations"])
         # inst.connectivity = hkpConvexVerticesConnectivity.fromdict(d["connectivity"])
 
         return inst

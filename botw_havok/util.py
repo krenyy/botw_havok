@@ -58,27 +58,25 @@ class Vector4(Vector3):
         return f"Vector4({self.x}, {self.y}, {self.z}, {self.w})"
 
 
-class Matrix3:
-    _matrix3: List[Vector4]
+class Matrix:
+    _matrix: List[Vector4]
 
     def __init__(self, matrix):
-        if len(matrix) == 3:
-            self._matrix3 = matrix
-        else:
-            raise Exception("Matrix3 only accepts lists of length 3")
+        self._matrix = []
+        self._matrix.extend(matrix)
 
     def __iter__(self):
-        return iter((self._matrix3))
+        return iter((self._matrix))
 
     def asdict(self):
-        return [v4.asdict() for v4 in self._matrix3]
+        return [v4.asdict() for v4 in self._matrix]
 
     @classmethod
     def fromdict(cls, d: list):
         return cls(d)
 
     def __repr__(self):
-        return f"Matrix3({self._matrix3})"
+        return f"{self.__class__.__name__}({self._matrix})"
 
 
 class QsTransform:
