@@ -1,4 +1,5 @@
 from typing import List
+from ...util import Vector3
 
 from ...binary import BinaryReader, BinaryWriter
 from .hkcdStaticMeshTreeBaseSectionDataRuns import hkcdStaticMeshTreeBaseSectionDataRuns
@@ -18,7 +19,7 @@ if False:
 
 
 class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage4):
-    codecParms: List[float]
+    codecParms: List[Vector3]
     firstPackedVertex: int
     sharedVertices: hkcdStaticMeshTreeBaseSectionSharedVertices
     primitives: hkcdStaticMeshTreeBaseSectionPrimitives
@@ -34,7 +35,7 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
     def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
         super().deserialize(hk, br, obj)
 
-        self.codecParms = [br.read_single() for _ in range(6)]
+        self.codecParms = [br.read_vector3() for _ in range(2)]
         self.firstPackedVertex = br.read_uint32()
 
         self.sharedVertices = hkcdStaticMeshTreeBaseSectionSharedVertices()
@@ -57,8 +58,8 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
 
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hk, bw)
-        
-        [bw.write_single(cp) for cp in self.codecParms]
+
+        [bw.write_vector3(cp) for cp in self.codecParms]
         bw.write_uint32(self.firstPackedVertex)
 
         self.sharedVertices.serialize(hk, bw, obj)
@@ -78,7 +79,7 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
         d = super().asdict()
         d.update(
             {
-                "codecParms": self.codecParms,
+                "codecParms": [cp.asdict() for cp in self.codecParms],
                 "firstPackedVertex": self.firstPackedVertex,
                 "sharedVertices": self.sharedVertices.asdict(),
                 "primitives": self.primitives.asdict(),
@@ -100,7 +101,7 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
         inst = cls()
         inst.__dict__.update(super().fromdict(d).__dict__)
 
-        inst.codecParms = d["codecParms"]
+        inst.codecParms = [Vector3.fromdict(cp) for cp in d["codecParms"]]
         inst.firstPackedVertex = d["firstPackedVertex"]
         inst.sharedVertices = hkcdStaticMeshTreeBaseSectionSharedVertices.fromdict(
             d["sharedVertices"]
