@@ -25,12 +25,7 @@ class hkpStaticCompoundShapeInstance:
                 try:
                     hk.data.objects.remove(gr.dst_obj)
                 except ValueError:
-                    # raise Exception
-                    print(
-                        "File links multiple StaticCompound instances to a single Havok object, "
-                        "this is probably done to link multiple HashIds and SRTHashes to a single piece of geometry."
-                        "\nThis file cannot be correctly interpreted as of yet."
-                    )
+                    pass
 
                 self.shape = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
                 self.shape.deserialize(hk, gr.dst_obj)
@@ -54,6 +49,14 @@ class hkpStaticCompoundShapeInstance:
     def serialize(self, hk: "HK", bw: BinaryWriter, obj: "HKObject"):
         bw.write_matrix(self.transform)
 
+        self.shape.serialize(hk)
+        for o in hk.data.objects:
+            if self.shape.hkobj.bytes == o.bytes:
+                self.shape.hkobj = o
+                break
+        else:
+            hk.data.objects.append(self.shape.hkobj)
+
         gr = GlobalReference()
         gr.src_obj = obj
         gr.src_rel_offset = bw.tell()
@@ -61,8 +64,6 @@ class hkpStaticCompoundShapeInstance:
         gr.dst_obj = self.shape.hkobj
         gr.dst_rel_offset = 0
         obj.global_references.append(gr)
-        hk.data.objects.append(self.shape.hkobj)
-        self.shape.serialize(hk)
 
         hk._write_empty_pointer(bw)
 

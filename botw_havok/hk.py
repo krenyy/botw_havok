@@ -42,7 +42,7 @@ class HK:
         self.types.read(br)
         self.data.read(self, br)
 
-    def write(self, bw: BinaryWriter):
+    def write(self, bw: BinaryWriter):        
         # Write Havok header
         self.header.write(bw)
 

@@ -34,6 +34,8 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
         self.perpendicular1 = br.read_vector4()
         self.perpendicular2 = br.read_vector4()
 
+        br.align_to(16)
+
     def serialize(self, hk: "HK"):
         HKBase.assign_class(self, hk)
 
@@ -50,6 +52,8 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
 
         bw.write_vector4(self.perpendicular1)
         bw.write_vector4(self.perpendicular2)
+
+        bw.align_to(16)
 
         HKBase.serialize(self, hk, bw)
 

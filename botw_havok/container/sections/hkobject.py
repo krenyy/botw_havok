@@ -15,7 +15,7 @@ class HKObject:
 
     offset: int
     hkclass: "HKClass"
-    bytes: bytes
+    bytes: bytes = b""
     size: int
 
     local_fixups: typing.List[LocalFixup]

@@ -1,7 +1,7 @@
 import argparse
 
 from .. import Havok
-from .util import Messages, bcolors, change_extension, check_if_exists
+from .util import Messages, change_extension, check_if_exists, Fore
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     Messages.loading(args.hkFile)
     hk = Havok.from_file(args.hkFile)
 
-    print(f"{bcolors.OKBLUE}Deserializing{bcolors.ENDC}")
+    print(f"{Fore.BLUE}Deserializing")
     hk.deserialize()
 
     Messages.writing(jsonFile)

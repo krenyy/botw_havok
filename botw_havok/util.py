@@ -71,6 +71,9 @@ class Matrix:
     def fromdict(cls, d: list):
         return cls(d)
 
+    def __len__(self):
+        return len(self._matrix)
+
     def __getitem__(self, idx: int):
         return self._matrix[idx]
 

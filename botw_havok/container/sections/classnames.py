@@ -113,10 +113,7 @@ class HKClassnamesSection(HKSection):
                 if cls.name == value:
                     return cls
             else:
-                cls = HKClass()
-                cls.name = value
-                cls.signature = HKSignatureMap.get(value)
-
+                cls = HKClass.from_name(value)
                 self.classes.append(cls)
                 return cls
         else:

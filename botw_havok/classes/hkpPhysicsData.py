@@ -57,7 +57,7 @@ class hkpPhysicsData(HKBase, hkReferencedObject):
         obj.global_references.clear()
 
     def serialize(self, hk: "HK"):
-        super().assign_class(hk)
+        HKBase.assign_class(self, hk)
 
         bw = BinaryWriter()
         bw.big_endian = hk.header.endian == 0

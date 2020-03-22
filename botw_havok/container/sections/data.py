@@ -83,13 +83,9 @@ class HKDataSection(HKSection):
                 hkcls = util.HKClassMap.get(obj.hkclass.name)()
                 self.contents.append(hkcls)
             except KeyError:
-                # return "OK"  # for testing purposes
-                raise NotImplementedError(
-                    f"Class '{obj.hkclass.name}' is not mapped out yet."
-                )
+                raise Exception(f"Class '{obj.hkclass.name}' is not mapped out yet.")
 
             hkcls.deserialize(hk, obj)
-
         self.objects.clear()
 
     def serialize(self, hk: "HK"):
@@ -109,7 +105,7 @@ class HKDataSection(HKSection):
 
         # Serialize the file if it happens to be deserialized
         if self.contents:
-            self.serialize(hk)
+            raise Exception("You need to serialize first!")
 
         for obj in self.objects:
             obj.write(hk, bw)

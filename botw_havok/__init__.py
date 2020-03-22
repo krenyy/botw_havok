@@ -33,6 +33,7 @@ class Havok:
         for file in self.files:
             _bw = BinaryWriter()
             _bw.big_endian = file.header.endian == 0
+            file.serialize()
             file.write(_bw)
             bw.write(_bw.getvalue())
 

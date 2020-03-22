@@ -1,7 +1,7 @@
 import argparse
 
 from .. import Havok
-from .util import Messages, bcolors, change_extension, check_if_exists
+from .util import Messages, Fore, change_extension, check_if_exists
 
 
 def main():
@@ -26,16 +26,17 @@ def main():
     hk = Havok.from_json(args.jsonFile)
 
     if args.nx:
-        print(f"{bcolors.OKBLUE}--nx flag set, outputting as Switch{bcolors.ENDC}")
+        print(f"{Fore.BLUE}--nx flag set, outputting as Switch")
         hk.to_switch()
     else:
-        print(f"{bcolors.OKBLUE}--nx flag not set, outputting as Wii U{bcolors.ENDC}")
+        print(f"{Fore.BLUE}--nx flag not set, outputting as Wii U")
         hk.to_wiiu()
 
     Messages.writing(hkFile)
     hk.to_file(hkFile)
 
     Messages.done()
+
 
 if __name__ == "__main__":
     main()
