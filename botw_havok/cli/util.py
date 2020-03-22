@@ -1,5 +1,7 @@
 import os
-from colorama import Fore, Style
+from colorama import init, Fore
+
+init()
 
 
 class Messages:

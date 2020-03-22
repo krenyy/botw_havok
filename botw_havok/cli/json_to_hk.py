@@ -1,7 +1,7 @@
 import argparse
 
 from .. import Havok
-from .util import Messages, Fore, change_extension, check_if_exists
+import botw_havok.cli.util as cliutil
 
 
 def main():
@@ -18,24 +18,24 @@ def main():
     if args.out:
         hkFile = args.out
     else:
-        hkFile = change_extension(args.jsonFile, "hkx")
+        hkFile = cliutil.change_extension(args.jsonFile, "hkx")
 
-        check_if_exists(hkFile)
+        cliutil.check_if_exists(hkFile)
 
-    Messages.loading(args.jsonFile)
+    cliutil.Messages.loading(args.jsonFile)
     hk = Havok.from_json(args.jsonFile)
 
     if args.nx:
-        print(f"{Fore.BLUE}--nx flag set, outputting as Switch")
+        print(f"{cliutil.Fore.BLUE}--nx flag set, outputting as Switch")
         hk.to_switch()
     else:
-        print(f"{Fore.BLUE}--nx flag not set, outputting as Wii U")
+        print(f"{cliutil.Fore.BLUE}--nx flag not set, outputting as Wii U")
         hk.to_wiiu()
 
-    Messages.writing(hkFile)
+    cliutil.Messages.writing(hkFile)
     hk.to_file(hkFile)
 
-    Messages.done()
+    cliutil.Messages.done()
 
 
 if __name__ == "__main__":

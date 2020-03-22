@@ -1,7 +1,7 @@
 import argparse
 
 from .. import Havok
-from .util import Messages, change_extension, check_if_exists, Fore
+import botw_havok.cli.util as cliutil
 
 
 def main():
@@ -16,20 +16,20 @@ def main():
     if args.out:
         jsonFile = args.out
     else:
-        jsonFile = change_extension(args.hkFile, "json")
+        jsonFile = cliutil.change_extension(args.hkFile, "json")
 
-        check_if_exists(jsonFile)
+        cliutil.check_if_exists(jsonFile)
 
-    Messages.loading(args.hkFile)
+    cliutil.Messages.loading(args.hkFile)
     hk = Havok.from_file(args.hkFile)
 
-    print(f"{Fore.BLUE}Deserializing")
+    print(f"{cliutil.Fore.BLUE}Deserializing")
     hk.deserialize()
 
-    Messages.writing(jsonFile)
+    cliutil.Messages.writing(jsonFile)
     hk.to_json(jsonFile, args.pretty_print)
 
-    Messages.done()
+    cliutil.Messages.done()
 
 
 if __name__ == "__main__":
