@@ -1,35 +1,37 @@
 import argparse
 
+from colorama import Fore, init
+
 from .. import Havok
-import botw_havok.cli.util as cliutil
+from .common import Messages, change_extension, check_if_exists
 
 
 def main():
+    init(autoreset=True, convert=True)
+
     parser = argparse.ArgumentParser(description="Convert Havok packfile to JSON")
     parser.add_argument("hkFile", help="Path to a Havok packfile")
-    parser.add_argument("-o", "--out", help="Path to destination JSON file")
+    parser.add_argument("outFile", help="Path to destination JSON file")
     parser.add_argument(
         "-p", "--pretty-print", action="store_true", help="Pretty-print the JSON"
     )
     args = parser.parse_args()
 
-    if args.out:
-        jsonFile = args.out
-    else:
-        jsonFile = cliutil.change_extension(args.hkFile, "json")
+    if not args.outFile:
+        args.outFile = change_extension(args.hkFile, "json")
 
-        cliutil.check_if_exists(jsonFile)
+        check_if_exists(args.outFile)
 
-    cliutil.Messages.loading(args.hkFile)
+    Messages.loading(args.hkFile)
     hk = Havok.from_file(args.hkFile)
 
-    print(f"{cliutil.Fore.BLUE}Deserializing")
+    print(f"{Fore.BLUE}Deserializing")
     hk.deserialize()
 
-    cliutil.Messages.writing(jsonFile)
-    hk.to_json(jsonFile, args.pretty_print)
+    Messages.writing(args.outFile)
+    hk.to_json(args.outFile, args.pretty_print)
 
-    cliutil.Messages.done()
+    Messages.done()
 
 
 if __name__ == "__main__":
