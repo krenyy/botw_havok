@@ -13,7 +13,7 @@ def main():
         description="Convert a valid JSON file to a Havok packfile"
     )
     parser.add_argument("jsonFile", help="Path to a JSON file")
-    parser.add_argument("outFile", help="Path to destination Havok packfile")
+    parser.add_argument("outFile", help="Path to destination Havok packfile", nargs="?")
     parser.add_argument(
         "--nx", action="store_true", help="Convert to Nintendo Switch packfile"
     )
