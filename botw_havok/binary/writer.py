@@ -6,85 +6,126 @@ import typing
 
 import numpy as np
 
-from ..util import Matrix, Vector3, Vector4
 from .base import BinaryBase
+from .types import (
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+    UInt8,
+    UInt16,
+    UInt32,
+    UInt64,
+    Float16,
+    Float32,
+    Float64,
+    String,
+    Vector3,
+    Vector4,
+    Matrix,
+)
 
 
 class BinaryWriter(BinaryBase):
-    reservations: typing.Mapping[str, int]
+    reservations: typing.Dict[str, int]
+
+    def __init__(self, initial_bytes=None, big_endian: bool = None):
+        super().__init__(initial_bytes=initial_bytes, big_endian=big_endian)
+
+        self.reservations = {}
+
+        self.types = {
+            Int8: self.write_int8,
+            Int16: self.write_int16,
+            Int32: self.write_int32,
+            Int64: self.write_int64,
+            UInt8: self.write_uint8,
+            UInt16: self.write_uint16,
+            UInt32: self.write_uint32,
+            UInt64: self.write_uint64,
+            Float16: self.write_float16,
+            Float32: self.write_float32,
+            Float64: self.write_float64,
+            String: self.write_string,
+            Vector3: self.write_vector3,
+            Vector4: self.write_vector4,
+            Matrix: self.write_matrix,
+        }
 
     # WRITE
 
-    def __init__(self, initial_bytes=None):
-        super().__init__(initial_bytes=initial_bytes)
-        self.reservations = {}
+    def write(self, value):
+        """Writes value as bytes depending on it's type
+        """
+        if isinstance(value, list):
+            [self.write(i) for i in value]
+        else:
+            try:
+                return self.types[type(value)](value)
+            except KeyError:
+                raise NotImplementedError("Invalid variable type!")
 
-    def write_type(self, type: str, value) -> bytes:
-        return self.write(
-            struct.pack(f"{self.endian_char()}{self.type_names[type]}", value)
+    def write_type(self, type: str, value):
+        return super().write(
+            struct.pack(f"{self.endian_char()}{self.struct_types[type]}", value)
         )
 
-    def write_int8(self, num: int) -> int:
-        return self.write_type("int8", num)
+    def write_int8(self, num: Int8):
+        return self.write_type("i8", num)
 
-    def write_uint8(self, num: int) -> int:
-        return self.write_type("uint8", num)
+    def write_uint8(self, num: UInt8):
+        return self.write_type("u8", num)
 
-    def write_int16(self, num: int) -> int:
-        return self.write_type("int16", num)
+    def write_int16(self, num: Int16):
+        return self.write_type("i16", num)
 
-    def write_uint16(self, num: int) -> int:
-        return self.write_type("uint16", num)
+    def write_uint16(self, num: UInt16):
+        return self.write_type("u16", num)
 
-    def write_int32(self, num: int) -> int:
-        return self.write_type("int32", num)
+    def write_int32(self, num: Int32):
+        return self.write_type("i32", num)
 
-    def write_uint32(self, num: int) -> int:
-        return self.write_type("uint32", num)
+    def write_uint32(self, num: UInt32):
+        return self.write_type("u32", num)
 
-    def write_int64(self, num: int) -> int:
-        return self.write_type("int64", num)
+    def write_int64(self, num: Int64):
+        return self.write_type("i64", num)
 
-    def write_uint64(self, num: int) -> int:
-        return self.write_type("uint64", num)
+    def write_uint64(self, num: UInt64):
+        return self.write_type("u64", num)
 
-    def write_floatu8(self, num: float) -> int:
-        if num > 1 or num < 0:
-            raise Exception("FloatU8 can only be between 0 and 1")
-        return self.write_uint8(round((num * 0xFF) / 1))
+    def write_float16(self, num: Float16):
+        return super().write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
 
-    def write_half(self, num: float) -> int:
-        return self.write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
+    def write_float32(self, num: Float32):
+        return self.write_type("f32", num)
 
-    def write_single(self, num: float) -> int:
-        return self.write_type("float", num)
+    def write_float64(self, num: Float64):
+        return self.write_type("f64", num)
 
-    def write_double(self, num: float) -> int:
-        return self.write_type("double", num)
+    def write_vector3(self, vector: Vector3):
+        return super().write(struct.pack(f"{self.endian_char()}3f", *vector))
 
-    def write_vector3(self, vector: Vector3) -> int:
-        return self.write(struct.pack(f"{self.endian_char()}3f", *vector))
+    def write_vector4(self, vector: Vector4):
+        return super().write(struct.pack(f"{self.endian_char()}4f", *vector))
 
-    def write_vector4(self, vector: Vector4) -> int:
-        return self.write(struct.pack(f"{self.endian_char()}4f", *vector))
+    def write_matrix(self, matrix: Matrix):
+        return [self.write_vector4(v) for v in matrix]
 
-    def write_matrix(self, matrix: Matrix) -> list:
-        return [self.write_vector4(v4) for v4 in matrix]
-
-    def write_string(self, string: str, size: int = None) -> str:
-        if isinstance(string, str):
-            string = string.encode()
+    def write_string(self, string: String, size: int = None, encoding: str = "utf-8"):
         if not size:
             size = len(string) + 1
-        return self.write(struct.pack(f"{self.endian_char()}{size}s", string))
+        return super().write(
+            struct.pack(f"{self.endian_char()}{size}s", string.encode(encoding))
+        )
 
     # NAVIGATION
 
-    def align_to(self, alignment: int, char=b"\x00"):
+    def align_to(self, alignment: int, char: bytes = b"\x00"):
         if alignment <= 0:
             raise Exception("Not possible")
         while self.tell() % alignment:
-            self.write(char)
+            super().write(char)
 
     # RESERVE, FILL
 
@@ -95,7 +136,7 @@ class BinaryWriter(BinaryBase):
 
         self.reservations[name] = self.tell()
         for _ in range(size):
-            self.write_uint8(0xFE)
+            self.write_uint8(UInt8(0xFE))
 
     def fill(self, name: str, struct_type: str):
         name = f"{name}:{struct_type}"
@@ -104,82 +145,82 @@ class BinaryWriter(BinaryBase):
 
         return self.reservations.pop(name)
 
-    def reserve_uint8(self, name: str):
-        self.reserve(name, "uint8", 1)
-
-    def fill_uint8(self, name: str, value: int):
-        self.step_in(self.fill(name, "uint8"))
-        self.write_uint8(value)
-        self.step_out()
-
     def reserve_int8(self, name: str):
-        self.reserve(name, "int8", 1)
+        self.reserve(name, "i8", 1)
 
-    def fill_int8(self, name: str, value: int):
-        self.step_in(self.fill(name, "int8"))
+    def fill_int8(self, name: str, value: Int8):
+        self.step_in(self.fill(name, "i8"))
         self.write_int8(value)
         self.step_out()
 
-    def reserve_uint16(self, name: str):
-        self.reserve(name, "uint16", 2)
+    def reserve_uint8(self, name: str):
+        self.reserve(name, "u8", 1)
 
-    def fill_uint16(self, name: str, value: int):
-        self.step_in(self.fill(name, "uint16"))
-        self.write_uint16(value)
+    def fill_uint8(self, name: str, value: UInt8):
+        self.step_in(self.fill(name, "u8"))
+        self.write_uint8(value)
         self.step_out()
 
     def reserve_int16(self, name: str):
-        self.reserve(name, "int16", 2)
+        self.reserve(name, "i16", 2)
 
-    def fill_int16(self, name: str, value: int):
-        self.step_in(self.fill(name, "int16"))
+    def fill_int16(self, name: str, value: Int16):
+        self.step_in(self.fill(name, "i16"))
         self.write_int16(value)
         self.step_out()
 
-    def reserve_uint32(self, name: str):
-        self.reserve(name, "uint32", 4)
+    def reserve_uint16(self, name: str):
+        self.reserve(name, "u16", 2)
 
-    def fill_uint32(self, name: str, value: int):
-        self.step_in(self.fill(name, "uint32"))
-        self.write_uint32(value)
+    def fill_uint16(self, name: str, value: UInt16):
+        self.step_in(self.fill(name, "u16"))
+        self.write_uint16(value)
         self.step_out()
 
     def reserve_int32(self, name: str):
-        self.reserve(name, "int32", 4)
+        self.reserve(name, "i32", 4)
 
-    def fill_int32(self, name: str, value: int):
-        self.step_in(self.fill(name, "int32"))
+    def fill_int32(self, name: str, value: Int32):
+        self.step_in(self.fill(name, "i32"))
         self.write_int32(value)
         self.step_out()
 
-    def reserve_uint64(self, name: str):
-        self.reserve(name, "uint64", 8)
+    def reserve_uint32(self, name: str):
+        self.reserve(name, "u32", 4)
 
-    def fill_uint64(self, name: str, value: int):
-        self.step_in(self.fill(name, "uint64"))
-        self.write_uint64(value)
+    def fill_uint32(self, name: str, value: UInt32):
+        self.step_in(self.fill(name, "u32"))
+        self.write_uint32(value)
         self.step_out()
 
     def reserve_int64(self, name: str):
-        self.reserve(name, "int64", 8)
+        self.reserve(name, "i64", 8)
 
-    def fill_int64(self, name: str, value: int):
-        self.step_in(self.fill(name, "int64"))
+    def fill_int64(self, name: str, value: Int64):
+        self.step_in(self.fill(name, "i64"))
         self.write_int64(value)
         self.step_out()
 
-    def reserve_single(self, name: str):
-        self.reserve(name, "float", 4)
+    def reserve_uint64(self, name: str):
+        self.reserve(name, "u64", 8)
 
-    def fill_single(self, name: str, value: int):
-        self.step_in(self.fill(name, "float"))
-        self.write_single(value)
+    def fill_uint64(self, name: str, value: UInt64):
+        self.step_in(self.fill(name, "u64"))
+        self.write_uint64(value)
         self.step_out()
 
-    def reserve_double(self, name: str):
-        self.reserve(name, "double", 8)
+    def reserve_float32(self, name: str):
+        self.reserve(name, "f32", 4)
 
-    def fill_double(self, name: str, value: int):
-        self.step_in(self.fill(name, "double"))
-        self.write_double(value)
+    def fill_float32(self, name: str, value: Float32):
+        self.step_in(self.fill(name, "f32"))
+        self.write_float32(value)
+        self.step_out()
+
+    def reserve_float64(self, name: str):
+        self.reserve(name, "f64", 8)
+
+    def fill_float64(self, name: str, value: Float64):
+        self.step_in(self.fill(name, "f64"))
+        self.write_float64(value)
         self.step_out()

@@ -1,19 +1,21 @@
 from ...binary import BinaryReader, BinaryWriter
-from ...util import Vector4
+from ...binary.types import Vector4
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkAabb:
+class hkAabb(hkObject):
     min: Vector4
     max: Vector4
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.min = br.read_vector4()
         self.max = br.read_vector4()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_vector4(self.min)
         bw.write_vector4(self.max)
 

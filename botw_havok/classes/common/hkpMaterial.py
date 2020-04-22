@@ -1,31 +1,32 @@
-from ..enums.ResponseType import ResponseType
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float16, Float32, Int8
+from ..enums.ResponseType import ResponseType
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
 
 
 class hkpMaterial:
-    responseType: int
-    rollingFrictionMultiplier: float
-    friction: float
-    restitution: float
+    responseType: Int8
+    rollingFrictionMultiplier: Float16
+    friction: Float32
+    restitution: Float32
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader):
         self.responseType = br.read_int8()
         br.align_to(2)
 
-        self.rollingFrictionMultiplier = br.read_half()
-        self.friction = br.read_single()
-        self.restitution = br.read_single()
+        self.rollingFrictionMultiplier = br.read_float16()
+        self.friction = br.read_float32()
+        self.restitution = br.read_float32()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter):
         bw.write_int8(self.responseType)
         bw.align_to(2)
 
-        bw.write_half(self.rollingFrictionMultiplier)
-        bw.write_single(self.friction)
-        bw.write_single(self.restitution)
+        bw.write_float16(self.rollingFrictionMultiplier)
+        bw.write_float32(self.friction)
+        bw.write_float32(self.restitution)
 
     def asdict(self):
         return {

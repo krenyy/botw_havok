@@ -1,32 +1,35 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt16
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkpEntitySmallArraySerializeOverrideType:
+class hkpEntitySmallArraySerializeOverrideType(hkObject):
     # data: None = None
-    size: int
-    capacityAndFlags: int
+    size: UInt16
+    capacityAndFlags: UInt16
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         data_offset = br.tell()
-        hk._assert_pointer(br)  # 'data' pointer
+        hkFile._assert_pointer(br)  # empty 'data' pointer
 
         self.size = br.read_uint16()
         self.capacityAndFlags = br.read_uint16()
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.align_to(8)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         data_offset = bw.tell()
-        hk._write_empty_pointer(bw)
+        hkFile._write_empty_pointer(bw)
 
         bw.write_uint16(self.size)
         bw.write_uint16(self.capacityAndFlags)
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             bw.align_to(8)
 
     def asdict(self):

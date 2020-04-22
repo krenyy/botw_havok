@@ -1,13 +1,15 @@
 from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
 from ..enums.ForceCollideOntoPpuReasons import ForceCollideOntoPpuReasons
 from .hkpCollidable import hkpCollidable
 from .hkpCollidableBoundingVolumeData import hkpCollidableBoundingVolumeData
 from .hkpTypedBroadPhaseHandle import hkpTypedBroadPhaseHandle
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkpLinkedCollidable(hkpCollidable):
@@ -18,17 +20,17 @@ class hkpLinkedCollidable(hkpCollidable):
 
         self.collisionEntries = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj):
-        super().deserialize(hk, br, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
-        collisionEntriesCount_offset = br.tell()
-        collisionEntriesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        collisionEntriesCount = hkFile._read_counter(br)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter, obj):
-        super().serialize(hk, bw, obj)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        collisionEntriesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.collisionEntries))
+        hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.collisionEntries)))
 
     def asdict(self):
         d = super().asdict()

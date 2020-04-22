@@ -1,19 +1,24 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float32
 from .hkpSphereRepShape import hkpSphereRepShape
+
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkpConvexShape(hkpSphereRepShape):
-    radius: float
+    radius: Float32
 
-    def deserialize(self, hk, br: BinaryReader, obj):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
-        self.radius = br.read_single()
+        self.radius = br.read_float32()
 
-    def serialize(self, hk, bw: BinaryWriter, obj):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_single(self.radius)
+        bw.write_float32(Float32(self.radius))
 
     def asdict(self):
         d = super().asdict()
@@ -26,6 +31,6 @@ class hkpConvexShape(hkpSphereRepShape):
         inst = cls()
         inst.__dict__.update(super().fromdict(d).__dict__)
 
-        inst.radius = d["radius"]
+        inst.radius = Float32(d["radius"])
 
         return inst

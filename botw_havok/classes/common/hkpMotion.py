@@ -1,20 +1,21 @@
 from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
-from ...util import Vector4
+from ...binary.types import Float16, UInt8, UInt16, UInt32, Vector4
 from ..enums.MotionType import MotionType
 from .hkMotionState import hkMotionState
 from .hkReferencedObject import hkReferencedObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
     from .hkpMaxSizeMotion import hkpMaxSizeMotion
 
 
 class hkpMotion(hkReferencedObject):
-    type: int
-    deactivationIntegrateCounter: int
-    deactivationNumInactiveFrames: List[int]
+    type: UInt8
+    deactivationIntegrateCounter: UInt8
+    deactivationNumInactiveFrames: List[UInt16]
 
     motionState: hkMotionState
 
@@ -24,24 +25,26 @@ class hkpMotion(hkReferencedObject):
     angularVelocity: Vector4
 
     deactivationRefPosition: List[Vector4]
-    deactivationRefOrientation: int
+    deactivationRefOrientation: UInt32
 
     # savedMotion: "hkpMaxSizeMotion" = None
-    savedQualityTypeIndex: int
+    savedQualityTypeIndex: UInt16
 
-    gravityFactor: float
+    gravityFactor: Float16
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
+
+        ###
 
         self.type = br.read_uint8()
         self.deactivationIntegrateCounter = br.read_uint8()
         self.deactivationNumInactiveFrames = [br.read_uint16() for _ in range(2)]
 
-        br.align_to(16)  # TODO: Check if this is right
+        br.align_to(16)
 
         self.motionState = hkMotionState()
-        self.motionState.deserialize(hk, br)
+        self.motionState.deserialize(hkFile, br)
 
         self.inertiaAndMassInv = br.read_vector4()
 
@@ -51,25 +54,27 @@ class hkpMotion(hkReferencedObject):
         self.deactivationRefPosition = [br.read_vector4() for _ in range(2)]
         self.deactivationRefOrientation = br.read_uint32()
 
-        br.align_to(8)  # FIXME: Not sure
+        br.align_to(8)
 
         savedMotion_offset = br.tell()
-        hk._assert_pointer(br)
+        hkFile._assert_pointer(br)
 
         self.savedQualityTypeIndex = br.read_uint16()
 
-        self.gravityFactor = br.read_half()
+        self.gravityFactor = br.read_float16()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_uint8(self.type)
-        bw.write_uint8(self.deactivationIntegrateCounter)
-        [bw.write_uint16(frame) for frame in self.deactivationNumInactiveFrames]
+        ###
+
+        bw.write_uint8(UInt8(self.type))
+        bw.write_uint8(UInt8(self.deactivationIntegrateCounter))
+        [bw.write_uint16(UInt16(frame)) for frame in self.deactivationNumInactiveFrames]
 
         bw.align_to(16)
 
-        self.motionState.serialize(hk, bw)
+        self.motionState.serialize(hkFile, bw)
 
         bw.write_vector4(self.inertiaAndMassInv)
 
@@ -77,16 +82,16 @@ class hkpMotion(hkReferencedObject):
         bw.write_vector4(self.angularVelocity)
 
         [bw.write_vector4(drp) for drp in self.deactivationRefPosition]
-        bw.write_uint32(self.deactivationRefOrientation)
+        bw.write_uint32(UInt32(self.deactivationRefOrientation))
 
         bw.align_to(8)
 
         savedMotion_offset = bw.tell()
-        hk._write_empty_pointer(bw)
+        hkFile._write_empty_pointer(bw)
 
-        bw.write_uint16(self.savedQualityTypeIndex)
+        bw.write_uint16(UInt16(self.savedQualityTypeIndex))
 
-        bw.write_half(self.gravityFactor)
+        bw.write_float16(Float16(self.gravityFactor))
 
     def asdict(self):
         d = super().asdict()

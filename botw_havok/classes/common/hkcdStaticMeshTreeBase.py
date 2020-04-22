@@ -1,6 +1,8 @@
 from typing import List
 
-from ..base import BinaryReader, BinaryWriter
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Int32, UInt16, UInt32
+from ...container.util.localreference import LocalReference
 from .hkcdStaticMeshTreeBasePrimitive import hkcdStaticMeshTreeBasePrimitive
 from .hkcdStaticMeshTreeBaseSection import hkcdStaticMeshTreeBaseSection
 from .hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5 import (
@@ -8,22 +10,18 @@ from .hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5 import (
 )
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
-    numPrimitiveKeys: int
-    bitsPerKey: int
-    maxKeyValue: int
-
-    _sectionsCount_offset: int
-    _primitivesCount_offset: int
-    _sharedVerticesIndexCount_offset: int
+    numPrimitiveKeys: Int32
+    bitsPerKey: Int32
+    maxKeyValue: UInt32
 
     sections: List[hkcdStaticMeshTreeBaseSection]
     primitives: List[hkcdStaticMeshTreeBasePrimitive]
-    sharedVerticesIndex: List[int]
+    sharedVerticesIndex: List[UInt16]
 
     def __init__(self):
         super().__init__()
@@ -32,24 +30,27 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
         self.primitives = []
         self.sharedVerticesIndex = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        super().deserialize(hk, br, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.numPrimitiveKeys = br.read_int32()
         self.bitsPerKey = br.read_int32()
         self.maxKeyValue = br.read_uint32()
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.align_to(16)
 
         sectionsCount_offset = br.tell()
-        sectionsCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        sectionsCount = hkFile._read_counter(br)
 
         primitivesCount_offset = br.tell()
-        primitivesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        primitivesCount = hkFile._read_counter(br)
 
         sharedVerticesIndexCount_offset = br.tell()
-        sharedVerticesIndexCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        sharedVerticesIndexCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
@@ -58,40 +59,37 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
                 for _ in range(sectionsCount):
                     section = hkcdStaticMeshTreeBaseSection()
                     self.sections.append(section)
-                    section.deserialize(hk, br, obj)
+                    section.deserialize(hkFile, br, obj)
 
-            if lfu.src == primitivesCount_offset:
+            elif lfu.src == primitivesCount_offset:
                 for _ in range(primitivesCount):
                     primitive = hkcdStaticMeshTreeBasePrimitive()
                     self.primitives.append(primitive)
-                    primitive.deserialize(hk, br, obj)
+                    primitive.deserialize(hkFile, br, obj)
 
-            if lfu.src == sharedVerticesIndexCount_offset:
+            elif lfu.src == sharedVerticesIndexCount_offset:
                 for _ in range(sharedVerticesIndexCount):
                     self.sharedVerticesIndex.append(br.read_uint16())
 
             br.step_out()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_int32(self.numPrimitiveKeys)
-        bw.write_int32(self.bitsPerKey)
-        bw.write_uint32(self.maxKeyValue)
+        bw.write_int32(Int32(self.numPrimitiveKeys))
+        bw.write_int32(Int32(self.bitsPerKey))
+        bw.write_uint32(UInt32(self.maxKeyValue))
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             bw.align_to(16)
 
-        self._sectionsCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.sections))
-
-        self._primitivesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.primitives))
-
-        self._sharedVerticesIndexCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.sharedVerticesIndex))
-
-        # Arrays get written later
+        obj.local_references.extend(
+            [
+                LocalReference(hkFile, bw, obj, bw.tell(), self.sections),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.primitives),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.sharedVerticesIndex),
+            ]
+        )
 
     def asdict(self):
         d = super().asdict()

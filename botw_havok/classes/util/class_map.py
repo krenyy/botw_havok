@@ -1,4 +1,5 @@
-from ..base import HKBase
+from ...binary.types import String
+from ..base import HKBaseClass
 from ..hkpBoxShape import hkpBoxShape
 from ..hkpBvCompressedMeshShape import hkpBvCompressedMeshShape
 from ..hkpCapsuleShape import hkpCapsuleShape
@@ -31,7 +32,7 @@ class HKClassMap:
         raise Exception("This class shouldn't be instantiated")
 
     @staticmethod
-    def get(name: str) -> HKBase:
+    def get(name: String):
         try:
             return HKClassMap.hk_class_map[name]
         except KeyError:

@@ -1,42 +1,42 @@
-from typing import List
+from typing import List, Union
 
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import String, UInt32, UInt64
+from ...container.util.localreference import LocalReference
 from .hkMultiThreadCheck import hkMultiThreadCheck
 from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkReferencedObject import hkReferencedObject
 from .hkSimpleProperty import hkSimpleProperty
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkpWorldObject(hkReferencedObject):
     # world: None = None
-    userData: int
+    userData: Union[UInt32, UInt64]
     collidable: hkpLinkedCollidable
     multiThreadCheck: hkMultiThreadCheck
 
-    _namePointer_offset: int  # for writing
-    name: str
+    name: String
 
     properties: List[hkSimpleProperty]
 
     def __init__(self):
         self.properties = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.align_to(16)
 
-        world_offset = br.tell()
-        hk._assert_pointer(br)
+        hkFile._assert_pointer(br)  # Empty 'world' pointer
 
-        if hk.header.pointer_size == 8:
+        if hkFile.header.pointer_size == 8:
             self.userData = br.read_uint64()
-        elif hk.header.pointer_size == 4:
+        elif hkFile.header.pointer_size == 4:
             self.userData = br.read_uint32()
         else:
             raise NotImplementedError()
@@ -44,60 +44,65 @@ class hkpWorldObject(hkReferencedObject):
         # ----
 
         self.collidable = hkpLinkedCollidable()
-        self.collidable.deserialize(hk, br, obj)
+        self.collidable.deserialize(hkFile, br, obj)
 
         self.multiThreadCheck = hkMultiThreadCheck()
-        self.multiThreadCheck.deserialize(hk, br)
-        if hk.header.padding_option:
+        self.multiThreadCheck.deserialize(hkFile, br, obj)
+
+        if hkFile.header.padding_option:
             br.align_to(16)
 
-        for lfu in obj.local_fixups:
-            if lfu.src == br.tell():
-                br.step_in(lfu.dst)
-                self.name = br.read_string()
-                br.step_out()
-                hk._assert_pointer(br)
-                break
+        namePointer_offset = br.tell()
+        hkFile._assert_pointer(br)
 
         propertiesCount_offset = br.tell()
-        propertiesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        propertiesCount = hkFile._read_counter(br)
 
-        # FIXME: Probably not right
-        for _ in range(propertiesCount):
-            prop = hkSimpleProperty()
-            prop.deserialize(hk, br)
-            self.properties.append(prop)
+        for lfu in obj.local_fixups:
+            br.step_in(lfu.dst)
+            if lfu.src == namePointer_offset:
+                self.name = br.read_string()
+            elif lfu.src == propertiesCount_offset:
+                for _ in range(propertiesCount):
+                    prop = hkSimpleProperty()
+                    prop.deserialize(hkFile, br, obj)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter, obj):
-        super().serialize(hk, bw)
-        if hk.header.padding_option:
+                    self.properties.append(prop)
+            br.step_out()
+
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
+
+        ###
+
+        if hkFile.header.padding_option:
             bw.align_to(16)
 
-        world_offset = bw.tell()
-        hk._write_empty_pointer(bw)
+        hkFile._write_empty_pointer(bw)
 
-        if hk.header.pointer_size == 8:
-            bw.write_uint64(self.userData)
-        elif hk.header.pointer_size == 4:
-            bw.write_uint32(self.userData)
+        if hkFile.header.pointer_size == 8:
+            bw.write_uint64(UInt64(self.userData))
+        elif hkFile.header.pointer_size == 4:
+            bw.write_uint32(UInt32(self.userData))
         else:
             raise NotImplementedError()
 
         # ----
 
-        self.collidable.serialize(hk, bw, obj)
-        self.multiThreadCheck.serialize(hk, bw)
-        if hk.header.padding_option:
+        self.collidable.serialize(hkFile, bw, obj)
+        self.multiThreadCheck.serialize(hkFile, bw, obj)
+        if hkFile.header.padding_option:
             bw.align_to(16)
 
-        self._namePointer_offset = bw.tell()
-        hk._write_empty_pointer(bw)  # 'name' pointer
+        obj.local_references.append(
+            LocalReference(hkFile, bw, obj, bw.tell(), self.name)
+        )
+        hkFile._write_empty_pointer(bw)  # 'name' pointer
 
-        propertiesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.properties))
-
-        for prop in self.properties:
-            prop.serialize(hk, bw)
+        obj.local_references.append(
+            LocalReference(hkFile, bw, obj, bw.tell(), self.properties)
+        )
 
     def asdict(self):
         d = super().asdict()

@@ -1,23 +1,21 @@
 from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32, UInt64
+from ...container.util.localreference import LocalReference
 from .hkcdStaticMeshTreeBase import hkcdStaticMeshTreeBase
 from .hkpBvCompressedMeshShapeTreeDataRun import hkpBvCompressedMeshShapeTreeDataRun
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglong1121hkpBvCompressedMeshShapeTreeDataRun(
     hkcdStaticMeshTreeBase
 ):
-    _packedVerticesCount_offset: int
-    _sharedVerticesCount_offset: int
-    _primitiveDataRunsCount_offset: int
-
-    packedVertices: List[int]
-    sharedVertices: List[int]
+    packedVertices: List[UInt32]
+    sharedVertices: List[UInt64]
     primitiveDataRuns: List[hkpBvCompressedMeshShapeTreeDataRun]
 
     def __init__(self):
@@ -27,17 +25,20 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
         self.sharedVertices = []
         self.primitiveDataRuns = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        super().deserialize(hk, br, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         packedVerticesCount_offset = br.tell()
-        packedVerticesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        packedVerticesCount = hkFile._read_counter(br)
 
         sharedVerticesCount_offset = br.tell()
-        sharedVerticesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        sharedVerticesCount = hkFile._read_counter(br)
 
         primitiveDataRunsCount_offset = br.tell()
-        primitiveDataRunsCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        primitiveDataRunsCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
@@ -54,23 +55,20 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
                 for _ in range(primitiveDataRunsCount):
                     dataRun = hkpBvCompressedMeshShapeTreeDataRun()
                     self.primitiveDataRuns.append(dataRun)
-                    dataRun.deserialize(hk, br, obj)
+                    dataRun.deserialize(hkFile, br, obj)
 
             br.step_out()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        self._packedVerticesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.packedVertices))
-
-        self._sharedVerticesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.sharedVertices))
-
-        self._primitiveDataRunsCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.primitiveDataRuns))
-
-        # Array data gets written later
+        obj.local_references.extend(
+            [
+                LocalReference(hkFile, bw, obj, bw.tell(), self.packedVertices),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.sharedVertices),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.primitiveDataRuns),
+            ]
+        )
 
     def asdict(self):
         d = super().asdict()
@@ -91,8 +89,8 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
         inst = cls()
         inst.__dict__.update(super().fromdict(d).__dict__)
 
-        inst.packedVertices = d["packedVertices"]
-        inst.sharedVertices = d["sharedVertices"]
+        inst.packedVertices = [UInt32(i) for i in d["packedVertices"]]
+        inst.sharedVertices = [UInt64(i) for i in d["sharedVertices"]]
         inst.primitiveDataRuns = [
             hkpBvCompressedMeshShapeTreeDataRun.fromdict(dataRun)
             for dataRun in d["primitiveDataRuns"]

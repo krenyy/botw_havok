@@ -1,7 +1,6 @@
-from typing import List
-
 from ...binary import BinaryReader, BinaryWriter
-from ...util import Matrix, Vector4
+from ...binary.types import Float16, Float32, Matrix, UInt8, Vector4
+from .hkUFloat8 import hkUFloat8
 
 
 class hkMotionState:
@@ -10,50 +9,53 @@ class hkMotionState:
 
     deltaAngle: Vector4
 
-    objectRadius: float
+    objectRadius: Float32
 
-    linearDamping: float
-    angularDamping: float
-    timeFactor: float
+    linearDamping: Float16
+    angularDamping: Float16
+    timeFactor: Float16
 
-    maxLinearVelocity: float
-    maxAngularVelocity: float
+    maxLinearVelocity: hkUFloat8
+    maxAngularVelocity: hkUFloat8
 
-    deactivationClass: int
+    deactivationClass: UInt8
 
-    def deserialize(self, hk, br: BinaryReader):
+    def deserialize(self, hkFile, br: BinaryReader):
         self.transform = br.read_matrix(4)
         self.sweptTransform = br.read_matrix(5)
 
         self.deltaAngle = br.read_vector4()
 
-        self.objectRadius = br.read_single()
+        self.objectRadius = br.read_float32()
 
-        self.linearDamping = br.read_half()
-        self.angularDamping = br.read_half()
-        self.timeFactor = br.read_half()
+        self.linearDamping = br.read_float16()
+        self.angularDamping = br.read_float16()
+        self.timeFactor = br.read_float16()
 
-        self.maxLinearVelocity = br.read_floatu8()
-        self.maxAngularVelocity = br.read_floatu8()
+        self.maxLinearVelocity = hkUFloat8()
+        self.maxLinearVelocity.deserialize(br)
+
+        self.maxAngularVelocity = hkUFloat8()
+        self.maxAngularVelocity.deserialize(br)
 
         self.deactivationClass = br.read_uint8()
 
         br.align_to(16)
 
-    def serialize(self, hk, bw: BinaryWriter):
+    def serialize(self, hkFile, bw: BinaryWriter):
         bw.write_matrix(self.transform)
         bw.write_matrix(self.sweptTransform)
 
         bw.write_vector4(self.deltaAngle)
 
-        bw.write_single(self.objectRadius)
+        bw.write_float32(self.objectRadius)
 
-        bw.write_half(self.linearDamping)
-        bw.write_half(self.angularDamping)
-        bw.write_half(self.timeFactor)
+        bw.write_float16(self.linearDamping)
+        bw.write_float16(self.angularDamping)
+        bw.write_float16(self.timeFactor)
 
-        bw.write_floatu8(self.maxLinearVelocity)
-        bw.write_floatu8(self.maxAngularVelocity)
+        self.maxLinearVelocity.serialize(bw)
+        self.maxAngularVelocity.serialize(bw)
 
         bw.write_uint8(self.deactivationClass)
 
@@ -68,8 +70,8 @@ class hkMotionState:
             "linearDamping": self.linearDamping,
             "angularDamping": self.angularDamping,
             "timeFactor": self.timeFactor,
-            "maxLinearVelocity": self.maxLinearVelocity,
-            "maxAngularVelocity": self.maxAngularVelocity,
+            "maxLinearVelocity": self.maxLinearVelocity.asdict(),
+            "maxAngularVelocity": self.maxAngularVelocity.asdict(),
             "deactivationClass": self.deactivationClass,
         }
 
@@ -83,8 +85,8 @@ class hkMotionState:
         inst.linearDamping = d["linearDamping"]
         inst.angularDamping = d["angularDamping"]
         inst.timeFactor = d["timeFactor"]
-        inst.maxLinearVelocity = d["maxLinearVelocity"]
-        inst.maxAngularVelocity = d["maxAngularVelocity"]
+        inst.maxLinearVelocity = hkUFloat8.fromdict(d["maxLinearVelocity"])
+        inst.maxAngularVelocity = hkUFloat8.fromdict(d["maxAngularVelocity"])
         inst.deactivationClass = d["deactivationClass"]
 
         return inst

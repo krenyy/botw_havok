@@ -1,62 +1,65 @@
 from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
-from ..container.sections.util import LocalFixup
-from ..util import Matrix, Vector4
-from .base import HKBase
+from ..binary.types import Bool, Int32, Matrix, UInt8, UInt32, Vector4
+from ..container.util.localfixup import LocalFixup
+from ..container.util.localreference import LocalReference
+from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
 
 if False:
-    from ..hk import HK
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
-class hkpConvexVerticesShape(HKBase, hkpConvexShape):
+class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
     aabbHalfExtents: Vector4
     aabbCenter: Vector4
 
     rotatedVertices: List[Matrix]
 
-    numVertices: int
-    useSpuBuffer: bool
+    numVertices: Int32
+    useSpuBuffer: Bool
 
     planeEquations: Matrix
 
     # connectivity: hkpConvexVerticesConnectivity = None
 
     def __init__(self):
-        HKBase.__init__(self)
+        HKBaseClass.__init__(self)
         hkpConvexShape.__init__(self)
 
         self.rotatedVertices = []
         self.planeEquations = []
 
-    def deserialize(self, hk: "HK", obj):
-        HKBase.deserialize(self, hk, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        HKBaseClass.deserialize(self, hkFile, br, obj)
+        hkpConvexShape.deserialize(self, hkFile, br, obj)
 
-        br = BinaryReader(self.hkobj.bytes)
-        br.big_endian = hk.header.endian == 0
+        ###
 
-        hkpConvexShape.deserialize(self, hk, br, obj)
         br.align_to(16)
 
         self.aabbHalfExtents = br.read_vector4()
         self.aabbCenter = br.read_vector4()
 
         rotatedVerticesCount_offset = br.tell()
-        rotatedVerticesCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        rotatedVerticesCount = hkFile._read_counter(br)
 
         self.numVertices = br.read_int32()
-        self.useSpuBuffer = bool(br.read_uint8())
-        br.align_to(4)  # TODO: Check if correct
+        self.useSpuBuffer = Bool(br.read_uint8())
+        br.align_to(4)
 
         planeEquationsCount_offset = br.tell()
-        planeEquationsCount = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        planeEquationsCount = hkFile._read_counter(br)
 
         connectivityPointer_offset = br.tell()
-        hk._assert_pointer(br)  # connectivity
+        hkFile._assert_pointer(br)  # connectivity
         br.align_to(16)
 
-        for lfu in self.hkobj.local_fixups:
+        for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
 
             if lfu.src == rotatedVerticesCount_offset:
@@ -68,57 +71,44 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
 
             br.step_out()
 
-        for gr in self.hkobj.global_references:
+        for gr in obj.global_references:
             if gr.src_rel_offset == connectivityPointer_offset:
                 raise Exception(
                     "This 'hkpConvexVerticesShape' instance has 'connectivity' attribute, which hasn't been implemented yet"
                 )
 
-    def serialize(self, hk: "HK"):
-        HKBase.assign_class(self, hk)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        HKBaseClass.assign_class(self, hkFile, obj)
+        hkpConvexShape.serialize(self, hkFile, bw, obj)
 
-        bw = BinaryWriter()
-        bw.big_endian = hk.header.endian == 0
+        ###
 
-        hkpConvexShape.serialize(self, hk, bw, self.hkobj)
         bw.align_to(16)
 
         bw.write_vector4(self.aabbHalfExtents)
         bw.write_vector4(self.aabbCenter)
 
-        rotatedVerticesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.rotatedVertices))
-
-        bw.write_int32(self.numVertices)
-        bw.write_uint8(int(self.useSpuBuffer))
-        bw.align_to(4)  # TODO: Check if correct
-
-        planeEquationsCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.planeEquations))
-
-        connectivityPointer_offset = bw.tell()
-        hk._write_empty_pointer(bw)  # connectivity
-        bw.align_to(16)
-
-        rotatedVertices_offset = bw.tell()
-        for rv in self.rotatedVertices:
-            bw.write_matrix(rv)
-        bw.align_to(16)
-
-        planeEquations_offset = bw.tell()
-        bw.write_matrix(self.planeEquations)
-
-        self.hkobj.local_fixups.extend(
-            [
-                LocalFixup(rotatedVerticesCount_offset, rotatedVertices_offset),
-                LocalFixup(planeEquationsCount_offset, planeEquations_offset),
-            ]
+        obj.local_references.append(
+            LocalReference(hkFile, bw, obj, bw.tell(), self.rotatedVertices)
         )
 
-        HKBase.serialize(self, hk, bw)
+        bw.write_int32(self.numVertices)
+        bw.write_uint8(UInt8(self.useSpuBuffer))
+        bw.align_to(4)
+
+        obj.local_references.append(
+            LocalReference(hkFile, bw, obj, bw.tell(), self.planeEquations)
+        )
+
+        hkFile._write_empty_pointer(bw)  # 'connectivity'
+        bw.align_to(16)
+
+        ###
+
+        HKBaseClass.serialize(self, hkFile, bw, obj)
 
     def asdict(self):
-        d = HKBase.asdict(self)
+        d = HKBaseClass.asdict(self)
         d.update(hkpConvexShape.asdict(self))
         d.update(
             {
@@ -137,7 +127,7 @@ class hkpConvexVerticesShape(HKBase, hkpConvexShape):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
         inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
 
         inst.aabbHalfExtents = Vector4.fromdict(d["aabbHalfExtents"])

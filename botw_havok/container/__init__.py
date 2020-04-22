@@ -1,6 +1,6 @@
 from .header import HKHeader
-from .sections.classnames import HKClassnamesSection
-from .sections.types import HKTypesSection
-from .sections.data import HKDataSection
+from .sections.classnames.hkclassnamessection import HKClassnamesSection
+from .sections.types.hktypessection import HKTypesSection
+from .sections.data.hkdatasection import HKDataSection
 
 __all__ = ("HKHeader", "HKClassnamesSection", "HKDataSection", "HKTypesSection")

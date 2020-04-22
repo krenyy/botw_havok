@@ -1,18 +1,20 @@
-from typing import List
+from typing import List, Union
 
 from ..binary import BinaryReader, BinaryWriter
-from ..container.sections.util import LocalFixup
-from .base import HKBase
+from ..binary.types import UInt32, UInt64
+from ..container.util.localfixup import LocalFixup
+from ..container.util.localreference import LocalReference
+from .base import HKBaseClass
 from .common.ActorInfo import ActorInfo
 from .common.ShapeInfo import ShapeInfo
 
 if False:
-    from ..hk import HK
-    from ..container.sections.hkobject import HKObject
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
-class StaticCompoundInfo(HKBase):
-    Offset: int
+class StaticCompoundInfo(HKBaseClass):
+    Offset: Union[UInt32, UInt64]
     ActorInfo: List[ActorInfo]
     ShapeInfo: List[ShapeInfo]
 
@@ -22,72 +24,63 @@ class StaticCompoundInfo(HKBase):
         self.ActorInfo = []
         self.ShapeInfo = []
 
-    def deserialize(self, hk: "HK", obj: "HKObject"):
-        super().deserialize(hk, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
-        br = BinaryReader(obj.bytes)
-        br.big_endian = hk.header.endian == 0
+        ###
 
-        self.Offset = br.read_uint32()
+        if hkFile.header.pointer_size == 8:
+            self.Offset = br.read_uint64()
+        elif hkFile.header.pointer_size == 4:
+            self.Offset = br.read_uint32()
 
-        if not br.big_endian:
-            br.seek_relative(+4)
+        hkFile._assert_pointer(br)
+        ai_count = hkFile._read_counter(br)
 
-        ai_count = hk._read_counter(br)
-        si_count = hk._read_counter(br)
+        hkFile._assert_pointer(br)
+        si_count = hkFile._read_counter(br)
+
         br.align_to(16)
 
         for _ in range(ai_count):
             ai = ActorInfo()
-            ai.read(br)
+            ai.deserialize(hkFile, br, obj)
             self.ActorInfo.append(ai)
         br.align_to(16)
 
         for _ in range(si_count):
             si = ShapeInfo()
-            si.read(br)
+            si.deserialize(hkFile, br, obj)
             self.ShapeInfo.append(si)
         br.align_to(16)
 
         obj.local_fixups.clear()
         obj.global_references.clear()
 
-    def serialize(self, hk: "HK"):
-        super().assign_class(hk)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().assign_class(hkFile, obj)
 
-        bw = BinaryWriter()
-        bw.big_endian = hk.header.endian == 0
+        ###
 
         bw.reserve_uint32("EOF")
 
-        if hk.header.padding_option:  # probably
-            bw.write_uint32(0)
+        if hkFile.header.padding_option:
+            bw.write_uint32(UInt32(0))
 
-        ai_count_offset = bw.tell()
-        hk._write_counter(bw, len(self.ActorInfo))
-
-        si_count_offset = bw.tell()
-        hk._write_counter(bw, len(self.ShapeInfo))
-        bw.align_to(16)
-
-        ai_offset = bw.tell()
-        [ai.write(bw) for ai in self.ActorInfo]
-        bw.align_to(16)
-
-        si_offset = bw.tell()
-        [si.write(bw) for si in self.ShapeInfo]
-        bw.align_to(16)
-
-        self.hkobj.local_fixups.extend(
+        obj.local_references.extend(
             [
-                LocalFixup(ai_count_offset, ai_offset),
-                LocalFixup(si_count_offset, si_offset),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.ActorInfo),
+                LocalReference(hkFile, bw, obj, bw.tell(), self.ShapeInfo),
             ]
         )
 
-        self.hkobj.reservations = bw.reservations
+        bw.align_to(16)
 
-        super().serialize(hk, bw)
+        obj.reservations = bw.reservations
+
+        ###
+
+        super().serialize(hkFile, bw, obj)
 
     def asdict(self):
         d = super().asdict()

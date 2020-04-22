@@ -1,21 +1,14 @@
-import io
-from typing import Union
-
 from .binary import BinaryReader, BinaryWriter
+from .binary.types import Int32, Int64, UInt32
 from .container import HKClassnamesSection, HKDataSection, HKHeader, HKTypesSection
 
 
-class HK:
+class HKFile:
     header: HKHeader
 
     classnames: HKClassnamesSection
     types: HKTypesSection
     data: HKDataSection
-
-    def __init__(self):
-        self.classnames = HKClassnamesSection()
-        self.types = HKTypesSection()
-        self.data = HKDataSection()
 
     def read(self, br: BinaryReader):
         # Read the endian byte ahead
@@ -38,11 +31,11 @@ class HK:
         self.data.read_header(br)
 
         # Read Havok sections' data
-        self.classnames.read(br)
-        self.types.read(br)
+        self.classnames.read(self, br)
+        self.types.read(self, br)
         self.data.read(self, br)
 
-    def write(self, bw: BinaryWriter):        
+    def write(self, bw: BinaryWriter):
         # Write Havok header
         self.header.write(bw)
 
@@ -52,42 +45,42 @@ class HK:
         self.data.write_header(bw)
 
         # Write Havok sections' data
-        self.classnames.write(bw)
-        self.types.write(bw)
+        self.classnames.write(self, bw)
+        self.types.write(self, bw)
         self.data.write(self, bw)
 
-    def deserialize(self):
+    def deserialize(self) -> None:
         self.data.deserialize(self)
 
-    def serialize(self):
+    def serialize(self) -> None:
         self.data.serialize(self)
 
-    def _assert_pointer(self, br: BinaryReader):
+    def _assert_pointer(self, br: BinaryReader) -> None:
         if self.header.pointer_size == 4:
-            br.assert_int32(0)
+            br.assert_int32(Int32(0))
         elif self.header.pointer_size == 8:
-            br.assert_int64(0)
+            br.assert_int64(Int64(0))
         else:
             raise NotImplementedError("Wrong pointer size!")
 
-    def _write_empty_pointer(self, bw: BinaryWriter):
+    def _write_empty_pointer(self, bw: BinaryWriter) -> None:
         if self.header.pointer_size == 4:
-            bw.write_int32(0)
+            bw.write_int32(Int32(0))
         elif self.header.pointer_size == 8:
-            bw.write_int64(0)
+            bw.write_int64(Int64(0))
         else:
             raise Exception("Wrong pointer size!")
 
-    def _read_counter(self, br: BinaryReader):
-        self._assert_pointer(br)
-        count = br.read_int32()  # 0x0000000X
-        br.assert_uint32(0x80000000 | count)  # 0x8000000X
+    def _read_counter(self, br: BinaryReader) -> UInt32:
+        """Read Havok array size
+        """
+        count = br.read_uint32()
+        br.assert_uint32(UInt32(0x80000000 | count))
         return count
 
-    def _write_counter(self, bw: BinaryWriter, count: int):
-        self._write_empty_pointer(bw)
-        bw.write_int32(count)
-        bw.write_uint32(0x80000000 | count)
+    def _write_counter(self, bw: BinaryWriter, count: UInt32) -> None:
+        bw.write_uint32(count)
+        bw.write_uint32(UInt32(0x80000000 | count))
 
     def asdict(self):
         return {
@@ -110,4 +103,4 @@ class HK:
         self.header.to_wiiu()
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} ({self.header})>"
+        return f"<{self.__class__.__name__}>"

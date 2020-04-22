@@ -7,16 +7,16 @@ class hkpEntityExtendedListeners:
     activationListeners: hkpEntitySmallArraySerializeOverrideType
     entityListeners: hkpEntitySmallArraySerializeOverrideType
 
-    def deserialize(self, hk, br):
+    def deserialize(self, hkFile, br):
         self.activationListeners = hkpEntitySmallArraySerializeOverrideType()
-        self.activationListeners.deserialize(hk, br)
+        self.activationListeners.deserialize(hkFile, br)
 
         self.entityListeners = hkpEntitySmallArraySerializeOverrideType()
-        self.entityListeners.deserialize(hk, br)
+        self.entityListeners.deserialize(hkFile, br)
 
-    def serialize(self, hk, bw):
-        self.activationListeners.serialize(hk, bw)
-        self.entityListeners.serialize(hk, bw)
+    def serialize(self, hkFile, bw):
+        self.activationListeners.serialize(hkFile, bw)
+        self.entityListeners.serialize(hkFile, bw)
 
     def asdict(self):
         return {

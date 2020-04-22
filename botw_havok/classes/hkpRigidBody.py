@@ -1,5 +1,5 @@
 from ..binary import BinaryReader, BinaryWriter
-from .base import HKBase
+from .base import HKBaseClass
 from .common.hkMultiThreadCheck import hkMultiThreadCheck
 from .common.hkpConstraintInstance import hkpConstraintInstance
 from .common.hkpEntity import hkpEntity
@@ -12,37 +12,29 @@ from .common.hkpMaterial import hkpMaterial
 from .common.hkpMaxSizeMotion import hkpMaxSizeMotion
 
 if False:
-    from ..hk import HK
-    from ..container.sections.hkobject import HKObject
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
-class hkpRigidBody(HKBase, hkpEntity):
-    def deserialize(self, hk: "HK", obj: "HKObject"):
-        HKBase.deserialize(self, hk, obj)
+class hkpRigidBody(HKBaseClass, hkpEntity):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        HKBaseClass.deserialize(self, hkFile, br, obj)
+        hkpEntity.deserialize(self, hkFile, br, obj)
 
-        br = BinaryReader(obj.bytes)
-        br.big_endian = hk.header.endian == 0
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        HKBaseClass.assign_class(self, hkFile, obj)
+        hkpEntity.serialize(self, hkFile, bw, obj)
 
-        hkpEntity.deserialize(self, hk, br, obj)
-
-    def serialize(self, hk: "HK"):
-        HKBase.assign_class(self, hk)
-
-        bw = BinaryWriter()
-        bw.big_endian = hk.header.endian == 0
-
-        hkpEntity.serialize(self, hk, bw, self.hkobj)
-
-        HKBase.serialize(self, hk, bw)
+        HKBaseClass.serialize(self, hkFile, bw, obj)
 
     def asdict(self):
-        d = HKBase.asdict(self)
+        d = HKBaseClass.asdict(self)
         d.update(hkpEntity.asdict(self))
         return d
 
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
         inst.__dict__.update(hkpEntity.fromdict(d).__dict__)
         return inst
