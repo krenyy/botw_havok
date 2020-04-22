@@ -1,8 +1,11 @@
 import argparse
 import json
+import os
 from copy import deepcopy
 
-from botw_havok import Havok
+from .. import Havok
+
+templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
 
 def main():
@@ -60,16 +63,16 @@ def main():
     if not args.outFile:
         args.outFile = ".".join(args.hkscFile.split(".")[:-1] + ["hkrb"])
 
-    with open("templates/hkrb.json", "r") as f:
+    with open(os.path.join(templates_dir, "hkrb.json"), "r") as f:
         hkrb_template = json.load(f)
 
-    with open("templates/hkrb_rigidbody.json", "r") as f:
+    with open(os.path.join(templates_dir, "hkrb_rigidbody.json"), "r") as f:
         hk_rigidbody_template = json.load(f)
 
-    with open("templates/bphysics.yml", "r") as f:
+    with open(os.path.join(templates_dir, "bphysics.yml"), "r") as f:
         bphysics_template = f.read()
 
-    with open("templates/bphysics_rigidbody.yml", "r") as f:
+    with open(os.path.join(templates_dir, "bphysics_rigidbody.yml"), "r") as f:
         bphysics_rigidbody_template = f.read()
 
     bphysics_rigidbodies = []
