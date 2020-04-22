@@ -1,0 +1,32 @@
+[
+    {
+        "header": null,
+        "data": {
+            "contents": [
+                {
+                    "hkClass": "hkRootLevelContainer",
+                    "namedVariants": [
+                        {
+                            "name": "hkpPhysicsData",
+                            "className": "hkpPhysicsData",
+                            "variant": {
+                                "hkClass": "hkpPhysicsData",
+                                "memSizeAndRefCount": 0,
+                                "systems": [
+                                    {
+                                        "hkClass": "hkpPhysicsSystem",
+                                        "memSizeAndRefCount": 0,
+                                        "rigidBodies": [],
+                                        "name": "Default Physics System",
+                                        "userData": 0,
+                                        "active": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]

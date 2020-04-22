@@ -1,0 +1,27 @@
+!io
+version: 0
+type: xml
+param_root: !list
+  objects: {{}}
+  lists:
+    ParamSet: !list
+      objects:
+        1258832850: !obj
+          use_rigid_body_set_num: 1
+          use_ragdoll: false
+          use_cloth: false
+          use_support_bone: false
+          use_character_controller: false
+          use_contact_info: false
+          use_edge_rigid_body_num: 0
+          use_system_group_handler: true
+      lists:
+        RigidBodySet: !list
+          objects: {{}}
+          lists:
+            RigidBodySet_0: !list
+              objects:
+                4288596824: !obj {{set_name: !str32 Body, type: !str32 from_resource,
+                  num: 1, setup_file_path: !str256 path_to/the_file.hkrb}}
+              lists:
+{0}

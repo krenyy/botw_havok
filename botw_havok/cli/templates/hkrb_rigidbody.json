@@ -1,0 +1,202 @@
+{
+    "hkClass": "hkpRigidBody",
+    "memSizeAndRefCount": 0,
+    "userData": 0,
+    "collidable": {
+        "shape": null,
+        "shapeKey": 4294967295,
+        "ownerOffset": 0,
+        "forceCollideOntoPpu": "FORCE_PPU_SHAPE_UNCHECKED",
+        "shapeSizeOnSpu": 0,
+        "broadPhaseHandle": {
+            "id": 0,
+            "type": "BROAD_PHASE_ENTITY",
+            "ownerOffset": 0,
+            "objectQualityType": 0,
+            "collisionFilterInfo": 1006632968
+        },
+        "boundingVolumeData": {
+            "min": [
+                0,
+                0,
+                0
+            ],
+            "expansionMin": [
+                0,
+                0,
+                0
+            ],
+            "expansionShift": 0,
+            "max": [
+                0,
+                0,
+                0
+            ],
+            "expansionMax": [
+                0,
+                0,
+                0
+            ],
+            "numChildShapeAabbs": 0,
+            "capacityChildShapeAabbs": 0
+        },
+        "allowedPenetrationDepth": 3.402820018375656e+38,
+        "collisionEntries": []
+    },
+    "multiThreadCheck": {
+        "threadId": 0,
+        "stackTraceId": 0,
+        "markCount": 0,
+        "markBitStack": 0
+    },
+    "name": "[PLACEHOLDER]",
+    "material": {
+        "responseType": "RESPONSE_SIMPLE_CONTACT",
+        "rollingFrictionMultiplier": 0.0,
+        "friction": 0.5,
+        "restitution": 0.4000000059604645
+    },
+    "damageMultiplier": 1.0,
+    "solverData": 0,
+    "storageIndex": 65535,
+    "contactPointCallbackDelay": 65535,
+    "constraintsMaster": {
+        "size": 0,
+        "capacityAndFlags": 0
+    },
+    "autoRemoveLevel": 0,
+    "numShapeKeysInContactPointProperties": 2,
+    "responseModifierFlags": 0,
+    "uid": 4294967295,
+    "spuCollisionCallback": {
+        "capacity": 0,
+        "eventFilter": "SPU_SEND_CONTACT_POINT_ADDED_OR_PROCESS",
+        "userFilter": "SPU_SEND_CONTACT_POINT_ADDED"
+    },
+    "motion": {
+        "memSizeAndRefCount": 0,
+        "type": "MOTION_FIXED",
+        "deactivationIntegrateCounter": 0,
+        "deactivationNumInactiveFrames": [
+            0,
+            49152
+        ],
+        "motionState": {
+            "transform": [
+                [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            ],
+            "sweptTransform": [
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.9999989867210388
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.9999989867210388
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "deltaAngle": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "objectRadius": 8.0,
+            "linearDamping": 0.0,
+            "angularDamping": 1.3251953125,
+            "timeFactor": 1.875,
+            "maxLinearVelocity": 0.0,
+            "maxAngularVelocity": 0.0,
+            "deactivationClass": 1
+        },
+        "inertiaAndMassInv": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "linearVelocity": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "angularVelocity": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "deactivationRefPosition": [
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "deactivationRefOrientation": 0,
+        "savedQualityTypeIndex": 0,
+        "gravityFactor": 1.875
+    },
+    "contactListeners": {
+        "size": 0,
+        "capacityAndFlags": 0
+    },
+    "actions": {
+        "size": 0,
+        "capacityAndFlags": 0
+    },
+    "npData": 4294967295
+}
