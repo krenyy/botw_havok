@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as readme:
 
 setup(
     name="botw_havok",
-    version="0.2.3",
+    version="0.2.4",
     author="kreny",
     author_email="kronerm9@gmail.com",
     description="A library for converting Breath of the Wild Havok packfiles to JSON and back",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/23kreny/botw_havok",
+    url="https://github.com/krenyy/botw_havok",
     include_package_data=True,
     packages=find_packages(),
     classifiers=[
