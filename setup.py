@@ -26,6 +26,7 @@ setup(
             "hk_to_json = botw_havok.cli.hk_to_json:main",
             "json_to_hk = botw_havok.cli.json_to_hk:main",
             "hk_extract = botw_havok.cli.hk_extract:main",
+            "hksc_to_hkrb = botw_havok.cli.hksc_to_hkrb:main",
         ]
     },
 )
