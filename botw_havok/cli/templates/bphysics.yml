@@ -22,6 +22,6 @@ param_root: !list
             RigidBodySet_0: !list
               objects:
                 4288596824: !obj {{set_name: !str32 Body, type: !str32 from_resource,
-                  num: 1, setup_file_path: !str256 path_to/the_file.hkrb}}
+                  num: {0}, setup_file_path: !str256 path_to/the_file.hkrb}}
               lists:
-{0}
+{1}

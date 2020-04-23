@@ -100,7 +100,11 @@ def main():
     hkrb.to_file(args.outFile)
 
     with open(".".join(args.outFile.split(".")[:-1] + ["yml"]), "w") as f:
-        f.write(bphysics_template.format("\n".join(bphysics_rigidbodies)))
+        f.write(
+            bphysics_template.format(
+                len(bphysics_rigidbodies), "\n".join(bphysics_rigidbodies)
+            )
+        )
 
 
 if __name__ == "__main__":
