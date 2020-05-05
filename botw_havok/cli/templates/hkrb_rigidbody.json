@@ -150,8 +150,12 @@
             "linearDamping": 0.0,
             "angularDamping": 1.3251953125,
             "timeFactor": 1.875,
-            "maxLinearVelocity": 0.0,
-            "maxAngularVelocity": 0.0,
+            "maxLinearVelocity": {
+                "value": 0
+            },
+            "maxAngularVelocity": {
+                "value": 0
+            },
             "deactivationClass": 1
         },
         "inertiaAndMassInv": [
