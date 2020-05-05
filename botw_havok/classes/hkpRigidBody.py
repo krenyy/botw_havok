@@ -17,6 +17,10 @@ if False:
 
 
 class hkpRigidBody(HKBase, hkpEntity):
+    def __init__(self):
+        HKBase.__init__(self)
+        hkpEntity.__init__(self)
+
     def deserialize(self, hk: "HK", obj: "HKObject"):
         HKBase.deserialize(self, hk, obj)
 
