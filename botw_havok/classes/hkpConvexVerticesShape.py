@@ -3,7 +3,6 @@ from typing import List
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Bool, Int32, Matrix, UInt8, UInt32, Vector4
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
 
@@ -43,20 +42,17 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
         self.aabbHalfExtents = br.read_vector4()
         self.aabbCenter = br.read_vector4()
 
-        rotatedVerticesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        rotatedVerticesCount_offset = hkFile._assert_pointer(br)
         rotatedVerticesCount = hkFile._read_counter(br)
 
         self.numVertices = br.read_int32()
         self.useSpuBuffer = Bool(br.read_uint8())
         br.align_to(4)
 
-        planeEquationsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        planeEquationsCount_offset = hkFile._assert_pointer(br)
         planeEquationsCount = hkFile._read_counter(br)
 
-        connectivityPointer_offset = br.tell()
-        hkFile._assert_pointer(br)  # connectivity
+        connectivityPointer_offset = hkFile._assert_pointer(br)  # connectivity
         br.align_to(16)
 
         for lfu in obj.local_fixups:
@@ -88,20 +84,35 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
         bw.write_vector4(self.aabbHalfExtents)
         bw.write_vector4(self.aabbCenter)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.rotatedVertices)
-        )
+        rotatedVerticesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.rotatedVertices)))
 
         bw.write_int32(self.numVertices)
         bw.write_uint8(UInt8(self.useSpuBuffer))
         bw.align_to(4)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.planeEquations)
-        )
+        planeEquationsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.planeEquations)))
 
         hkFile._write_empty_pointer(bw)  # 'connectivity'
         bw.align_to(16)
+
+        ################
+        # Write arrays #
+        ################
+
+        # rotatedVertices
+
+        obj.local_fixups.append(LocalFixup(rotatedVerticesCount_offset, bw.tell()))
+
+        [bw.write_matrix(rV) for rV in self.rotatedVertices]
+        bw.align_to(16)
+
+        # planeEquations
+
+        obj.local_fixups.append(LocalFixup(planeEquationsCount_offset, bw.tell()))
+
+        bw.write_matrix(self.planeEquations)
 
         ###
 

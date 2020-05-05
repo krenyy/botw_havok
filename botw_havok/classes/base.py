@@ -17,8 +17,6 @@ class HKBaseClass:
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: HKObject):
         # SPECIFIC HKCLASS BEHAVIOUR EXECUTES BEFORE THIS
 
-        obj.resolve_local_references(bw)
-
         obj.bytes = bw.getvalue()
         obj.size = len(obj.bytes)
 

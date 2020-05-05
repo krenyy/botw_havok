@@ -16,8 +16,8 @@ class GlobalReference:
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__}({self.src_obj.hkclass.name}@{hex(self.src_rel_offset)}, "
-            f"{self.dst_obj.hkclass.name}@{hex(self.dst_rel_offset)})"
+            f"{self.__class__.__name__}({self.src_obj.hkClass.name}@{hex(self.src_rel_offset)}, "
+            f"{self.dst_obj.hkClass.name}@{hex(self.dst_rel_offset)})"
         )
 
     def __hash__(self):

@@ -2,7 +2,6 @@ from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from ...container.util.localreference import LocalReference
 from .hkcdStaticTreeCodec3Axis5 import hkcdStaticTreeCodec3Axis5
 from .hkObject import hkObject
 
@@ -14,12 +13,14 @@ if False:
 class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5(hkObject):
     nodes: List[hkcdStaticTreeCodec3Axis5]
 
+    # TODO: Get rid of these things sometime
+    _nodesCount_offset: UInt32
+
     def __init__(self):
         self.nodes = []
 
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
-        nodesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        nodesCount_offset = hkFile._assert_pointer(br)
         nodesCount = hkFile._read_counter(br)
 
         br.align_to(16)
@@ -36,10 +37,14 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5(hkObject):
             br.step_out()
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.nodes)
-        )
+        self._nodesCount_offset = bw.tell()
+
+        hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.nodes)))
+
         bw.align_to(16)
+
+        # The nodes get written at a later stage
 
     def asdict(self):
         return {"nodes": [node.asdict() for node in self.nodes]}

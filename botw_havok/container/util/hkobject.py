@@ -8,7 +8,6 @@ from .localfixup import LocalFixup
 if False:
     from ...hkfile import HKFile
     from ..sections.classnames.hkclass import HKClass
-    from .localreference import LocalReference
     from .globalreference import GlobalReference
 
 
@@ -22,16 +21,12 @@ class HKObject:
     size: int
 
     local_fixups: typing.List[LocalFixup]
-
-    local_references: typing.List["LocalReference"]
     global_references: typing.List["GlobalReference"]
 
     reservations: typing.Mapping[str, int]
 
     def __init__(self):
         self.local_fixups = []
-
-        self.local_references = []
         self.global_references = []
 
         self.reservations = {}
@@ -40,10 +35,6 @@ class HKObject:
         hkFile.data.local_fixups.extend(
             [lfu + self.offset for lfu in self.local_fixups]
         )
-
-    def resolve_local_references(self, bw: BinaryWriter):
-        for lr in self.local_references:
-            lr.resolve(bw, self)
 
     def resolve_global_references(self, hkFile: "HKFile"):
         for gr in self.global_references:

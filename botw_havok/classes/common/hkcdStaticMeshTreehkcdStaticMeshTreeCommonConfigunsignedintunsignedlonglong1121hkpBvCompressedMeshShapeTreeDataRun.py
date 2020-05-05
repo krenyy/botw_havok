@@ -2,7 +2,6 @@ from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32, UInt64
-from ...container.util.localreference import LocalReference
 from .hkcdStaticMeshTreeBase import hkcdStaticMeshTreeBase
 from .hkpBvCompressedMeshShapeTreeDataRun import hkpBvCompressedMeshShapeTreeDataRun
 
@@ -18,6 +17,10 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
     sharedVertices: List[UInt64]
     primitiveDataRuns: List[hkpBvCompressedMeshShapeTreeDataRun]
 
+    _packedVerticesCount_offset: UInt32
+    _sharedVerticesCount_offset: UInt32
+    _primitiveDataRunsCount_offset: UInt32
+
     def __init__(self):
         super().__init__()
 
@@ -28,16 +31,13 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         super().deserialize(hkFile, br, obj)
 
-        packedVerticesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        packedVerticesCount_offset = hkFile._assert_pointer(br)
         packedVerticesCount = hkFile._read_counter(br)
 
-        sharedVerticesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        sharedVerticesCount_offset = hkFile._assert_pointer(br)
         sharedVerticesCount = hkFile._read_counter(br)
 
-        primitiveDataRunsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        primitiveDataRunsCount_offset = hkFile._assert_pointer(br)
         primitiveDataRunsCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
@@ -62,13 +62,16 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hkFile, bw, obj)
 
-        obj.local_references.extend(
-            [
-                LocalReference(hkFile, bw, obj, bw.tell(), self.packedVertices),
-                LocalReference(hkFile, bw, obj, bw.tell(), self.sharedVertices),
-                LocalReference(hkFile, bw, obj, bw.tell(), self.primitiveDataRuns),
-            ]
-        )
+        self._packedVerticesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.packedVertices)))
+
+        self._sharedVerticesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.sharedVertices)))
+
+        self._primitiveDataRunsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.primitiveDataRuns)))
+
+        # Arrays get written later
 
     def asdict(self):
         d = super().asdict()

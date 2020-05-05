@@ -86,13 +86,11 @@ class hkpEntity(hkpWorldObject):
         self.constraintsMaster = hkpEntitySmallArraySerializeOverrideType()
         self.constraintsMaster.deserialize(hkFile, br, obj)
 
-        constraintsSlaveCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        constraintsSlaveCount_offset = hkFile._assert_pointer(br)
         constraintsSlaveCount = hkFile._read_counter(br)
         assert constraintsSlaveCount == 0
 
-        constraintRuntimeCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        constraintRuntimeCount_offset = hkFile._assert_pointer(br)
         constraintRuntimeCount = hkFile._read_counter(br)
         assert constraintRuntimeCount == 0
 
@@ -140,16 +138,14 @@ class hkpEntity(hkpWorldObject):
         if hkFile.header.padding_option:
             bw.align_to(8)
 
-        limitContactImpulseUtilAndFlag_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)  # limitContactImpulseUtilAndFlag
+        limitContactImpulseUtilAndFlag_offset = hkFile._write_empty_pointer(bw)
 
         bw.write_float32(self.damageMultiplier)
 
         if hkFile.header.padding_option:
             bw.align_to(8)
 
-        breakableBody_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)  # breakableBody
+        breakableBody_offset = hkFile._write_empty_pointer(bw)
 
         bw.write_uint32(self.solverData)
 
@@ -158,16 +154,13 @@ class hkpEntity(hkpWorldObject):
 
         self.constraintsMaster.serialize(hkFile, bw, obj)
 
-        constraintsSlaveCount_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        constraintsSlaveCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.constraintsSlave)))
 
-        constraintRuntimeCount_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        constraintRuntimeCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.constraintRuntime)))
 
-        simulationIsland_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)  # simulationIsland
+        simulationIsland_offset = hkFile._write_empty_pointer(bw)
 
         # ----
 
@@ -192,15 +185,22 @@ class hkpEntity(hkpWorldObject):
 
         # ----
 
-        localFrame_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)  # localFrame
+        localFrame_offset = hkFile._write_empty_pointer(bw)  # localFrame
 
-        extendedListeners = bw.tell()
-        hkFile._write_empty_pointer(bw)  # extendedListeners
+        extendedListeners = hkFile._write_empty_pointer(bw)  # extendedListeners
 
         # ----
 
         bw.write_uint32(self.npData)
+        bw.align_to(16)
+
+        ####################
+        # Write array data #
+        ####################
+
+        obj.local_fixups.append(LocalFixup(self._namePointer_offset, bw.tell()))
+
+        bw.write_string(self.name)
         bw.align_to(16)
 
     def asdict(self):

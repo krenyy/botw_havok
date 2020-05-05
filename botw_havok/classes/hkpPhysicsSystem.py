@@ -4,7 +4,6 @@ from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Bool, Int8, String, UInt32, UInt64
 from ..container.util.globalreference import GlobalReference
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.hkReferencedObject import hkReferencedObject
 from .hkpRigidBody import hkpRigidBody
@@ -44,24 +43,19 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         if hkFile.header.padding_option:
             br.align_to(16)
 
-        rigidBodiesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        rigidBodiesCount_offset = hkFile._assert_pointer(br)
         rigidBodiesCount = hkFile._read_counter(br)
 
-        constraintsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        constraintsCount_offset = hkFile._assert_pointer(br)
         constraintsCount = hkFile._read_counter(br)
 
-        actionsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        actionsCount_offset = hkFile._assert_pointer(br)
         actionsCount = hkFile._read_counter(br)
 
-        phantomsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        phantomsCount_offset = hkFile._assert_pointer(br)
         phantomsCount = hkFile._read_counter(br)
 
-        namePointer_offset = br.tell()
-        hkFile._assert_pointer(br)
+        namePointer_offset = hkFile._assert_pointer(br)
 
         # ----
 
@@ -110,31 +104,21 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-        rigidBodiesCount_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        rigidBodiesCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.rigidBodies)))
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.constraints)
-        )
+        constraintsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.constraints)))
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.actions)
-        )
+        actionsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.actions)))
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.phantoms)
-        )
+        phantomsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.phantoms)))
 
-        # ---
+        namePointer_offset = hkFile._write_empty_pointer(bw)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.name)
-        )
-
-        hkFile._write_empty_pointer(bw)
-
-        # ----
+        ###
 
         if hkFile.header.pointer_size == 8:
             bw.write_uint64(UInt64(self.userData))
@@ -146,7 +130,9 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         bw.write_int8(Int8(self.active))
         bw.align_to(16)
 
-        # ----
+        ##############
+        # Write data #
+        ##############
 
         if self.rigidBodies:
             obj.local_fixups.append(LocalFixup(rigidBodiesCount_offset, bw.tell()))
@@ -155,7 +141,6 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
                 gr = GlobalReference()
                 gr.src_obj = obj
                 gr.src_rel_offset = bw.tell()
-                # gr.dst_obj = HKObject()
                 obj.global_references.append(gr)
 
                 hkFile._write_empty_pointer(bw)
@@ -168,6 +153,10 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
                 )
 
             bw.align_to(16)
+
+        obj.local_fixups.append(LocalFixup(namePointer_offset, bw.tell()))
+        bw.write_string(self.name)
+        bw.align_to(16)
 
         ###
 

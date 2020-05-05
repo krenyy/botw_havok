@@ -56,8 +56,7 @@ class hkpMotion(hkReferencedObject):
 
         br.align_to(8)
 
-        savedMotion_offset = br.tell()
-        hkFile._assert_pointer(br)
+        savedMotion_offset = hkFile._assert_pointer(br)
 
         self.savedQualityTypeIndex = br.read_uint16()
 
@@ -86,8 +85,7 @@ class hkpMotion(hkReferencedObject):
 
         bw.align_to(8)
 
-        savedMotion_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        savedMotion_offset = hkFile._write_empty_pointer(bw)
 
         bw.write_uint16(UInt16(self.savedQualityTypeIndex))
 

@@ -2,7 +2,6 @@ from typing import List, Union
 
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import String, UInt32, UInt64
-from ...container.util.localreference import LocalReference
 from .hkMultiThreadCheck import hkMultiThreadCheck
 from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkReferencedObject import hkReferencedObject
@@ -22,6 +21,8 @@ class hkpWorldObject(hkReferencedObject):
     name: String
 
     properties: List[hkSimpleProperty]
+
+    _namePointer_offset: UInt32
 
     def __init__(self):
         self.properties = []
@@ -52,12 +53,11 @@ class hkpWorldObject(hkReferencedObject):
         if hkFile.header.padding_option:
             br.align_to(16)
 
-        namePointer_offset = br.tell()
-        hkFile._assert_pointer(br)
+        namePointer_offset = hkFile._assert_pointer(br)
 
-        propertiesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        propertiesCount_offset = hkFile._assert_pointer(br)
         propertiesCount = hkFile._read_counter(br)
+        assert propertiesCount == 0
 
         for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
@@ -95,14 +95,14 @@ class hkpWorldObject(hkReferencedObject):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.name)
-        )
-        hkFile._write_empty_pointer(bw)  # 'name' pointer
+        self._namePointer_offset = hkFile._write_empty_pointer(bw)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.properties)
-        )
+        propertiesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.properties)))
+
+        # FIXME: Probably should be in hkpEntity, doesn't seem to cause issues yet
+        for prop in self.properties:
+            prop.serialize(hkFile, bw, obj)
 
     def asdict(self):
         d = super().asdict()

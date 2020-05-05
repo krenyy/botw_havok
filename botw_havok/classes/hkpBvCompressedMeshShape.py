@@ -3,7 +3,6 @@ from typing import List
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Bool, Float32, String, UInt8, UInt32
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.hkpBvCompressedMeshShapeTree import hkpBvCompressedMeshShapeTree
 from .common.hkpBvTreeShape import hkpBvTreeShape
@@ -53,16 +52,13 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
         self.hasPerPrimitiveUserData = Bool(br.read_int8())
         br.align_to(4)
 
-        collisionFilterInfoPaletteCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        collisionFilterInfoPaletteCount_offset = hkFile._assert_pointer(br)
         collisionFilterInfoPaletteCount = hkFile._read_counter(br)
 
-        userDataPaletteCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        userDataPaletteCount_offset = hkFile._assert_pointer(br)
         userDataPaletteCount = hkFile._read_counter(br)
 
-        userStringPaletteCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        userStringPaletteCount_offset = hkFile._assert_pointer(br)
         userStringPaletteCount = hkFile._read_counter(br)
 
         br.align_to(16)
@@ -104,21 +100,142 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
         bw.write_uint8(UInt8(self.hasPerPrimitiveUserData))
         bw.align_to(4)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.collisionFilterInfoPalette)
-        )
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.userDataPalette)
-        )
+        collisionFilterInfoPaletteCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.collisionFilterInfoPalette)))
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.userStringPalette)
-        )
+        userDataPaletteCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.userDataPalette)))
+
+        userStringPaletteCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.userStringPalette)))
 
         bw.align_to(16)
 
         self.tree.serialize(hkFile, bw, obj)
         bw.align_to(16)
+
+        ####################
+        # Write array data #
+        ####################
+
+        # collisionFilterInfoPalette
+
+        obj.local_fixups.append(
+            LocalFixup(collisionFilterInfoPaletteCount_offset, bw.tell())
+        )
+        [
+            bw.write_uint32(collisionFilterInfo)
+            for collisionFilterInfo in self.collisionFilterInfoPalette
+        ]
+        bw.align_to(16)
+
+        # userDataPalette
+
+        obj.local_fixups.append(LocalFixup(userDataPaletteCount_offset, bw.tell()))
+        [bw.write_uint32(userData) for userData in self.userDataPalette]
+        bw.align_to(16)
+
+        # userStringPalette
+
+        if self.userStringPalette:
+            obj.local_fixups.append(
+                LocalFixup(userStringPaletteCount_offset, bw.tell())
+            )
+
+            userString_sources = []  # Messy as heck but I don't care
+            userString_destinations = []
+
+            for _ in enumerate(self.userStringPalette):
+                userString_sources.append(bw.tell())
+                hkFile._write_empty_pointer(bw)
+
+            for userString in self.userStringPalette:
+                userString_destinations.append(bw.tell())
+                bw.write_string(userString)
+                bw.align_to(2)
+            bw.align_to(16)
+
+            for src, dst in zip(userString_sources, userString_destinations):
+                obj.local_fixups.append(LocalFixup(src, dst))
+
+        # --------------------------------
+        # hkpBvCompressedMeshShapeTree
+        # nodes
+
+        if self.tree.nodes:
+            obj.local_fixups.append(LocalFixup(self.tree._nodesCount_offset, bw.tell()))
+
+            [node.serialize(hkFile, bw, obj) for node in self.tree.nodes]
+            bw.align_to(16)
+
+        # sections
+        if self.tree.sections:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._sectionsCount_offset, bw.tell())
+            )
+
+            [section.serialize(hkFile, bw, obj) for section in self.tree.sections]
+            bw.align_to(16)
+
+            for section in self.tree.sections:
+                if section.nodes:
+                    obj.local_fixups.append(
+                        LocalFixup(section._nodesCount_offset, bw.tell())
+                    )
+
+                    [node.serialize(hkFile, bw, obj) for node in section.nodes]
+                    bw.align_to(16)
+
+        # primitives
+        if self.tree.primitives:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._primitivesCount_offset, bw.tell())
+            )
+
+            [primitive.serialize(hkFile, bw, obj) for primitive in self.tree.primitives]
+            bw.align_to(16)
+
+        # sharedVerticesIndex
+        if self.tree.sharedVerticesIndex:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._sharedVerticesIndexCount_offset, bw.tell())
+            )
+
+            [bw.write_uint16(sVI) for sVI in self.tree.sharedVerticesIndex]
+            bw.align_to(16)
+
+        # packedVertices
+        if self.tree.packedVertices:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._packedVerticesCount_offset, bw.tell())
+            )
+
+            [bw.write_uint32(packedVertex) for packedVertex in self.tree.packedVertices]
+
+            bw.align_to(16)
+
+        # sharedVertices
+        if self.tree.sharedVertices:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._sharedVerticesCount_offset, bw.tell())
+            )
+
+            [bw.write_uint64(sharedVertex) for sharedVertex in self.tree.sharedVertices]
+
+            bw.align_to(16)
+
+        # primitiveDataRuns
+        if self.tree.primitiveDataRuns:
+            obj.local_fixups.append(
+                LocalFixup(self.tree._primitiveDataRunsCount_offset, bw.tell())
+            )
+
+            [
+                primitiveDataRun.serialize(hkFile, bw, obj)
+                for primitiveDataRun in self.tree.primitiveDataRuns
+            ]
+
+            bw.align_to(16)
 
         ###
 

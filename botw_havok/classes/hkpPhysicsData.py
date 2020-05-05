@@ -35,15 +35,12 @@ class hkpPhysicsData(HKBaseClass, hkReferencedObject):
         if hkFile.header.padding_option:
             br.align_to(16)
 
-        # worldCinfo_offset = br.tell()
-        hkFile._assert_pointer(br)
+        hkFile._assert_pointer(br)  # worldCinfo
 
-        # systemCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        hkFile._assert_pointer(br)  # systems
         systemCount = hkFile._read_counter(br)
         br.align_to(16)
 
-        # systems_offset = br.read()
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
                 system = hkpPhysicsSystem()
@@ -75,18 +72,18 @@ class hkpPhysicsData(HKBaseClass, hkReferencedObject):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-        # worldCinfo_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        hkFile._write_empty_pointer(bw)  # worldCinfo
 
-        hkFile._write_empty_pointer(bw)
+        systemsCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.systems)))
         bw.align_to(16)
+
+        obj.local_fixups.append(LocalFixup(systemsCount_offset, bw.tell()))
 
         for system in self.systems:
             gr = GlobalReference()
             gr.src_obj = obj
             gr.src_rel_offset = bw.tell()
-            # gr.dst_obj = HKObject()
             obj.global_references.append(gr)
 
             hkFile._write_empty_pointer(bw)

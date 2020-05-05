@@ -3,7 +3,6 @@ from typing import List, Union
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import UInt32, UInt64
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.ActorInfo import ActorInfo
 from .common.ShapeInfo import ShapeInfo
@@ -34,28 +33,25 @@ class StaticCompoundInfo(HKBaseClass):
         elif hkFile.header.pointer_size == 4:
             self.Offset = br.read_uint32()
 
-        hkFile._assert_pointer(br)
-        ai_count = hkFile._read_counter(br)
+        ActorInfoCount_offset = hkFile._assert_pointer(br)
+        ActorInfoCount = hkFile._read_counter(br)
 
-        hkFile._assert_pointer(br)
-        si_count = hkFile._read_counter(br)
+        ShapeInfoCount_offset = hkFile._assert_pointer(br)
+        ShapeInfoCount = hkFile._read_counter(br)
 
-        br.align_to(16)
-
-        for _ in range(ai_count):
-            ai = ActorInfo()
-            ai.deserialize(hkFile, br, obj)
-            self.ActorInfo.append(ai)
-        br.align_to(16)
-
-        for _ in range(si_count):
-            si = ShapeInfo()
-            si.deserialize(hkFile, br, obj)
-            self.ShapeInfo.append(si)
-        br.align_to(16)
-
-        obj.local_fixups.clear()
-        obj.global_references.clear()
+        for lfu in obj.local_fixups:
+            br.step_in(lfu.dst)
+            if lfu.src == ActorInfoCount_offset:
+                for _ in range(ActorInfoCount):
+                    ai = ActorInfo()
+                    ai.deserialize(hkFile, br, obj)
+                    self.ActorInfo.append(ai)
+            elif lfu.src == ShapeInfoCount_offset:
+                for _ in range(ShapeInfoCount):
+                    si = ShapeInfo()
+                    si.deserialize(hkFile, br, obj)
+                    self.ShapeInfo.append(si)
+            br.step_out()
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         super().assign_class(hkFile, obj)
@@ -67,16 +63,23 @@ class StaticCompoundInfo(HKBaseClass):
         if hkFile.header.padding_option:
             bw.write_uint32(UInt32(0))
 
-        obj.local_references.extend(
-            [
-                LocalReference(hkFile, bw, obj, bw.tell(), self.ActorInfo),
-                LocalReference(hkFile, bw, obj, bw.tell(), self.ShapeInfo),
-            ]
-        )
+        ActorInfoCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.ActorInfo)))
+
+        ShapeInfoCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.ShapeInfo)))
 
         bw.align_to(16)
 
-        obj.reservations = bw.reservations
+        obj.local_fixups.append(LocalFixup(ActorInfoCount_offset, bw.tell()))
+        [ai.write(hkFile, bw, obj) for ai in self.ActorInfo]
+        bw.align_to(16)
+
+        obj.local_fixups.append(LocalFixup(ShapeInfoCount_offset, bw.tell()))
+        [si.write(hkFile, bw, obj) for si in self.ShapeInfo]
+        bw.align_to(16)
+
+        obj.reservations.update(bw.reservations)
 
         ###
 

@@ -3,7 +3,6 @@ from typing import List
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Int8, UInt16, UInt32
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.hkcdStaticTreeDefaultTreeStorage6 import hkcdStaticTreeDefaultTreeStorage6
 from .common.hkpBvTreeShape import hkpBvTreeShape
@@ -49,12 +48,10 @@ class hkpStaticCompoundShape(HKBaseClass, hkpBvTreeShape):
 
         self.childShapeKeyMask = br.read_uint32()
 
-        instancesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        instancesCount_offset = hkFile._assert_pointer(br)
         instancesCount = hkFile._read_counter(br)
 
-        instanceExtraInfosCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        instanceExtraInfosCount_offset = hkFile._assert_pointer(br)
         instanceExtraInfosCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
@@ -99,15 +96,40 @@ class hkpStaticCompoundShape(HKBaseClass, hkpBvTreeShape):
 
         bw.write_uint32(self.childShapeKeyMask)
 
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.instances)
-        )
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.instanceExtraInfos)
-        )
+        instancesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.instances)))
+
+        instanceExtraInfosCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.instanceExtraInfos)))
 
         self.disabledLargeShapeKeyTable.serialize(hkFile, bw, obj)
         self.tree.serialize(hkFile, bw, obj)
+
+        ####################
+        # Write array data #
+        ####################
+
+        if self.instances:
+            obj.local_fixups.append(LocalFixup(instancesCount_offset, bw.tell()))
+
+            [instance.serialize(hkFile, bw, obj) for instance in self.instances]
+
+        if self.instanceExtraInfos:
+            obj.local_fixups.append(
+                LocalFixup(instanceExtraInfosCount_offset, bw.tell())
+            )
+
+            [
+                bw.write_uint16(instanceExtraInfo)
+                for instanceExtraInfo in self.instanceExtraInfos
+            ]
+
+        if self.tree.nodes:
+            obj.local_fixups.append(LocalFixup(self.tree._nodesCount_offset, bw.tell()))
+
+            [node.serialize(hkFile, bw, obj) for node in self.tree.nodes]
+
+        ###
 
         bw.align_to(16)
 

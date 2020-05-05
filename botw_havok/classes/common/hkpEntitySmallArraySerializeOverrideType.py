@@ -13,8 +13,7 @@ class hkpEntitySmallArraySerializeOverrideType(hkObject):
     capacityAndFlags: UInt16
 
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
-        data_offset = br.tell()
-        hkFile._assert_pointer(br)  # empty 'data' pointer
+        data_offset = hkFile._assert_pointer(br)  # empty 'data' pointer
 
         self.size = br.read_uint16()
         self.capacityAndFlags = br.read_uint16()
@@ -23,8 +22,7 @@ class hkpEntitySmallArraySerializeOverrideType(hkObject):
             br.align_to(8)
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
-        data_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        data_offset = hkFile._write_empty_pointer(bw)
 
         bw.write_uint16(self.size)
         bw.write_uint16(self.capacityAndFlags)

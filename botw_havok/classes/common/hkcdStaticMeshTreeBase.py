@@ -2,7 +2,6 @@ from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Int32, UInt16, UInt32
-from ...container.util.localreference import LocalReference
 from .hkcdStaticMeshTreeBasePrimitive import hkcdStaticMeshTreeBasePrimitive
 from .hkcdStaticMeshTreeBaseSection import hkcdStaticMeshTreeBaseSection
 from .hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5 import (
@@ -23,6 +22,10 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
     primitives: List[hkcdStaticMeshTreeBasePrimitive]
     sharedVerticesIndex: List[UInt16]
 
+    _sectionsCount_offset: UInt32
+    _primitivesCount_offset: UInt32
+    _sharedVerticesIndexCount_offset: UInt32
+
     def __init__(self):
         super().__init__()
 
@@ -40,16 +43,13 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
         if hkFile.header.padding_option:
             br.align_to(16)
 
-        sectionsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        sectionsCount_offset = hkFile._assert_pointer(br)
         sectionsCount = hkFile._read_counter(br)
 
-        primitivesCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        primitivesCount_offset = hkFile._assert_pointer(br)
         primitivesCount = hkFile._read_counter(br)
 
-        sharedVerticesIndexCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        sharedVerticesIndexCount_offset = hkFile._assert_pointer(br)
         sharedVerticesIndexCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
@@ -83,13 +83,16 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-        obj.local_references.extend(
-            [
-                LocalReference(hkFile, bw, obj, bw.tell(), self.sections),
-                LocalReference(hkFile, bw, obj, bw.tell(), self.primitives),
-                LocalReference(hkFile, bw, obj, bw.tell(), self.sharedVerticesIndex),
-            ]
-        )
+        self._sectionsCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.sections)))
+
+        self._primitivesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.primitives)))
+
+        self._sharedVerticesIndexCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.sharedVerticesIndex)))
+
+        # Arrays get written later
 
     def asdict(self):
         d = super().asdict()

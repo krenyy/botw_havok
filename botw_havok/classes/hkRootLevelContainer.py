@@ -1,9 +1,9 @@
 from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import UInt32
+from ..binary.types import Int32, UInt32
+from ..container.util.globalreference import GlobalReference
 from ..container.util.localfixup import LocalFixup
-from ..container.util.localreference import LocalReference
 from .base import HKBaseClass
 from .common.hkRootLevelContainerNamedVariant import hkRootLevelContainerNamedVariant
 
@@ -25,8 +25,7 @@ class hkRootLevelContainer(HKBaseClass):
 
         ###
 
-        namedVariantsCount_offset = br.tell()
-        hkFile._assert_pointer(br)
+        namedVariantsCount_offset = hkFile._assert_pointer(br)
         namedVariantsCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
@@ -39,25 +38,50 @@ class hkRootLevelContainer(HKBaseClass):
                     self.namedVariants.append(nv)
             br.step_out()
 
-        obj.local_fixups.clear()
-        obj.global_references.clear()
-
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         super().assign_class(hkFile, obj)
 
         ###
 
-        namedVariantsCount_offset = bw.tell()
-        hkFile._write_empty_pointer(bw)
+        namedVariantsCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.namedVariants)))
 
         bw.align_to(16)
 
-        namedVariants_offset = bw.tell()
-        for nV in self.namedVariants:
-            nV.serialize(hkFile, bw, obj)
+        obj.local_fixups.append(LocalFixup(namedVariantsCount_offset, bw.tell()))
 
-        ###
+        [namedVariant.serialize(hkFile, bw, obj) for namedVariant in self.namedVariants]
+
+        ####################
+        # Write array data #
+        ####################
+
+        for namedVariant in self.namedVariants:
+            obj.local_fixups.append(
+                LocalFixup(namedVariant._namePointer_offset, bw.tell())
+            )
+
+            bw.write_string(namedVariant.name)
+            bw.align_to(16)
+
+            obj.local_fixups.append(
+                LocalFixup(namedVariant._classNamePointer_offset, bw.tell())
+            )
+
+            bw.write_string(namedVariant.className)
+            bw.align_to(16)
+
+            gr = GlobalReference()
+            gr.src_obj = obj
+            gr.src_rel_offset = namedVariant._variantPointer_offset
+            gr.dst_section_id = Int32(2)
+            obj.global_references.append(gr)
+
+            hkFile.data.objects.append(gr.dst_obj)
+
+            namedVariant.variant.serialize(
+                hkFile, BinaryWriter(big_endian=hkFile.header.endian == 0), gr.dst_obj
+            )
 
         super().serialize(hkFile, bw, obj)
 

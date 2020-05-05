@@ -55,7 +55,8 @@ class HKFile:
     def serialize(self) -> None:
         self.data.serialize(self)
 
-    def _assert_pointer(self, br: BinaryReader) -> None:
+    def _assert_pointer(self, br: BinaryReader) -> UInt32:
+        offset = br.tell()
         if self.header.pointer_size == 4:
             br.assert_int32(Int32(0))
         elif self.header.pointer_size == 8:
@@ -63,13 +64,18 @@ class HKFile:
         else:
             raise NotImplementedError("Wrong pointer size!")
 
-    def _write_empty_pointer(self, bw: BinaryWriter) -> None:
+        return offset
+
+    def _write_empty_pointer(self, bw: BinaryWriter) -> UInt32:
+        offset = bw.tell()
         if self.header.pointer_size == 4:
             bw.write_int32(Int32(0))
         elif self.header.pointer_size == 8:
             bw.write_int64(Int64(0))
         else:
             raise Exception("Wrong pointer size!")
+
+        return offset
 
     def _read_counter(self, br: BinaryReader) -> UInt32:
         """Read Havok array size

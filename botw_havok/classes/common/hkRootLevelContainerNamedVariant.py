@@ -3,10 +3,9 @@ from typing import List
 import botw_havok.classes.util.class_map as class_map
 
 from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Int32, String
+from ...binary.types import Int32, String, UInt32
 from ...container.util.globalreference import GlobalReference
 from ...container.util.localfixup import LocalFixup
-from ...container.util.localreference import LocalReference
 from ..base import HKBaseClass
 from .hkObject import hkObject
 
@@ -20,15 +19,16 @@ class hkRootLevelContainerNamedVariant(hkObject):
     className: String
     variant: HKBaseClass
 
+    _namePointer_offset: UInt32
+    _classNamePointer_offset: UInt32
+    _variantPointer_offset: UInt32
+
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
-        name_offset = br.tell()
-        hkFile._assert_pointer(br)  # name
+        name_offset = hkFile._assert_pointer(br)  # name
 
-        className_offset = br.tell()
-        hkFile._assert_pointer(br)  # className
+        className_offset = hkFile._assert_pointer(br)  # className
 
-        variant_offset = br.tell()
-        hkFile._assert_pointer(br)  # variant
+        variant_offset = hkFile._assert_pointer(br)  # variant
 
         for lfu in obj.local_fixups:
             br.step_in(lfu.dst)
@@ -53,29 +53,9 @@ class hkRootLevelContainerNamedVariant(hkObject):
                 hkFile.data.objects.remove(gr.dst_obj)
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.name)
-        )
-        hkFile._write_empty_pointer(bw)  # name
-
-        obj.local_references.append(
-            LocalReference(hkFile, bw, obj, bw.tell(), self.className)
-        )
-        hkFile._write_empty_pointer(bw)  # className
-
-        # Add reference to the nested 'variant' object
-        gr = GlobalReference()
-        gr.src_obj = obj
-        gr.src_rel_offset = bw.tell()
-        gr.dst_section_id = Int32(2)
-        obj.global_references.append(gr)
-        hkFile._write_empty_pointer(bw)  # variant
-
-        hkFile.data.objects.append(gr.dst_obj)
-
-        self.variant.serialize(
-            hkFile, BinaryWriter(big_endian=hkFile.header.endian == 0), gr.dst_obj
-        )
+        self._namePointer_offset = hkFile._write_empty_pointer(bw)
+        self._classNamePointer_offset = hkFile._write_empty_pointer(bw)
+        self._variantPointer_offset = hkFile._write_empty_pointer(bw)
 
     def asdict(self):
         return {
