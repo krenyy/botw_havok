@@ -1,5 +1,5 @@
 {
-    "python.linting.enabled": true,
+    "python.linting.pylamaEnabled": false,
     "python.linting.mypyEnabled": true,
-    "python.linting.pylamaEnabled": false
+    "python.linting.enabled": true
 }

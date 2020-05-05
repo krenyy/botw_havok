@@ -1,22 +1,28 @@
 from typing import List
 
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
 from .hkcdStaticTreeCodec3Axis4 import hkcdStaticTreeCodec3Axis4
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis4:
+class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis4(hkObject):
     nodes: List[hkcdStaticTreeCodec3Axis4]
+
+    _nodesCount_offset: UInt32
 
     def __init__(self):
         self.nodes = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         nodesCount_offset = br.tell()
-        nodesCount = hk._read_counter(br)
+
+        hkFile._assert_pointer(br)
+        nodesCount = hkFile._read_counter(br)
 
         br.align_to(16)
 
@@ -27,13 +33,13 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis4:
                 for _ in range(nodesCount):
                     node = hkcdStaticTreeCodec3Axis4()
                     self.nodes.append(node)
-                    node.deserialize(hk, br, obj)
+                    node.deserialize(hkFile, br, obj)
 
             br.step_out()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        self._nodesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.nodes))
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        self._nodesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.nodes)))
 
         bw.align_to(16)
 

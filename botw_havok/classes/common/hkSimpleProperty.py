@@ -1,31 +1,33 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
+from .hkObject import hkObject
 from .hkSimplePropertyValue import hkSimplePropertyValue
 
-
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkSimpleProperty:
-    key: int
+class hkSimpleProperty(hkObject):
+    key: UInt32
     value: hkSimplePropertyValue
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.key = br.read_uint32()
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.read_uint32()
 
         self.value = hkSimplePropertyValue()
-        self.value.deserialize(hk, br)
+        self.value.deserialize(hkFile, br, obj)
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        bw.write_uint32(self.key)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        bw.write_uint32(UInt32(self.key))
 
-        if hk.header.padding_option:
-            bw.write_uint32()
+        if hkFile.header.padding_option:
+            bw.write_uint32(UInt32(0x0))
 
-        self.value.serialize(hk, bw)
+        self.value.serialize(hkFile, bw, obj)
 
     def asdict(self):
         return {"key": self.key, "value": self.value.asdict()}

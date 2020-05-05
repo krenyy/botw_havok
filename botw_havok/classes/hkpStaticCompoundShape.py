@@ -1,25 +1,26 @@
 from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
-from ..container.sections.util import LocalFixup
-from .base import HKBase
+from ..binary.types import Int8, UInt16, UInt32
+from ..container.util.localfixup import LocalFixup
+from .base import HKBaseClass
 from .common.hkcdStaticTreeDefaultTreeStorage6 import hkcdStaticTreeDefaultTreeStorage6
 from .common.hkpBvTreeShape import hkpBvTreeShape
 from .common.hkpShapeKeyTable import hkpShapeKeyTable
 from .common.hkpStaticCompoundShapeInstance import hkpStaticCompoundShapeInstance
 
 if False:
-    from ..hk import HK
-    from ..container.sections.hkobject import HKObject
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
-class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
-    numBitsForChildShapeKey: int
-    referencePolicy: int
-    childShapeKeyMask: int
+class hkpStaticCompoundShape(HKBaseClass, hkpBvTreeShape):
+    numBitsForChildShapeKey: Int8
+    referencePolicy: Int8
+    childShapeKeyMask: UInt32
 
     instances: List[hkpStaticCompoundShapeInstance]
-    instanceExtraInfos: List[int]
+    instanceExtraInfos: List[UInt16]
 
     disabledLargeShapeKeyTable: hkpShapeKeyTable
     tree: hkcdStaticTreeDefaultTreeStorage6
@@ -30,18 +31,16 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
         self.instances = []
         self.instanceExtraInfos = []
 
-    def deserialize(self, hk: "HK", obj: "HKObject"):
-        HKBase.deserialize(self, hk, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        HKBaseClass.deserialize(self, hkFile, br, obj)
+        hkpBvTreeShape.deserialize(self, hkFile, br, obj)
 
-        br = BinaryReader(obj.bytes)
-        br.big_endian = hk.header.endian == 0
+        ###
 
-        hkpBvTreeShape.deserialize(self, hk, br, obj)
-
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.align_to(16)
 
-        hk._assert_pointer(br)  # Not sure
+        hkFile._assert_pointer(br)
 
         self.numBitsForChildShapeKey = br.read_int8()
         self.referencePolicy = br.read_int8()
@@ -49,11 +48,11 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
 
         self.childShapeKeyMask = br.read_uint32()
 
-        instancesCount_offset = br.tell()
-        instancesCount = hk._read_counter(br)
+        instancesCount_offset = hkFile._assert_pointer(br)
+        instancesCount = hkFile._read_counter(br)
 
-        instanceExtraInfosCount_offset = br.tell()
-        instanceExtraInfosCount = hk._read_counter(br)
+        instanceExtraInfosCount_offset = hkFile._assert_pointer(br)
+        instanceExtraInfosCount = hkFile._read_counter(br)
 
         for lfu in obj.local_fixups:
             if lfu.src == instancesCount_offset:
@@ -62,7 +61,7 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
                 for _ in range(instancesCount):
                     inst = hkpStaticCompoundShapeInstance()
                     self.instances.append(inst)
-                    inst.deserialize(hk, br, obj)
+                    inst.deserialize(hkFile, br, obj)
 
                 br.step_out()
 
@@ -75,23 +74,21 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
                 br.step_out()
 
         self.disabledLargeShapeKeyTable = hkpShapeKeyTable()
-        self.disabledLargeShapeKeyTable.deserialize(hk, br)
+        self.disabledLargeShapeKeyTable.deserialize(hkFile, br, obj)
 
         self.tree = hkcdStaticTreeDefaultTreeStorage6()
-        self.tree.deserialize(hk, br, obj)
+        self.tree.deserialize(hkFile, br, obj)
 
-    def serialize(self, hk: "HK"):
-        HKBase.assign_class(self, hk)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        HKBaseClass.assign_class(self, hkFile, obj)
+        hkpBvTreeShape.serialize(self, hkFile, bw, obj)
 
-        bw = BinaryWriter()
-        bw.big_endian = hk.header.endian == 0
+        ###
 
-        hkpBvTreeShape.serialize(self, hk, bw)
-
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             bw.align_to(16)
 
-        hk._write_empty_pointer(bw)
+        hkFile._write_empty_pointer(bw)
 
         bw.write_int8(self.numBitsForChildShapeKey)
         bw.write_int8(self.referencePolicy)
@@ -99,48 +96,49 @@ class hkpStaticCompoundShape(HKBase, hkpBvTreeShape):
 
         bw.write_uint32(self.childShapeKeyMask)
 
-        instancesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.instances))
+        instancesCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.instances)))
 
-        instanceExtraInfosCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.instanceExtraInfos))
+        instanceExtraInfosCount_offset = hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.instanceExtraInfos)))
 
-        self.disabledLargeShapeKeyTable.serialize(hk, bw)
-        self.tree.serialize(hk, bw, self.hkobj)
+        self.disabledLargeShapeKeyTable.serialize(hkFile, bw, obj)
+        self.tree.serialize(hkFile, bw, obj)
+
+        ####################
+        # Write array data #
+        ####################
 
         if self.instances:
-            instances_offset = bw.tell()
-            for inst in self.instances:
-                inst.serialize(hk, bw, self.hkobj)
+            obj.local_fixups.append(LocalFixup(instancesCount_offset, bw.tell()))
 
-            self.hkobj.local_fixups.append(
-                LocalFixup(instancesCount_offset, instances_offset)
-            )
+            [instance.serialize(hkFile, bw, obj) for instance in self.instances]
 
         if self.instanceExtraInfos:
-            instanceExtraInfos_offset = bw.tell()
-            for instExtraInfo in self.instanceExtraInfos:
-                bw.write_uint16(instExtraInfo)
-
-            self.hkobj.local_fixups.append(
-                LocalFixup(instanceExtraInfosCount_offset, instanceExtraInfos_offset)
+            obj.local_fixups.append(
+                LocalFixup(instanceExtraInfosCount_offset, bw.tell())
             )
+
+            [
+                bw.write_uint16(instanceExtraInfo)
+                for instanceExtraInfo in self.instanceExtraInfos
+            ]
 
         if self.tree.nodes:
-            nodes_offset = bw.tell()
-            for node in self.tree.nodes:
-                node.serialize(hk, bw, self.hkobj)
+            obj.local_fixups.append(LocalFixup(self.tree._nodesCount_offset, bw.tell()))
 
-            self.hkobj.local_fixups.append(
-                LocalFixup(self.tree._nodesCount_offset, nodes_offset)
-            )
+            [node.serialize(hkFile, bw, obj) for node in self.tree.nodes]
+
+        ###
 
         bw.align_to(16)
 
-        HKBase.serialize(self, hk, bw)
+        ###
+
+        HKBaseClass.serialize(self, hkFile, bw, obj)
 
     def asdict(self):
-        d = HKBase.asdict(self)
+        d = HKBaseClass.asdict(self)
         d.update(hkpBvTreeShape.asdict(self))
         d.update(
             {

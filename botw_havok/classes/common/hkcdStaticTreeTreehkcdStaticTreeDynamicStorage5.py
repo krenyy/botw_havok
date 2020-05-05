@@ -1,20 +1,25 @@
+from ...binary import BinaryReader, BinaryWriter
 from .hkAabb import hkAabb
 from .hkcdStaticTreeDynamicStorage5 import hkcdStaticTreeDynamicStorage5
+
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5(hkcdStaticTreeDynamicStorage5):
     domain: hkAabb
 
-    def deserialize(self, hk, br, obj):
-        super().deserialize(hk, br, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.domain = hkAabb()
-        self.domain.deserialize(hk, br)
+        self.domain.deserialize(hkFile, br, obj)
 
-    def serialize(self, hk, bw):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        self.domain.serialize(hk, bw)
+        self.domain.serialize(hkFile, bw, obj)
 
     def asdict(self):
         d = super().asdict()

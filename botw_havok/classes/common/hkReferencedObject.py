@@ -1,22 +1,24 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
 from .hkBaseObject import hkBaseObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkReferencedObject(hkBaseObject):
-    memSizeAndRefCount: int
+    memSizeAndRefCount: UInt32
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.memSizeAndRefCount = br.read_uint32()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_uint32(self.memSizeAndRefCount)
+        bw.write_uint32(UInt32(self.memSizeAndRefCount))
 
     def asdict(self):
         return {"memSizeAndRefCount": self.memSizeAndRefCount}
@@ -24,5 +26,5 @@ class hkReferencedObject(hkBaseObject):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.memSizeAndRefCount = d["memSizeAndRefCount"]
+        inst.memSizeAndRefCount = UInt32(d["memSizeAndRefCount"])
         return inst

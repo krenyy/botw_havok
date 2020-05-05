@@ -1,17 +1,20 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt64
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkSimplePropertyValue:
-    data: int
+class hkSimplePropertyValue(hkObject):
+    data: UInt64
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.data = br.read_uint64()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        bw.write_uint64(self.data)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        bw.write_uint64(UInt64(self.data))
 
     def asdict(self):
         return {"data": self.data}

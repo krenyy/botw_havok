@@ -1,17 +1,20 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkpBroadPhaseHandle:
-    id: int
+class hkpBroadPhaseHandle(hkObject):
+    id: UInt32
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.id = br.read_uint32()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        bw.write_uint32(self.id)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        bw.write_uint32(UInt32(self.id))
 
     def asdict(self):
         return {"id": self.id}

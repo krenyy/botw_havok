@@ -1,15 +1,16 @@
 from ..binary import BinaryReader, BinaryWriter
-from ..util import Vector4
-from .base import HKBase
+from ..binary.types import Float32, Vector4
+from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
 
 if False:
-    from ..hk import HK
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
-class hkpCylinderShape(HKBase, hkpConvexShape):
-    cylRadius: float
-    cylBaseRadiusFactorForHeightFieldCollisions: float
+class hkpCylinderShape(HKBaseClass, hkpConvexShape):
+    cylRadius: Float32
+    cylBaseRadiusFactorForHeightFieldCollisions: Float32
 
     vertexA: Vector4
     vertexB: Vector4
@@ -17,16 +18,14 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
     perpendicular1: Vector4
     perpendicular2: Vector4
 
-    def deserialize(self, hk: "HK", obj):
-        HKBase.deserialize(self, hk, obj)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        HKBaseClass.deserialize(self, hkFile, br, obj)
+        hkpConvexShape.deserialize(self, hkFile, br, obj)
 
-        br = BinaryReader(self.hkobj.bytes)
-        br.big_endian = hk.header.endian == 0
+        ###
 
-        hkpConvexShape.deserialize(self, hk, br, obj)
-
-        self.cylRadius = br.read_single()
-        self.cylBaseRadiusFactorForHeightFieldCollisions = br.read_single()
+        self.cylRadius = br.read_float32()
+        self.cylBaseRadiusFactorForHeightFieldCollisions = br.read_float32()
 
         self.vertexA = br.read_vector4()
         self.vertexB = br.read_vector4()
@@ -36,16 +35,14 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
 
         br.align_to(16)
 
-    def serialize(self, hk: "HK"):
-        HKBase.assign_class(self, hk)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        HKBaseClass.assign_class(self, hkFile, obj)
+        hkpConvexShape.serialize(self, hkFile, bw, obj)
 
-        bw = BinaryWriter()
-        bw.big_endian = hk.header.endian == 0
+        ###
 
-        hkpConvexShape.serialize(self, hk, bw, self.hkobj)
-
-        bw.write_single(self.cylRadius)
-        bw.write_single(self.cylBaseRadiusFactorForHeightFieldCollisions)
+        bw.write_float32(Float32(self.cylRadius))
+        bw.write_float32(Float32(self.cylBaseRadiusFactorForHeightFieldCollisions))
 
         bw.write_vector4(self.vertexA)
         bw.write_vector4(self.vertexB)
@@ -55,10 +52,12 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
 
         bw.align_to(16)
 
-        HKBase.serialize(self, hk, bw)
+        ###
+
+        HKBaseClass.serialize(self, hkFile, bw, obj)
 
     def asdict(self):
-        d = HKBase.asdict(self)
+        d = HKBaseClass.asdict(self)
         d.update(hkpConvexShape.asdict(self))
         d.update(
             {
@@ -76,7 +75,7 @@ class hkpCylinderShape(HKBase, hkpConvexShape):
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBase.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
         inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
 
         inst.cylRadius = d["cylRadius"]

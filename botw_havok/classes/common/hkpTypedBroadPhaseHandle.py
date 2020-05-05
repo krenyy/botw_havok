@@ -1,19 +1,21 @@
 from ...binary import BinaryReader, BinaryWriter
-from .hkpBroadPhaseHandle import hkpBroadPhaseHandle
+from ...binary.types import Int8, UInt32
 from ..enums.BroadPhaseType import BroadPhaseType
+from .hkpBroadPhaseHandle import hkpBroadPhaseHandle
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
-    type: int
-    ownerOffset: int
-    objectQualityType: int
-    collisionFilterInfo: int
+    type: Int8
+    ownerOffset: Int8
+    objectQualityType: Int8
+    collisionFilterInfo: UInt32
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.type = br.read_int8()
         self.ownerOffset = br.read_int8()
@@ -22,15 +24,15 @@ class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
 
         self.collisionFilterInfo = br.read_uint32()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_int8(self.type)
-        bw.write_int8(self.ownerOffset)
-        bw.write_int8(self.objectQualityType)
+        bw.write_int8(Int8(self.type))
+        bw.write_int8(Int8(self.ownerOffset))
+        bw.write_int8(Int8(self.objectQualityType))
         bw.align_to(4)
 
-        bw.write_uint32(self.collisionFilterInfo)
+        bw.write_uint32(UInt32(self.collisionFilterInfo))
 
     def asdict(self):
         d = super().asdict()

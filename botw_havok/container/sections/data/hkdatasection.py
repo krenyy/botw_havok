@@ -1,15 +1,17 @@
 import typing
 
-from ...binary import BinaryReader, BinaryWriter
-import botw_havok.classes.util.class_map as util
-from .base import HKSection
-from .classnames import HKClass
-from .util import GlobalFixup, GlobalReference, LocalFixup
-from .hkobject import HKObject
+from ....binary import BinaryReader, BinaryWriter
+from ....binary.types import Int32, String, UInt32
+from ....classes.util.class_map import HKClassMap
+from ...util.globalfixup import GlobalFixup
+from ...util.globalreference import GlobalReference
+from ...util.hkobject import HKObject
+from ...util.virtualfixup import VirtualFixup
+from ..base import HKSection
 
 if False:
-    from ...classes.base import HKBase
-    from ...hk import HK
+    from ....hkfile import HKFile
+    from ....classes.base import HKBaseClass
 
 
 class HKDataSection(HKSection):
@@ -17,12 +19,12 @@ class HKDataSection(HKSection):
     """
 
     id: int = 2
-    tag: str = "__data__"
+    tag: String = String("__data__")
 
     global_references: typing.List[GlobalReference]
 
     objects: typing.List[HKObject]
-    contents: typing.List["HKBase"]
+    contents: typing.List["HKBaseClass"]
 
     def __init__(self):
         super().__init__()
@@ -30,12 +32,12 @@ class HKDataSection(HKSection):
         self.objects = []
         self.contents = []
 
-    def read(self, hk: "HK", br: BinaryReader):
-        super().read(br)
+    def read(self, hkFile: "HKFile", br: BinaryReader):
+        super().read(hkFile, br)
 
         # Map out all the objects contained in the data section
         for i, vfu in enumerate(self.virtual_fixups):
-            cls = hk.classnames.get(vfu.dst)
+            cls = hkFile.classnames.get(vfu.dst)
 
             if len(self.virtual_fixups) > i + 1:
                 length = self.virtual_fixups[i + 1].src - vfu.src
@@ -45,8 +47,8 @@ class HKDataSection(HKSection):
             obj = HKObject()
 
             obj.size = length
-            obj.hkclass = cls
-            obj.read(hk, br, length)
+            obj.hkClass = cls
+            obj.read(hkFile, br, length)
 
             self.objects.append(obj)
 
@@ -67,8 +69,6 @@ class HKDataSection(HKSection):
                     ref.dst_obj = self.get(gfu.dst)
                     ref.dst_rel_offset = gfu.dst - ref.dst_obj.offset
                     obj.global_references.append(ref)
-                    if ref not in self.global_references:
-                        self.global_references.append(ref)
 
         self.local_fixups.clear()
         self.global_fixups.clear()
@@ -77,24 +77,35 @@ class HKDataSection(HKSection):
         # Seek to the end of the file to check for additional embedded hk files
         br.seek_absolute(self.absolute_offset + self.EOF_offset)
 
-    def deserialize(self, hk: "HK"):
+    def deserialize(self, hkFile: "HKFile"):
         for obj in self.objects:
-            try:
-                hkcls = util.HKClassMap.get(obj.hkclass.name)()
-                self.contents.append(hkcls)
-            except KeyError:
-                raise Exception(f"Class '{obj.hkclass.name}' is not mapped out yet.")
+            hkcls = HKClassMap.get(obj.hkClass.name)()
+            hkcls.deserialize(
+                hkFile,
+                BinaryReader(
+                    initial_bytes=obj.bytes, big_endian=hkFile.header.endian == 0
+                ),
+                obj,
+            )
 
-            hkcls.deserialize(hk, obj)
+            self.contents.append(hkcls)
         self.objects.clear()
 
-    def serialize(self, hk: "HK"):
+    def serialize(self, hkFile: "HKFile"):
         for hkcls in self.contents:
-            self.objects.append(hkcls.hkobj)
-            hkcls.serialize(hk)
+            obj = HKObject()
+            self.objects.append(obj)
+
+            hkcls.serialize(
+                hkFile, BinaryWriter(big_endian=hkFile.header.endian == 0), obj,
+            )
         self.contents.clear()
 
-    def write(self, hk: "HK", bw: BinaryWriter):
+    def write(self, hkFile: "HKFile", bw: BinaryWriter):
+        # Raise exception if deserialized
+        if self.contents:
+            raise Exception("You need to serialize first!")
+
         # Clear out all the fixups beforehand
         self.local_fixups.clear()
         self.global_fixups.clear()
@@ -103,12 +114,8 @@ class HKDataSection(HKSection):
         # Set data section absolute offset
         self.absolute_offset = bw.tell()
 
-        # Serialize the file if it happens to be deserialized
-        if self.contents:
-            raise Exception("You need to serialize first!")
-
         for obj in self.objects:
-            obj.write(hk, bw)
+            obj.write(hkFile, bw)
             bw.reservations.update(
                 {
                     k: v + obj.offset + self.absolute_offset
@@ -117,10 +124,10 @@ class HKDataSection(HKSection):
             )
 
             # Create a Virtual fixup
-            vfu = GlobalFixup()
+            vfu = VirtualFixup()
             vfu.src = obj.offset
-            vfu.dst_section_id = 0  # __classnames__ section id
-            vfu.dst = obj.hkclass.offset
+            vfu.dst_section_id = Int32(0)  # __classnames__ section id
+            vfu.dst = obj.hkClass.offset
 
             self.virtual_fixups.append(vfu)
 
@@ -128,7 +135,7 @@ class HKDataSection(HKSection):
             # Create a Global fixup
             gfu = GlobalFixup()
             gfu.src = gr.src_obj.offset + gr.src_rel_offset
-            gfu.dst_section_id = 2
+            gfu.dst_section_id = Int32(2)
             gfu.dst = gr.dst_obj.offset + gr.dst_rel_offset
 
             self.global_fixups.append(gfu)
@@ -176,7 +183,7 @@ class HKDataSection(HKSection):
         # and other classes in the second one. There's an offset in there
         # that points to the beginning of the second hkfile
         for name in list(bw.reservations):
-            if name == "EOF:uint32":
+            if name == "EOF:u32":
                 bw.fill_uint32(
                     name.split(":")[0], self.absolute_offset + self.EOF_offset
                 )
@@ -187,6 +194,8 @@ class HKDataSection(HKSection):
         for obj in self.objects:
             if obj.offset == value:
                 return obj
+        else:
+            return HKObject()
 
     def asdict(self):
         return {
@@ -197,7 +206,7 @@ class HKDataSection(HKSection):
     def fromdict(cls, d: dict):
         inst = cls()
         inst.contents = [
-            util.HKClassMap.get(content["hkClass"]).fromdict(content)
+            HKClassMap.get(content["hkClass"]).fromdict(content)
             for content in d["contents"]
         ]
         return inst

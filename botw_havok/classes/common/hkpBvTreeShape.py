@@ -1,21 +1,25 @@
 from ...binary import BinaryReader, BinaryWriter
-from .hkpShape import hkpShape
+from ...binary.types import UInt8
 from ..enums.BvTreeType import BvTreeType
+from .hkpShape import hkpShape
+
+if False:
+    from ...container.util.hkobject import HKObject
 
 
 class hkpBvTreeShape(hkpShape):
-    bvTreeType: int
+    bvTreeType: UInt8
 
-    def deserialize(self, hk, br: BinaryReader, obj):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile, br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.bvTreeType = br.read_uint8()
         br.align_to(4)
 
-    def serialize(self, hk, bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile, bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_uint8(self.bvTreeType)
+        bw.write_uint8(UInt8(self.bvTreeType))
         bw.align_to(4)
 
     def asdict(self):

@@ -1,78 +1,61 @@
 from typing import List
 
-import botw_havok.classes.util.class_map as util
+import botw_havok.classes.util.class_map as class_map
 
 from ...binary import BinaryReader, BinaryWriter
-from ...container.sections.util import GlobalReference, LocalFixup
-from .hkReferencedObject import hkReferencedObject
+from ...binary.types import Int32, String, UInt32
+from ...container.util.globalreference import GlobalReference
+from ...container.util.localfixup import LocalFixup
+from ..base import HKBaseClass
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkRootLevelContainerNamedVariant:
-    name: str
-    className: str
-    variant: hkReferencedObject
+class hkRootLevelContainerNamedVariant(hkObject):
+    name: String
+    className: String
+    variant: HKBaseClass
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        # name_offset = br.tell()
-        hk._assert_pointer(br)  # name
+    _namePointer_offset: UInt32
+    _classNamePointer_offset: UInt32
+    _variantPointer_offset: UInt32
 
-        # className_offset = br.tell()
-        hk._assert_pointer(br)  # className
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        name_offset = hkFile._assert_pointer(br)  # name
 
-        variant_offset = br.tell()
-        hk._assert_pointer(br)  # variant
+        className_offset = hkFile._assert_pointer(br)  # className
 
-        self.name = br.read_string()
-        br.align_to(16)
+        variant_offset = hkFile._assert_pointer(br)  # variant
 
-        self.className = br.read_string()
-        br.align_to(16)
+        for lfu in obj.local_fixups:
+            br.step_in(lfu.dst)
+            if lfu.src == name_offset:
+                self.name = br.read_string()
+            elif lfu.src == className_offset:
+                self.className = br.read_string()
+            br.step_out()
 
         for gr in obj.global_references:
             if gr.src_rel_offset == variant_offset:
-                self.variant = util.HKClassMap.get(gr.dst_obj.hkclass.name)()
-                self.variant.deserialize(hk, gr.dst_obj)
-                hk.data.objects.remove(gr.dst_obj)
+                self.variant = class_map.HKClassMap.get(gr.dst_obj.hkClass.name)()
+                self.variant.deserialize(
+                    hkFile,
+                    BinaryReader(
+                        initial_bytes=gr.dst_obj.bytes,
+                        big_endian=hkFile.header.endian == 0,
+                    ),
+                    gr.dst_obj,
+                )
 
-        obj.global_references.clear()
+                hkFile.data.objects.remove(gr.dst_obj)
 
-    def serialize(self, hk: "HK", obj: "HKObject", bw: BinaryWriter):
-        namePointer_offset = bw.tell()
-        hk._write_empty_pointer(bw)  # name
-
-        classNamePointer_offset = bw.tell()
-        hk._write_empty_pointer(bw)  # className
-
-        variantPointer_offset = bw.tell()
-        hk._write_empty_pointer(bw)  # variant
-
-        name_offset = bw.tell()
-        bw.write_string(self.name)
-        bw.align_to(16)
-
-        className_offset = bw.tell()
-        bw.write_string(self.className)
-        bw.align_to(16)
-
-        hk.data.objects.append(self.variant.hkobj)
-        self.variant.serialize(hk)
-
-        # Local fixups
-        obj.local_fixups.append(LocalFixup(namePointer_offset, name_offset))
-        obj.local_fixups.append(LocalFixup(classNamePointer_offset, className_offset))
-
-        # Write reference to the nested object
-        gr = GlobalReference()
-        gr.src_obj = obj
-        gr.src_rel_offset = variantPointer_offset
-        gr.dst_obj = self.variant.hkobj
-        gr.dst_rel_offset = 0  # i guess?
-
-        obj.global_references.append(gr)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        self._namePointer_offset = hkFile._write_empty_pointer(bw)
+        self._classNamePointer_offset = hkFile._write_empty_pointer(bw)
+        self._variantPointer_offset = hkFile._write_empty_pointer(bw)
 
     def asdict(self):
         return {
@@ -86,7 +69,7 @@ class hkRootLevelContainerNamedVariant:
         inst = cls()
         inst.name = d["name"]
         inst.className = d["className"]
-        inst.variant = util.HKClassMap.get(d["className"]).fromdict(d["variant"])
+        inst.variant = class_map.HKClassMap.get(d["className"]).fromdict(d["variant"])
 
         return inst
 

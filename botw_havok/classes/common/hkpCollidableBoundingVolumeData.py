@@ -1,26 +1,29 @@
-from ...binary import BinaryWriter, BinaryReader
 from typing import List
 
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8, UInt16, UInt32
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkpCollidableBoundingVolumeData:
-    min: List[int]
-    expansionMin: List[int]
+class hkpCollidableBoundingVolumeData(hkObject):
+    min: List[UInt32]
+    expansionMin: List[UInt8]
 
-    expansionShift: int
+    expansionShift: UInt8
 
-    max: List[int]
-    expansionMax: List[int]
+    max: List[UInt32]
+    expansionMax: List[UInt8]
 
-    numChildShapeAabbs: int
-    capacityChildShapeAabbs: int
+    numChildShapeAabbs: UInt16
+    capacityChildShapeAabbs: UInt16
     # childShapeAabbs: None = None
     # childShapeKeys: None = None
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.min = [br.read_uint32() for _ in range(3)]
         self.expansionMin = [br.read_uint8() for _ in range(3)]
 
@@ -37,35 +40,35 @@ class hkpCollidableBoundingVolumeData:
         self.capacityChildShapeAabbs = br.read_uint16()
 
         # Not entirely sure
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             br.align_to(8)
 
         # Empty pointers (?)
-        hk._assert_pointer(br)  # childShapeAabbs
-        hk._assert_pointer(br)  # childShapeKeys
+        hkFile._assert_pointer(br)  # childShapeAabbs
+        hkFile._assert_pointer(br)  # childShapeKeys
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        [bw.write_uint32(m) for m in self.min]
-        [bw.write_uint8(exm) for exm in self.expansionMin]
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        [bw.write_uint32(UInt32(m)) for m in self.min]
+        [bw.write_uint8(UInt8(exm)) for exm in self.expansionMin]
 
-        bw.write_uint8(self.expansionShift)
+        bw.write_uint8(UInt8(self.expansionShift))
 
-        [bw.write_uint32(m) for m in self.max]
-        [bw.write_uint8(exm) for exm in self.expansionMax]
+        [bw.write_uint32(UInt32(m)) for m in self.max]
+        [bw.write_uint8(UInt8(exm)) for exm in self.expansionMax]
 
-        bw.write_uint8(0)
+        bw.write_uint8(UInt8(0))
 
         # ----
 
         bw.write_uint16(self.numChildShapeAabbs)
         bw.write_uint16(self.capacityChildShapeAabbs)
 
-        if hk.header.padding_option:
+        if hkFile.header.padding_option:
             bw.align_to(8)
 
         # Empty pointers
-        hk._write_empty_pointer(bw)  # childShapeAabbs
-        hk._write_empty_pointer(bw)  # childShapeKeys
+        hkFile._write_empty_pointer(bw)  # childShapeAabbs
+        hkFile._write_empty_pointer(bw)  # childShapeKeys
 
     def asdict(self):
         return {

@@ -1,24 +1,30 @@
 import typing
 
 from ...binary import BinaryReader, BinaryWriter
-from .util import GlobalFixup, LocalFixup, GlobalReference
+from ...binary.types import String, UInt8, UInt32
+from ..util.globalfixup import GlobalFixup
+from ..util.localfixup import LocalFixup
+from ..util.virtualfixup import VirtualFixup
+
+if False:
+    from ...hkfile import HKFile
 
 
 class HKSection:
     id: int  # 0,1,2
-    tag: str  # __classnames__, __types__, __data__
+    tag: String  # __classnames__, __types__, __data__
 
     local_fixups: typing.List[LocalFixup]
     global_fixups: typing.List[GlobalFixup]
-    virtual_fixups: typing.List[GlobalFixup]
+    virtual_fixups: typing.List[VirtualFixup]
 
-    absolute_offset: int  # Used in each section, defines absolute section start
-    local_fixups_offset: int  # Used in the data section, points to local links
-    global_fixups_offset: int  # Used in the data section, points to global links
-    virtual_fixups_offset: int  # Used in the data section, links chunks to classes
-    exports_offset: int  # Never used?, equals to EOF_offset
-    imports_offset: int  # Never used?, equals to EOF_offset
-    EOF_offset: int  # Points to the end of the section
+    absolute_offset: UInt32  # Used in each section
+    local_fixups_offset: UInt32  # Used in the data section
+    global_fixups_offset: UInt32  # Used in the data section
+    virtual_fixups_offset: UInt32  # Used in the data section
+    exports_offset: UInt32  # Never used, equals to EOF_offset
+    imports_offset: UInt32  # Never used, equals to EOF_offset
+    EOF_offset: UInt32  # Points to the end of the section
 
     def __init__(self):
         self.local_fixups = []
@@ -28,7 +34,7 @@ class HKSection:
     def read_header(self, br: BinaryReader):
         # Section name
         self.tag = br.read_string(19)
-        br.assert_uint8(0xFF)
+        br.assert_uint8(UInt8(0xFF))
 
         # Section offsets
         self.absolute_offset = br.read_uint32()
@@ -40,15 +46,15 @@ class HKSection:
         self.EOF_offset = br.read_uint32()
 
         # Delimiter between section headers
-        br.assert_uint32(0xFFFFFFFF)
-        br.assert_uint32(0xFFFFFFFF)
-        br.assert_uint32(0xFFFFFFFF)
-        br.assert_uint32(0xFFFFFFFF)
+        br.assert_uint32(UInt32(0xFFFFFFFF))
+        br.assert_uint32(UInt32(0xFFFFFFFF))
+        br.assert_uint32(UInt32(0xFFFFFFFF))
+        br.assert_uint32(UInt32(0xFFFFFFFF))
 
     def write_header(self, bw: BinaryWriter):
         # Section name
         bw.write_string(self.tag, size=19)
-        bw.write_uint8(0xFF)
+        bw.write_uint8(UInt8(0xFF))
 
         # Section offsets
         bw.reserve_uint32(f"{self.tag}abs")
@@ -60,52 +66,56 @@ class HKSection:
         bw.reserve_uint32(f"{self.tag}eof")
 
         # Delimiter between section headers
-        bw.write_uint32(0xFFFFFFFF)
-        bw.write_uint32(0xFFFFFFFF)
-        bw.write_uint32(0xFFFFFFFF)
-        bw.write_uint32(0xFFFFFFFF)
+        bw.write_uint32(UInt32(0xFFFFFFFF))
+        bw.write_uint32(UInt32(0xFFFFFFFF))
+        bw.write_uint32(UInt32(0xFFFFFFFF))
+        bw.write_uint32(UInt32(0xFFFFFFFF))
 
-    def read(self, br: BinaryReader):
-        # Read data links
+    def read(self, hkFile: "HKFile", br: BinaryReader):
+        ###
+        # Read local fixups
         br.step_in(self.absolute_offset + self.local_fixups_offset)
-        self.local_fixups = self._read_local_fixups(
-            br, self.global_fixups_offset - self.local_fixups_offset
-        )
-        br.step_out()
 
-        # Read chunk links
-        br.step_in(self.absolute_offset + self.global_fixups_offset)
-        self.global_fixups = self._read_global_fixups(
-            br, self.virtual_fixups_offset - self.global_fixups_offset
-        )
-        br.step_out()
-
-        # Read class mappings
-        br.step_in(self.absolute_offset + self.virtual_fixups_offset)
-        self.virtual_fixups = self._read_global_fixups(
-            br, self.exports_offset - self.virtual_fixups_offset
-        )
-        br.step_out()
-
-    def _read_local_fixups(self, br: BinaryReader, length: int):
-        ret = []
-        for _ in range(length // 8):
+        for _ in range((self.global_fixups_offset - self.local_fixups_offset) // 8):
             if br.peek() != b"\xFF":
                 lfu = LocalFixup()
                 lfu.read(br)
-                ret.append(lfu)
-        br.align_to(16)
-        return ret
 
-    def _read_global_fixups(self, br: BinaryReader, length: int):
-        ret = []
-        for _ in range(length // 12):
+                self.local_fixups.append(lfu)
+        br.align_to(16)
+
+        br.step_out()
+
+        ###
+        # Read global fixups
+        br.step_in(self.absolute_offset + self.global_fixups_offset)
+
+        for _ in range((self.virtual_fixups_offset - self.global_fixups_offset) // 12):
             if br.peek() != b"\xFF":
                 gfu = GlobalFixup()
                 gfu.read(br)
-                ret.append(gfu)
+
+                self.global_fixups.append(gfu)
         br.align_to(16)
-        return ret
+
+        br.step_out()
+
+        ###
+        # Read virtual fixups
+        br.step_in(self.absolute_offset + self.virtual_fixups_offset)
+
+        for _ in range((self.exports_offset - self.global_fixups_offset) // 12):
+            if br.peek() != b"\xFF":
+                vfu = VirtualFixup()
+                vfu.read(br)
+
+                self.virtual_fixups.append(vfu)
+        br.align_to(16)
+
+        br.step_out()
+
+    def write(self, hkFile: "HKFile", bw: BinaryWriter):
+        raise NotImplementedError("This method is meant to be overridden!")
 
     def asdict(self):
         raise NotImplementedError("This method is meant to be overridden!")

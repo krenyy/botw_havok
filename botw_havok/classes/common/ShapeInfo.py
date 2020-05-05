@@ -1,19 +1,25 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Int16, Int32, UInt16
+from .hkObject import hkObject
+
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class ShapeInfo:
-    ActorInfoIndex: int
-    InstanceId: int
-    BodyGroup: int
-    BodyLayerType: int
+class ShapeInfo(hkObject):
+    ActorInfoIndex: Int32
+    InstanceId: Int32
+    BodyGroup: Int16
+    BodyLayerType: UInt16
 
-    def read(self, br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.ActorInfoIndex = br.read_int32()
         self.InstanceId = br.read_int32()
         self.BodyGroup = br.read_int16()
         self.BodyLayerType = br.read_uint16()
 
-    def write(self, bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_int32(self.ActorInfoIndex)
         bw.write_int32(self.InstanceId)
         bw.write_int16(self.BodyGroup)
@@ -30,10 +36,10 @@ class ShapeInfo:
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.ActorInfoIndex = d["ActorInfoIndex"]
-        inst.InstanceId = d["InstanceId"]
-        inst.BodyGroup = d["BodyGroup"]
-        inst.BodyLayerType = d["BodyLayerType"]
+        inst.ActorInfoIndex = Int32(d["ActorInfoIndex"])
+        inst.InstanceId = Int32(d["InstanceId"])
+        inst.BodyGroup = Int16(d["BodyGroup"])
+        inst.BodyLayerType = UInt16(d["BodyLayerType"])
 
         return inst
 

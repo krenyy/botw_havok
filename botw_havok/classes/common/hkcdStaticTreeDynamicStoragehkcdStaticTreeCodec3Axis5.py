@@ -1,22 +1,27 @@
 from typing import List
-from .hkcdStaticTreeCodec3Axis5 import hkcdStaticTreeCodec3Axis5
+
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
+from .hkcdStaticTreeCodec3Axis5 import hkcdStaticTreeCodec3Axis5
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
-    from ...container.sections.hkobject import HKObject
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5:
-    _nodesCount_offset: int
+class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5(hkObject):
     nodes: List[hkcdStaticTreeCodec3Axis5]
+
+    # TODO: Get rid of these things sometime
+    _nodesCount_offset: UInt32
 
     def __init__(self):
         self.nodes = []
 
-    def deserialize(self, hk: "HK", br: BinaryReader, obj: "HKObject"):
-        nodesCount_offset = br.tell()
-        nodesCount = hk._read_counter(br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        nodesCount_offset = hkFile._assert_pointer(br)
+        nodesCount = hkFile._read_counter(br)
 
         br.align_to(16)
 
@@ -27,17 +32,19 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5:
                 for _ in range(nodesCount):
                     node = hkcdStaticTreeCodec3Axis5()
                     self.nodes.append(node)
-                    node.deserialize(hk, br, obj)
+                    node.deserialize(hkFile, br, obj)
 
             br.step_out()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         self._nodesCount_offset = bw.tell()
-        hk._write_counter(bw, len(self.nodes))
+
+        hkFile._write_empty_pointer(bw)
+        hkFile._write_counter(bw, UInt32(len(self.nodes)))
 
         bw.align_to(16)
 
-        # Individual nodes get written later
+        # The nodes get written at a later stage
 
     def asdict(self):
         return {"nodes": [node.asdict() for node in self.nodes]}

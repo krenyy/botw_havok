@@ -1,26 +1,29 @@
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt16, UInt32
+from .hkObject import hkObject
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
-class hkMultiThreadCheck:
-    threadId: int
-    stackTraceId: int
-    markCount: int
-    markBitStack: int
+class hkMultiThreadCheck(hkObject):
+    threadId: UInt32
+    stackTraceId: UInt32
+    markCount: UInt16
+    markBitStack: UInt16
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.threadId = br.read_uint32()
         self.stackTraceId = br.read_uint32()
         self.markCount = br.read_uint16()
         self.markBitStack = br.read_uint16()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        bw.write_uint32(self.threadId)
-        bw.write_uint32(self.stackTraceId)
-        bw.write_uint16(self.markCount)
-        bw.write_uint16(self.markBitStack)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        bw.write_uint32(UInt32(self.threadId))
+        bw.write_uint32(UInt32(self.stackTraceId))
+        bw.write_uint16(UInt16(self.markCount))
+        bw.write_uint16(UInt16(self.markBitStack))
 
     def asdict(self):
         return {

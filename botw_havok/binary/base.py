@@ -1,27 +1,35 @@
 from io import BytesIO
 
+from .types import UInt32
+
 
 class BinaryBase(BytesIO):
     big_endian: bool = False
     steps: list
 
-    type_names = {
-        "int8": "b",
-        "uint8": "B",
-        "int16": "h",
-        "uint16": "H",
-        "int32": "i",
-        "uint32": "I",
-        "int64": "q",
-        "uint64": "Q",
-        "float": "f",
-        "double": "d",
-        "char": "s",
+    struct_types = {
+        "i8": "b",
+        "i16": "h",
+        "i32": "i",
+        "i64": "q",
+        "u8": "B",
+        "u16": "H",
+        "u32": "I",
+        "u64": "Q",
+        "f32": "f",
+        "f64": "d",
+        "string": "s",
     }
 
-    def __init__(self, initial_bytes=None):
+    def __init__(self, initial_bytes=None, big_endian: bool = None):
         super().__init__(initial_bytes=initial_bytes)
         self.steps = []
+
+        if big_endian:
+            self.big_endian = big_endian
+
+    def tell(self):
+        return UInt32(super().tell())
 
     def seek_absolute(self, offset: int):
         return self.seek(offset, 0)
@@ -39,7 +47,9 @@ class BinaryBase(BytesIO):
 
     def step_out(self):
         if len(self.steps) == 0:
-            raise Exception("Reader is already stepped all the way out")
+            raise Exception(
+                f"{self.__class__.__name__} is already stepped all the way out"
+            )
         return self.seek_absolute(self.steps.pop())
 
     def endian_char(self):

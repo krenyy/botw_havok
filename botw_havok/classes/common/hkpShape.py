@@ -1,28 +1,32 @@
-from .hkpShapeBase import hkpShapeBase
+from typing import Union
+
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32, UInt64
+from .hkpShapeBase import hkpShapeBase
 
 if False:
-    from ...hk import HK
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkpShape(hkpShapeBase):
-    userData: int
+    userData: Union[UInt32, UInt64]
 
-    def deserialize(self, hk: "HK", br: BinaryReader):
-        super().deserialize(hk, br)
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
-        if hk.header.pointer_size == 8:
+        if hkFile.header.pointer_size == 8:
             self.userData = br.read_uint64()
-        elif hk.header.pointer_size == 4:
+        elif hkFile.header.pointer_size == 4:
             self.userData = br.read_uint32()
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        super().serialize(hk, bw)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        if hk.header.pointer_size == 8:
-            bw.write_uint64(self.userData)
-        elif hk.header.pointer_size == 4:
-            bw.write_uint32(self.userData)
+        if hkFile.header.pointer_size == 8:
+            bw.write_uint64(UInt64(self.userData))
+        elif hkFile.header.pointer_size == 4:
+            bw.write_uint32(UInt32(self.userData))
 
     def asdict(self):
         d = super().asdict()

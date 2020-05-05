@@ -1,29 +1,27 @@
 from ..binary import BinaryReader, BinaryWriter
-from typing import List
-from ..container.sections.hkobject import HKObject
-
+from ..binary.types import String
+from ..container.util.hkobject import HKObject
 
 if False:
-    from ..hk import HK
+    from ..hkfile import HKFile
 
 
-class HKBase:
-    hkClass: str
-    hkobj: HKObject
+class HKBaseClass:
+    hkClass: String
 
-    def __init__(self):
-        self.hkobj = HKObject()
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: HKObject):
+        # SPECIFIC HKCLASS BEHAVIOUR EXECUTES AFTER THIS
 
-    def deserialize(self, hk: "HK", obj: HKObject):
-        self.hkobj = obj
-        self.hkClass = self.hkobj.hkclass.name
+        self.hkClass = obj.hkClass.name
 
-    def assign_class(self, hk: "HK"):
-        self.hkobj.hkclass = hk.classnames.get(self.hkClass)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: HKObject):
+        # SPECIFIC HKCLASS BEHAVIOUR EXECUTES BEFORE THIS
 
-    def serialize(self, hk: "HK", bw: BinaryWriter):
-        self.hkobj.bytes = bw.getvalue()
-        self.hkobj.size = len(self.hkobj.bytes)
+        obj.bytes = bw.getvalue()
+        obj.size = len(obj.bytes)
+
+    def assign_class(self, hkFile: "HKFile", obj: "HKObject"):
+        obj.hkClass = hkFile.classnames.get(self.hkClass)
 
     def asdict(self):
         return {"hkClass": self.hkClass}
@@ -32,4 +30,5 @@ class HKBase:
     def fromdict(cls, d: dict):
         inst = cls()
         inst.hkClass = d["hkClass"]
+
         return inst

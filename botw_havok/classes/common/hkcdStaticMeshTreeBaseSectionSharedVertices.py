@@ -1,11 +1,20 @@
-class hkcdStaticMeshTreeBaseSectionSharedVertices:
-    data: int
+from .hkObject import hkObject
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
 
-    def deserialize(self, hk, br, obj):
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
+
+
+class hkcdStaticMeshTreeBaseSectionSharedVertices(hkObject):
+    data: UInt32
+
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.data = br.read_uint32()
 
-    def serialize(self, hk, bw, obj):
-        bw.write_uint32(self.data)
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
+        bw.write_uint32(UInt32(self.data))
 
     def asdict(self):
         return {"data": self.data}

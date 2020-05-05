@@ -1,18 +1,24 @@
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8
 from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
+
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
 
 
 class hkcdStaticTreeCodec3Axis4(hkcdStaticTreeCodec3Axis):
-    data: int
+    data: UInt8
 
-    def deserialize(self, hk, br, obj):
-        super().deserialize(hk, br, obj)
+    def deserialize(self, hkFile, br: BinaryReader, obj: "HKObject"):
+        super().deserialize(hkFile, br, obj)
 
         self.data = br.read_uint8()
 
-    def serialize(self, hk, bw, obj):
-        super().serialize(hk, bw, obj)
+    def serialize(self, hkFile, bw: BinaryWriter, obj: "HKObject"):
+        super().serialize(hkFile, bw, obj)
 
-        bw.write_uint8(self.data)
+        bw.write_uint8(UInt8(self.data))
 
     def asdict(self):
         d = super().asdict()
