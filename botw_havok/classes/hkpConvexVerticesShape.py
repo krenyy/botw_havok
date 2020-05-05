@@ -127,7 +127,7 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
                 "aabbCenter": self.aabbCenter.asdict(),
                 "rotatedVertices": [rv.asdict() for rv in self.rotatedVertices],
                 "numVertices": self.numVertices,
-                "useSpuBuffer": self.useSpuBuffer,
+                "useSpuBuffer": bool(self.useSpuBuffer),
                 "planeEquations": self.planeEquations.asdict(),
                 # "connectivity": self.connectivity.asdict(),
             }
@@ -145,7 +145,7 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
         inst.aabbCenter = Vector4.fromdict(d["aabbCenter"])
         inst.rotatedVertices = [Matrix.fromdict(rv) for rv in d["rotatedVertices"]]
         inst.numVertices = d["numVertices"]
-        inst.useSpuBuffer = d["useSpuBuffer"]
+        inst.useSpuBuffer = Bool(d["useSpuBuffer"])
         inst.planeEquations = Matrix.fromdict(d["planeEquations"])
         # inst.connectivity = hkpConvexVerticesConnectivity.fromdict(d["connectivity"])
 

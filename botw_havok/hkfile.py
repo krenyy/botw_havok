@@ -10,17 +10,18 @@ class HKFile:
     types: HKTypesSection
     data: HKDataSection
 
+    def __init__(self):
+        self.header = HKHeader()
+
+        self.classnames = HKClassnamesSection()
+        self.types = HKTypesSection()
+        self.data = HKDataSection()
+
     def read(self, br: BinaryReader):
         # Read the endian byte ahead
         br.step_in(0x11)
         br.big_endian = br.read_int8() == 0
         br.step_out()
-
-        # Create all needed instances
-        self.header = HKHeader()
-        self.classnames = HKClassnamesSection()
-        self.types = HKTypesSection()
-        self.data = HKDataSection()
 
         # Read Havok header
         self.header.read(br)
@@ -54,6 +55,12 @@ class HKFile:
 
     def serialize(self) -> None:
         self.data.serialize(self)
+
+    def to_switch(self):
+        self.header.to_switch()
+
+    def to_wiiu(self):
+        self.header.to_wiiu()
 
     def _assert_pointer(self, br: BinaryReader) -> UInt32:
         offset = br.tell()
@@ -101,12 +108,6 @@ class HKFile:
         inst.data = HKDataSection.fromdict(d["data"])
 
         return inst
-
-    def to_switch(self):
-        self.header.to_switch()
-
-    def to_wiiu(self):
-        self.header.to_wiiu()
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"

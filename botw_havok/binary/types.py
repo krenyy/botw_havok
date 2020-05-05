@@ -196,7 +196,7 @@ class Vector3(List[Float32], BinaryType):
 
     @classmethod
     def fromdict(cls, items: list):
-        return cls([Float32(i) for i in items])
+        return cls(*[Float32(i) for i in items])
 
 
 class Vector4(List[Float32], BinaryType):
@@ -214,7 +214,7 @@ class Vector4(List[Float32], BinaryType):
 
     @classmethod
     def fromdict(cls, items: list):
-        return cls([Float32(i) for i in items])
+        return cls(*[Float32(i) for i in items])
 
 
 class Matrix(List[Vector4], BinaryType):
@@ -229,7 +229,7 @@ class Matrix(List[Vector4], BinaryType):
 
     @classmethod
     def fromdict(cls, matrix: list):
-        return cls([Vector4.fromdict(v) for v in matrix])
+        return cls(*[Vector4.fromdict(v) for v in matrix])
 
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"

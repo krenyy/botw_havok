@@ -173,7 +173,7 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
                 # "phantoms": [p.asdict() for p in self.phantoms],
                 "name": self.name,
                 "userData": self.userData,
-                "active": self.active,
+                "active": bool(self.active),
             }
         )
         return d
@@ -188,7 +188,7 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         # inst.constraints = [hkpConstraintInstance.fromdict(c) for c in d["constraints"]]
         inst.name = d["name"]
         inst.userData = d["userData"]
-        inst.active = d["active"]
+        inst.active = Bool(d["active"])
 
         return inst
 

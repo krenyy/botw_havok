@@ -249,8 +249,10 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
             {
                 "convexRadius": self.convexRadius,
                 "weldingType": WeldingType(self.weldingType).name,
-                "hasPerPrimitiveCollisionFilterInfo": self.hasPerPrimitiveCollisionFilterInfo,
-                "hasPerPrimitiveUserData": self.hasPerPrimitiveUserData,
+                "hasPerPrimitiveCollisionFilterInfo": bool(
+                    self.hasPerPrimitiveCollisionFilterInfo
+                ),
+                "hasPerPrimitiveUserData": bool(self.hasPerPrimitiveUserData),
                 "collisionFilterInfoPalette": self.collisionFilterInfoPalette,
                 "userDataPalette": self.userDataPalette,
                 "userStringPalette": self.userStringPalette,
@@ -268,10 +270,10 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
 
         inst.convexRadius = d["convexRadius"]
         inst.weldingType = WeldingType[d["weldingType"]].value
-        inst.hasPerPrimitiveCollisionFilterInfo = d[
-            "hasPerPrimitiveCollisionFilterInfo"
-        ]
-        inst.hasPerPrimitiveUserData = d["hasPerPrimitiveUserData"]
+        inst.hasPerPrimitiveCollisionFilterInfo = Bool(
+            d["hasPerPrimitiveCollisionFilterInfo"]
+        )
+        inst.hasPerPrimitiveUserData = Bool(d["hasPerPrimitiveUserData"])
         inst.collisionFilterInfoPalette = d["collisionFilterInfoPalette"]
         inst.userDataPalette = d["userDataPalette"]
         inst.userStringPalette = d["userStringPalette"]

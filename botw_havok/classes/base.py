@@ -29,6 +29,6 @@ class HKBaseClass:
     @classmethod
     def fromdict(cls, d: dict):
         inst = cls()
-        inst.hkClass = d["hkClass"]
+        inst.hkClass = String(d["hkClass"])
 
         return inst

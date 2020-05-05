@@ -28,10 +28,10 @@ def main():
     hk = Havok.from_json(args.jsonFile)
 
     if args.nx:
-        print(f"{Fore.BLUE}--nx flag set, outputting as Switch")
+        print(f"{Fore.BLUE}'--nx' flag set, outputting as Switch")
         hk.to_switch()
     else:
-        print(f"{Fore.BLUE}--nx flag not set, outputting as Wii U")
+        print(f"{Fore.BLUE}'--nx' flag not set, outputting as Wii U")
         hk.to_wiiu()
 
     Messages.writing(args.outFile)
