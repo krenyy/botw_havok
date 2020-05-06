@@ -11,3 +11,8 @@ class hkObject:
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         raise NotImplementedError("This method is meant to be overridden!")
+
+    def __eq__(self, value: object):
+        if not isinstance(value, hkObject):
+            raise NotImplementedError()
+        return self.__dict__ == value.__dict__

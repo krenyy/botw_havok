@@ -1,9 +1,10 @@
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Float16, Float32, Matrix, UInt8, Vector4
+from .hkObject import hkObject
 from .hkUFloat8 import hkUFloat8
 
 
-class hkMotionState:
+class hkMotionState(hkObject):
     transform: Matrix
     sweptTransform: Matrix
 

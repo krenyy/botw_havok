@@ -32,3 +32,8 @@ class HKBaseClass:
         inst.hkClass = String(d["hkClass"])
 
         return inst
+
+    def __eq__(self, value: object):
+        if not isinstance(value, HKBaseClass):
+            raise NotImplementedError()
+        return self.__dict__ == value.__dict__

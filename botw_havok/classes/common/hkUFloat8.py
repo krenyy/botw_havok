@@ -1,8 +1,9 @@
-from ...binary.types import UInt8
 from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8
+from .hkObject import hkObject
 
 
-class hkUFloat8:
+class hkUFloat8(hkObject):
     value: UInt8
 
     def deserialize(self, br: BinaryReader):
