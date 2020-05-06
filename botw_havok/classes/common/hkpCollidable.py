@@ -48,8 +48,8 @@ class hkpCollidable(hkpCdBody):
         bw.write_float32(self.allowedPenetrationDepth)
         bw.align_to(16)
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 "ownerOffset": self.ownerOffset,
@@ -57,25 +57,27 @@ class hkpCollidable(hkpCdBody):
                     self.forceCollideOntoPpu
                 ).name,
                 "shapeSizeOnSpu": self.shapeSizeOnSpu,
-                "broadPhaseHandle": self.broadPhaseHandle.asdict(),
-                "boundingVolumeData": self.boundingVolumeData.asdict(),
+                "broadPhaseHandle": self.broadPhaseHandle.as_dict(),
+                "boundingVolumeData": self.boundingVolumeData.as_dict(),
                 "allowedPenetrationDepth": self.allowedPenetrationDepth,
             }
         )
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.ownerOffset = d["ownerOffset"]
         inst.forceCollideOntoPpu = getattr(
             ForceCollideOntoPpuReasons, d["forceCollideOntoPpu"]
         ).value
         inst.shapeSizeOnSpu = d["shapeSizeOnSpu"]
-        inst.broadPhaseHandle = hkpTypedBroadPhaseHandle.fromdict(d["broadPhaseHandle"])
-        inst.boundingVolumeData = hkpCollidableBoundingVolumeData.fromdict(
+        inst.broadPhaseHandle = hkpTypedBroadPhaseHandle.from_dict(
+            d["broadPhaseHandle"]
+        )
+        inst.boundingVolumeData = hkpCollidableBoundingVolumeData.from_dict(
             d["boundingVolumeData"]
         )
         inst.allowedPenetrationDepth = d["allowedPenetrationDepth"]

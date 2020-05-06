@@ -34,8 +34,8 @@ class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
 
         bw.write_uint32(UInt32(self.collisionFilterInfo))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 "type": BroadPhaseType(self.type).name,
@@ -48,9 +48,9 @@ class hkpTypedBroadPhaseHandle(hkpBroadPhaseHandle):
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.type = BroadPhaseType[d["type"]].value
         inst.ownerOffset = d["ownerOffset"]

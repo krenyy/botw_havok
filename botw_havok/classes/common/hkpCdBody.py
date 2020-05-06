@@ -65,19 +65,19 @@ class hkpCdBody(hkObject):
         hkFile._write_empty_pointer(bw)
         hkFile._write_empty_pointer(bw)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "shape": self.shape.asdict(),
+            "shape": self.shape.as_dict(),
             "shapeKey": self.shapeKey,
             # "motion": self.motion,
             # "parent": self.parent,
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
-        inst.shape = class_map.HKClassMap.get(d["shape"]["hkClass"]).fromdict(
+        inst.shape = class_map.HKClassMap.get(d["shape"]["hkClass"]).from_dict(
             d["shape"]
         )
         inst.shapeKey = d["shapeKey"]

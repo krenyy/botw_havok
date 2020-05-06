@@ -137,39 +137,39 @@ class hkpStaticCompoundShape(HKBaseClass, hkpBvTreeShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpBvTreeShape.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpBvTreeShape.as_dict(self))
         d.update(
             {
                 "numBitsForChildShapeKey": self.numBitsForChildShapeKey,
                 "referencePolicy": self.referencePolicy,
                 "childShapeKeyMask": self.childShapeKeyMask,
-                "instances": [inst.asdict() for inst in self.instances],
+                "instances": [inst.as_dict() for inst in self.instances],
                 "instanceExtraInfos": self.instanceExtraInfos,
-                "disabledLargeShapeKeyTable": self.disabledLargeShapeKeyTable.asdict(),
-                "tree": self.tree.asdict(),
+                "disabledLargeShapeKeyTable": self.disabledLargeShapeKeyTable.as_dict(),
+                "tree": self.tree.as_dict(),
             }
         )
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
-        inst.__dict__.update(hkpBvTreeShape.fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
+        inst.__dict__.update(hkpBvTreeShape.from_dict(d).__dict__)
 
         inst.numBitsForChildShapeKey = d["numBitsForChildShapeKey"]
         inst.referencePolicy = d["referencePolicy"]
         inst.childShapeKeyMask = d["childShapeKeyMask"]
         inst.instances = [
-            hkpStaticCompoundShapeInstance.fromdict(inst) for inst in d["instances"]
+            hkpStaticCompoundShapeInstance.from_dict(inst) for inst in d["instances"]
         ]
         inst.instanceExtraInfos = d["instanceExtraInfos"]
-        inst.disabledLargeShapeKeyTable = hkpShapeKeyTable.fromdict(
+        inst.disabledLargeShapeKeyTable = hkpShapeKeyTable.from_dict(
             d["disabledLargeShapeKeyTable"]
         )
-        inst.tree = hkcdStaticTreeDefaultTreeStorage6.fromdict(d["tree"])
+        inst.tree = hkcdStaticTreeDefaultTreeStorage6.from_dict(d["tree"])
 
         return inst

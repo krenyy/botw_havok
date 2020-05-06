@@ -104,14 +104,14 @@ class hkpWorldObject(hkReferencedObject):
         for prop in self.properties:
             prop.serialize(hkFile, bw, obj)
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 # "world": self.world,
                 "userData": self.userData,
-                "collidable": self.collidable.asdict(),
-                "multiThreadCheck": self.multiThreadCheck.asdict(),
+                "collidable": self.collidable.as_dict(),
+                "multiThreadCheck": self.multiThreadCheck.as_dict(),
                 "name": self.name,
             }
         )
@@ -119,13 +119,13 @@ class hkpWorldObject(hkReferencedObject):
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.memSizeAndRefCount = d["memSizeAndRefCount"]
         # inst.world = d["world"]
         inst.userData = d["userData"]
-        inst.collidable = hkpLinkedCollidable.fromdict(d["collidable"])
-        inst.multiThreadCheck = hkMultiThreadCheck.fromdict(d["multiThreadCheck"])
+        inst.collidable = hkpLinkedCollidable.from_dict(d["collidable"])
+        inst.multiThreadCheck = hkMultiThreadCheck.from_dict(d["multiThreadCheck"])
         inst.name = d["name"]
 
         return inst

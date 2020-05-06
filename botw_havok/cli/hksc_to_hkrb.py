@@ -56,7 +56,7 @@ def main():
         bp_rb = bphysics_rigidbody_template
 
         hk_rb["name"] = f"Shape_{i}"
-        hk_rb["collidable"]["shape"] = shape.asdict()
+        hk_rb["collidable"]["shape"] = shape.as_dict()
 
         hkrb_template[0]["data"]["contents"][0]["namedVariants"][0]["variant"][
             "systems"
@@ -64,7 +64,7 @@ def main():
 
         bphysics_rigidbodies.append(bp_rb.format(i))
 
-    hkrb = Havok.fromdict(hkrb_template)
+    hkrb = Havok.from_dict(hkrb_template)
 
     if nx:
         hkrb.to_switch()

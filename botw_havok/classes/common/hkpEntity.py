@@ -203,45 +203,45 @@ class hkpEntity(hkpWorldObject):
         bw.write_string(self.name)
         bw.align_to(16)
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
-                "material": self.material.asdict(),
+                "material": self.material.as_dict(),
                 "damageMultiplier": self.damageMultiplier,
                 "solverData": self.solverData,
                 "storageIndex": self.storageIndex,
                 "contactPointCallbackDelay": self.contactPointCallbackDelay,
-                "constraintsMaster": self.constraintsMaster.asdict(),
-                # "constraintsSlave": [slave.asdict() for slave in self.constraintsSlave],
+                "constraintsMaster": self.constraintsMaster.as_dict(),
+                # "constraintsSlave": [slave.as_dict() for slave in self.constraintsSlave],
                 # "constraintRuntime": self.constraintRuntime,
                 "autoRemoveLevel": self.autoRemoveLevel,
                 "numShapeKeysInContactPointProperties": self.numShapeKeysInContactPointProperties,
                 "responseModifierFlags": self.responseModifierFlags,
                 "uid": self.uid,
-                "spuCollisionCallback": self.spuCollisionCallback.asdict(),
-                "motion": self.motion.asdict(),
-                "contactListeners": self.contactListeners.asdict(),
-                "actions": self.actions.asdict(),
+                "spuCollisionCallback": self.spuCollisionCallback.as_dict(),
+                "motion": self.motion.as_dict(),
+                "contactListeners": self.contactListeners.as_dict(),
+                "actions": self.actions.as_dict(),
                 "npData": self.npData,
             }
         )
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
-        inst.material = hkpMaterial.fromdict(d["material"])
+        inst.material = hkpMaterial.from_dict(d["material"])
         inst.damageMultiplier = d["damageMultiplier"]
         inst.solverData = d["solverData"]
         inst.storageIndex = d["storageIndex"]
         inst.contactPointCallbackDelay = d["contactPointCallbackDelay"]
-        inst.constraintsMaster = hkpEntitySmallArraySerializeOverrideType.fromdict(
+        inst.constraintsMaster = hkpEntitySmallArraySerializeOverrideType.from_dict(
             d["constraintsMaster"]
         )
-        # inst.constraintsSlave = [hkpConstraintInstance.fromdict(slave) for slave in d["constraintsSlave"]]
+        # inst.constraintsSlave = [hkpConstraintInstance.from_dict(slave) for slave in d["constraintsSlave"]]
         # inst.constraintRuntime = d["constraintRuntime"]
         inst.autoRemoveLevel = d["autoRemoveLevel"]
         inst.numShapeKeysInContactPointProperties = d[
@@ -249,14 +249,14 @@ class hkpEntity(hkpWorldObject):
         ]
         inst.responseModifierFlags = d["responseModifierFlags"]
         inst.uid = d["uid"]
-        inst.spuCollisionCallback = hkpEntitySpuCollisionCallback.fromdict(
+        inst.spuCollisionCallback = hkpEntitySpuCollisionCallback.from_dict(
             d["spuCollisionCallback"]
         )
-        inst.motion = hkpMaxSizeMotion.fromdict(d["motion"])
-        inst.contactListeners = hkpEntitySmallArraySerializeOverrideType.fromdict(
+        inst.motion = hkpMaxSizeMotion.from_dict(d["motion"])
+        inst.contactListeners = hkpEntitySmallArraySerializeOverrideType.from_dict(
             d["contactListeners"]
         )
-        inst.actions = hkpEntitySmallArraySerializeOverrideType.fromdict(d["actions"])
+        inst.actions = hkpEntitySmallArraySerializeOverrideType.from_dict(d["actions"])
         inst.npData = d["npData"]
 
         return inst

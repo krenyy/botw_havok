@@ -162,15 +162,15 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkReferencedObject.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkReferencedObject.as_dict(self))
         d.update(
             {
-                "rigidBodies": [rb.asdict() for rb in self.rigidBodies],
-                # "constraints": [c.asdict() for c in self.constraints],
-                # "actions": [a.asdict() for a in self.actions],
-                # "phantoms": [p.asdict() for p in self.phantoms],
+                "rigidBodies": [rb.as_dict() for rb in self.rigidBodies],
+                # "constraints": [c.as_dict() for c in self.constraints],
+                # "actions": [a.as_dict() for a in self.actions],
+                # "phantoms": [p.as_dict() for p in self.phantoms],
                 "name": self.name,
                 "userData": self.userData,
                 "active": bool(self.active),
@@ -179,13 +179,13 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkReferencedObject.from_dict(d).__dict__)
 
-        inst.rigidBodies = [hkpRigidBody.fromdict(rb) for rb in d["rigidBodies"]]
-        # inst.constraints = [hkpConstraintInstance.fromdict(c) for c in d["constraints"]]
+        inst.rigidBodies = [hkpRigidBody.from_dict(rb) for rb in d["rigidBodies"]]
+        # inst.constraints = [hkpConstraintInstance.from_dict(c) for c in d["constraints"]]
         inst.name = d["name"]
         inst.userData = d["userData"]
         inst.active = Bool(d["active"])

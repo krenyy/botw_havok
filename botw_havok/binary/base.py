@@ -31,6 +31,9 @@ class BinaryBase(BytesIO):
     def tell(self):
         return UInt32(super().tell())
 
+    def length(self):
+        return len(self.getvalue())
+
     def seek_absolute(self, offset: int):
         return self.seek(offset, 0)
 

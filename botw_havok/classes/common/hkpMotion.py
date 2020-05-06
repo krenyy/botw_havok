@@ -91,22 +91,22 @@ class hkpMotion(hkReferencedObject):
 
         bw.write_float16(Float16(self.gravityFactor))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 "type": MotionType(self.type).name,
                 "deactivationIntegrateCounter": self.deactivationIntegrateCounter,
                 "deactivationNumInactiveFrames": self.deactivationNumInactiveFrames,
-                "motionState": self.motionState.asdict(),
-                "inertiaAndMassInv": self.inertiaAndMassInv.asdict(),
-                "linearVelocity": self.linearVelocity.asdict(),
-                "angularVelocity": self.angularVelocity.asdict(),
+                "motionState": self.motionState.as_dict(),
+                "inertiaAndMassInv": self.inertiaAndMassInv.as_dict(),
+                "linearVelocity": self.linearVelocity.as_dict(),
+                "angularVelocity": self.angularVelocity.as_dict(),
                 "deactivationRefPosition": [
-                    pos.asdict() for pos in self.deactivationRefPosition
+                    pos.as_dict() for pos in self.deactivationRefPosition
                 ],
                 "deactivationRefOrientation": self.deactivationRefOrientation,
-                # "savedMotion": self.savedMotion.asdict(),
+                # "savedMotion": self.savedMotion.as_dict(),
                 "savedQualityTypeIndex": self.savedQualityTypeIndex,
                 "gravityFactor": self.gravityFactor,
             }
@@ -114,22 +114,22 @@ class hkpMotion(hkReferencedObject):
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.type = getattr(MotionType, d["type"]).value
         inst.deactivationIntegrateCounter = d["deactivationIntegrateCounter"]
         inst.deactivationNumInactiveFrames = d["deactivationNumInactiveFrames"]
-        inst.motionState = hkMotionState.fromdict(d["motionState"])
-        inst.inertiaAndMassInv = Vector4.fromdict(d["inertiaAndMassInv"])
-        inst.linearVelocity = Vector4.fromdict(d["linearVelocity"])
-        inst.angularVelocity = Vector4.fromdict(d["angularVelocity"])
+        inst.motionState = hkMotionState.from_dict(d["motionState"])
+        inst.inertiaAndMassInv = Vector4.from_dict(d["inertiaAndMassInv"])
+        inst.linearVelocity = Vector4.from_dict(d["linearVelocity"])
+        inst.angularVelocity = Vector4.from_dict(d["angularVelocity"])
         inst.deactivationRefPosition = [
-            Vector4.fromdict(pos) for pos in d["deactivationRefPosition"]
+            Vector4.from_dict(pos) for pos in d["deactivationRefPosition"]
         ]
         inst.deactivationRefOrientation = d["deactivationRefOrientation"]
-        # inst.savedMotion = hkpMaxSizeMotion.fromdict(d["savedMotion"])
+        # inst.savedMotion = hkpMaxSizeMotion.from_dict(d["savedMotion"])
         inst.savedQualityTypeIndex = d["savedQualityTypeIndex"]
         inst.gravityFactor = d["gravityFactor"]
 

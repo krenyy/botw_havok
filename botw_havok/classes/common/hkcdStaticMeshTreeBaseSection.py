@@ -79,15 +79,15 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
         bw.write_uint8(UInt8(self.layerData))
         bw.write_uint8(UInt8(self.unusedData))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
-                "codecParms": [cp.asdict() for cp in self.codecParms],
+                "codecParms": [cp.as_dict() for cp in self.codecParms],
                 "firstPackedVertex": self.firstPackedVertex,
-                "sharedVertices": self.sharedVertices.asdict(),
-                "primitives": self.primitives.asdict(),
-                "dataRuns": self.dataRuns.asdict(),
+                "sharedVertices": self.sharedVertices.as_dict(),
+                "primitives": self.primitives.as_dict(),
+                "dataRuns": self.dataRuns.as_dict(),
                 "numPackedVertices": self.numPackedVertices,
                 "numSharedIndices": self.numSharedIndices,
                 "leafIndex": self.leafIndex,
@@ -101,19 +101,19 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
-        inst.codecParms = [Vector3.fromdict(cp) for cp in d["codecParms"]]
+        inst.codecParms = [Vector3.from_dict(cp) for cp in d["codecParms"]]
         inst.firstPackedVertex = d["firstPackedVertex"]
-        inst.sharedVertices = hkcdStaticMeshTreeBaseSectionSharedVertices.fromdict(
+        inst.sharedVertices = hkcdStaticMeshTreeBaseSectionSharedVertices.from_dict(
             d["sharedVertices"]
         )
-        inst.primitives = hkcdStaticMeshTreeBaseSectionPrimitives.fromdict(
+        inst.primitives = hkcdStaticMeshTreeBaseSectionPrimitives.from_dict(
             d["primitives"]
         )
-        inst.dataRuns = hkcdStaticMeshTreeBaseSectionDataRuns.fromdict(d["dataRuns"])
+        inst.dataRuns = hkcdStaticMeshTreeBaseSectionDataRuns.from_dict(d["dataRuns"])
         inst.numPackedVertices = d["numPackedVertices"]
         inst.numSharedIndices = d["numSharedIndices"]
         inst.leafIndex = d["leafIndex"]

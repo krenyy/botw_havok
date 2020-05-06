@@ -1,5 +1,5 @@
-import typing
 from io import BytesIO
+from typing import Dict, List
 
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
@@ -20,10 +20,10 @@ class HKObject:
     bytes: bytes = b""
     size: int
 
-    local_fixups: typing.List[LocalFixup]
-    global_references: typing.List["GlobalReference"]
+    local_fixups: List[LocalFixup]
+    global_references: List["GlobalReference"]
 
-    reservations: typing.Mapping[str, int]
+    reservations: Dict[str, int]
 
     def __init__(self):
         self.local_fixups = []

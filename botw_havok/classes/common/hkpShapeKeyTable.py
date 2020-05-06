@@ -30,17 +30,17 @@ class hkpShapeKeyTable(hkObject):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            # "lists": self.lists.asdict(),
+            # "lists": self.lists.as_dict(),
             "occupancyBitField": self.occupancyBitField,
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
-        # inst.lists = hkpShapeKeyTableBlock.fromdict(d['lists'])
+        # inst.lists = hkpShapeKeyTableBlock.from_dict(d['lists'])
         inst.occupancyBitField = d["occupancyBitField"]
 
         return inst

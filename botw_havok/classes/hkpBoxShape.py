@@ -35,19 +35,19 @@ class hkpBoxShape(HKBaseClass, hkpConvexShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpConvexShape.asdict(self))
-        d.update({"halfExtents": self.halfExtents.asdict()})
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpConvexShape.as_dict(self))
+        d.update({"halfExtents": self.halfExtents.as_dict()})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.from_dict(d).__dict__)
 
-        inst.halfExtents = Vector4.fromdict(d["halfExtents"])
+        inst.halfExtents = Vector4.from_dict(d["halfExtents"])
 
         return inst

@@ -73,14 +73,14 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
 
         # Arrays get written later
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 "packedVertices": self.packedVertices,
                 "sharedVertices": self.sharedVertices,
                 "primitiveDataRuns": [
-                    dataRun.asdict() for dataRun in self.primitiveDataRuns
+                    dataRun.as_dict() for dataRun in self.primitiveDataRuns
                 ],
             }
         )
@@ -88,14 +88,14 @@ class hkcdStaticMeshTreehkcdStaticMeshTreeCommonConfigunsignedintunsignedlonglon
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.packedVertices = [UInt32(i) for i in d["packedVertices"]]
         inst.sharedVertices = [UInt64(i) for i in d["sharedVertices"]]
         inst.primitiveDataRuns = [
-            hkpBvCompressedMeshShapeTreeDataRun.fromdict(dataRun)
+            hkpBvCompressedMeshShapeTreeDataRun.from_dict(dataRun)
             for dataRun in d["primitiveDataRuns"]
         ]
 

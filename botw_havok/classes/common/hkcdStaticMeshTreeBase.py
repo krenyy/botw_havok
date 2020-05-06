@@ -94,33 +94,34 @@ class hkcdStaticMeshTreeBase(hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5):
 
         # Arrays get written later
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
                 "numPrimitiveKeys": self.numPrimitiveKeys,
                 "bitsPerKey": self.bitsPerKey,
                 "maxKeyValue": self.maxKeyValue,
-                "sections": [section.asdict() for section in self.sections],
-                "primitives": [primitive.asdict() for primitive in self.primitives],
+                "sections": [section.as_dict() for section in self.sections],
+                "primitives": [primitive.as_dict() for primitive in self.primitives],
                 "sharedVerticesIndex": self.sharedVerticesIndex,
             }
         )
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.numPrimitiveKeys = d["numPrimitiveKeys"]
         inst.bitsPerKey = d["bitsPerKey"]
         inst.maxKeyValue = d["maxKeyValue"]
         inst.sections = [
-            hkcdStaticMeshTreeBaseSection.fromdict(section) for section in d["sections"]
+            hkcdStaticMeshTreeBaseSection.from_dict(section)
+            for section in d["sections"]
         ]
         inst.primitives = [
-            hkcdStaticMeshTreeBasePrimitive.fromdict(primitive)
+            hkcdStaticMeshTreeBasePrimitive.from_dict(primitive)
             for primitive in d["primitives"]
         ]
         inst.sharedVerticesIndex = d["sharedVerticesIndex"]

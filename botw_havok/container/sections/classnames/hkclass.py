@@ -24,7 +24,7 @@ class HKClass:
         bw.write_string(self.name)
 
     @classmethod
-    def from_name(cls, name):
+    def from_name(cls, name: String):
         inst = cls()
         inst.name = name
         inst.signature = HKSignatureMap.get(name)

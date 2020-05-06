@@ -95,17 +95,17 @@ class HKFile:
         bw.write_uint32(count)
         bw.write_uint32(UInt32(0x80000000 | count))
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "header": self.header.asdict(),
-            "data": self.data.asdict(),
+            "header": self.header.as_dict(),
+            "data": self.data.as_dict(),
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.header = HKHeader.fromdict(d["header"])
-        inst.data = HKDataSection.fromdict(d["data"])
+        inst.header = HKHeader.from_dict(d["header"])
+        inst.data = HKDataSection.from_dict(d["data"])
 
         return inst
 

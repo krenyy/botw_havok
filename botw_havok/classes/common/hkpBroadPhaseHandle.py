@@ -16,11 +16,11 @@ class hkpBroadPhaseHandle(hkObject):
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_uint32(UInt32(self.id))
 
-    def asdict(self):
+    def as_dict(self):
         return {"id": self.id}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
         inst.id = d["id"]

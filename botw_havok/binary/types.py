@@ -191,11 +191,11 @@ class Vector3(List[Float32], BinaryType):
         else:
             raise NotImplementedError()
 
-    def asdict(self):
+    def as_dict(self):
         return self
 
     @classmethod
-    def fromdict(cls, items: list):
+    def from_dict(cls, items: list):
         return cls(*[Float32(i) for i in items])
 
 
@@ -209,11 +209,11 @@ class Vector4(List[Float32], BinaryType):
         else:
             raise NotImplementedError()
 
-    def asdict(self):
+    def as_dict(self):
         return self
 
     @classmethod
-    def fromdict(cls, items: list):
+    def from_dict(cls, items: list):
         return cls(*[Float32(i) for i in items])
 
 
@@ -224,12 +224,12 @@ class Matrix(List[Vector4], BinaryType):
         else:
             self.extend(args)
 
-    def asdict(self):
-        return [v.asdict() for v in self]
+    def as_dict(self):
+        return [v.as_dict() for v in self]
 
     @classmethod
-    def fromdict(cls, matrix: list):
-        return cls(*[Vector4.fromdict(v) for v in matrix])
+    def from_dict(cls, matrix: list):
+        return cls(*[Vector4.from_dict(v) for v in matrix])
 
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"

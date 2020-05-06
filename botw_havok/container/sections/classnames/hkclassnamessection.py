@@ -20,7 +20,7 @@ class HKClassnamesSection(HKSection):
 
     def __init__(self):
         self.classes = [
-            HKClass.from_name(x)
+            HKClass.from_name(String(x))
             for x in ["hkClass", "hkClassMember", "hkClassEnum", "hkClassEnumItem"]
         ]
 

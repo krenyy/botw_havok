@@ -22,16 +22,16 @@ class hkpBvTreeShape(hkpShape):
         bw.write_uint8(UInt8(self.bvTreeType))
         bw.align_to(4)
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update({"bvTreeType": BvTreeType(self.bvTreeType).name})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.bvTreeType = BvTreeType[d["bvTreeType"]].value
 

@@ -29,13 +29,13 @@ class hkSimpleProperty(hkObject):
 
         self.value.serialize(hkFile, bw, obj)
 
-    def asdict(self):
-        return {"key": self.key, "value": self.value.asdict()}
+    def as_dict(self):
+        return {"key": self.key, "value": self.value.as_dict()}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.key = d["key"]
-        inst.value = hkSimplePropertyValue.fromdict(d["value"])
+        inst.value = hkSimplePropertyValue.from_dict(d["value"])
 
         return inst

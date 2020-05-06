@@ -197,16 +197,16 @@ class HKDataSection(HKSection):
         else:
             return HKObject()
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "contents": [content.asdict() for content in self.contents],
+            "contents": [content.as_dict() for content in self.contents],
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.contents = [
-            HKClassMap.get(content["hkClass"]).fromdict(content)
+            HKClassMap.get(content["hkClass"]).from_dict(content)
             for content in d["contents"]
         ]
         return inst

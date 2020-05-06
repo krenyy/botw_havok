@@ -57,19 +57,19 @@ class hkRootLevelContainerNamedVariant(hkObject):
         self._classNamePointer_offset = hkFile._write_empty_pointer(bw)
         self._variantPointer_offset = hkFile._write_empty_pointer(bw)
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "name": self.name,
             "className": self.className,
-            "variant": self.variant.asdict(),
+            "variant": self.variant.as_dict(),
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.name = d["name"]
-        inst.className = d["className"]
-        inst.variant = class_map.HKClassMap.get(d["className"]).fromdict(d["variant"])
+        inst.name = String(d["name"])
+        inst.className = String(d["className"])
+        inst.variant = class_map.HKClassMap.get(d["className"]).from_dict(d["variant"])
 
         return inst
 

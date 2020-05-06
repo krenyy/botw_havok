@@ -32,6 +32,11 @@ class LocalFixup:
             raise NotImplementedError()
         return (self.src == value.src) and (self.dst == value.dst)
 
+    def __gt__(self, value: object):
+        if not isinstance(value, LocalFixup):
+            raise NotImplementedError()
+        return self.src > value.src
+
     def __hash__(self):
         return hash((self.src, self.dst))
 

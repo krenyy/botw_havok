@@ -72,11 +72,11 @@ class StaticCompoundInfo(HKBaseClass):
         bw.align_to(16)
 
         obj.local_fixups.append(LocalFixup(ActorInfoCount_offset, bw.tell()))
-        [ai.write(hkFile, bw, obj) for ai in self.ActorInfo]
+        [ai.serialize(hkFile, bw, obj) for ai in self.ActorInfo]
         bw.align_to(16)
 
         obj.local_fixups.append(LocalFixup(ShapeInfoCount_offset, bw.tell()))
-        [si.write(hkFile, bw, obj) for si in self.ShapeInfo]
+        [si.serialize(hkFile, bw, obj) for si in self.ShapeInfo]
         bw.align_to(16)
 
         obj.reservations.update(bw.reservations)
@@ -85,24 +85,28 @@ class StaticCompoundInfo(HKBaseClass):
 
         super().serialize(hkFile, bw, obj)
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {
-                "ActorInfo": [ai.asdict() for ai in self.ActorInfo],
-                "ShapeInfo": [si.asdict() for si in self.ShapeInfo],
+                "ActorInfo": [ai.as_dict() for ai in self.ActorInfo],
+                "ShapeInfo": [si.as_dict() for si in self.ShapeInfo],
             }
         )
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.hkClass = d["hkClass"]
-        inst.ActorInfo = [ActorInfo.fromdict(ai) for ai in d["ActorInfo"]]
-        inst.ShapeInfo = [ShapeInfo.fromdict(si) for si in d["ShapeInfo"]]
+
+        inst.__dict__.update(super().from_dict(d).__dict__)
+
+        inst.ActorInfo = [ActorInfo.from_dict(ai) for ai in d["ActorInfo"]]
+        inst.ShapeInfo = [ShapeInfo.from_dict(si) for si in d["ShapeInfo"]]
 
         return inst
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.ActorInfo}, {self.ShapeInfo})"
+        return (
+            f"{self.__class__.__name__}({len(self.ActorInfo)}, {len(self.ShapeInfo)})"
+        )

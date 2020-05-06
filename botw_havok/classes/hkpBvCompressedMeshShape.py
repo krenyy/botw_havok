@@ -241,9 +241,9 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpBvTreeShape.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpBvTreeShape.as_dict(self))
 
         d.update(
             {
@@ -256,17 +256,17 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
                 "collisionFilterInfoPalette": self.collisionFilterInfoPalette,
                 "userDataPalette": self.userDataPalette,
                 "userStringPalette": self.userStringPalette,
-                "tree": self.tree.asdict(),
+                "tree": self.tree.as_dict(),
             }
         )
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpBvTreeShape.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpBvTreeShape.from_dict(d).__dict__)
 
         inst.convexRadius = d["convexRadius"]
         inst.weldingType = WeldingType[d["weldingType"]].value
@@ -277,6 +277,6 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
         inst.collisionFilterInfoPalette = d["collisionFilterInfoPalette"]
         inst.userDataPalette = d["userDataPalette"]
         inst.userStringPalette = d["userStringPalette"]
-        inst.tree = hkpBvCompressedMeshShapeTree.fromdict(d["tree"])
+        inst.tree = hkpBvCompressedMeshShapeTree.from_dict(d["tree"])
 
         return inst

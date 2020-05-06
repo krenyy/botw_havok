@@ -25,7 +25,7 @@ class ActorInfo(hkObject):
         bw.write_int32(Int32(self.ShapeInfoStart))
         bw.write_int32(Int32(self.ShapeInfoEnd))
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "HashId": self.HashId,
             "SRTHash": self.SRTHash,
@@ -34,7 +34,7 @@ class ActorInfo(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.HashId = UInt32(d["HashId"])
         inst.SRTHash = Int32(d["SRTHash"])

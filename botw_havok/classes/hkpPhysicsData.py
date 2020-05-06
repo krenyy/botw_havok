@@ -97,25 +97,25 @@ class hkpPhysicsData(HKBaseClass, hkReferencedObject):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = super().asdict()
-        d.update(hkReferencedObject.asdict(self))
+    def as_dict(self):
+        d = super().as_dict()
+        d.update(hkReferencedObject.as_dict(self))
         d.update(
             {
                 # "worldCinfo": self.worldCinfo,
-                "systems": [ps.asdict() for ps in self.systems],
+                "systems": [ps.as_dict() for ps in self.systems],
             }
         )
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         # inst.worldCinfo = d['worldCinfo']
-        inst.systems = [hkpPhysicsSystem.fromdict(ps) for ps in d["systems"]]
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkReferencedObject.fromdict(d).__dict__)
+        inst.systems = [hkpPhysicsSystem.from_dict(ps) for ps in d["systems"]]
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkReferencedObject.from_dict(d).__dict__)
 
         return inst
 

@@ -25,7 +25,7 @@ class hkMultiThreadCheck(hkObject):
         bw.write_uint16(UInt16(self.markCount))
         bw.write_uint16(UInt16(self.markBitStack))
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "threadId": self.threadId,
             "stackTraceId": self.stackTraceId,
@@ -34,7 +34,7 @@ class hkMultiThreadCheck(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.threadId = d["threadId"]
         inst.stackTraceId = d["stackTraceId"]

@@ -28,7 +28,7 @@ class hkpMaterial:
         bw.write_float32(self.friction)
         bw.write_float32(self.restitution)
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "responseType": ResponseType(self.responseType).name,
             "rollingFrictionMultiplier": self.rollingFrictionMultiplier,
@@ -37,7 +37,7 @@ class hkpMaterial:
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.responseType = getattr(ResponseType, d["responseType"]).value
         inst.rollingFrictionMultiplier = d["rollingFrictionMultiplier"]

@@ -61,32 +61,32 @@ class hkMotionState:
 
         bw.align_to(16)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "transform": self.transform.asdict(),
-            "sweptTransform": self.sweptTransform.asdict(),
-            "deltaAngle": self.deltaAngle.asdict(),
+            "transform": self.transform.as_dict(),
+            "sweptTransform": self.sweptTransform.as_dict(),
+            "deltaAngle": self.deltaAngle.as_dict(),
             "objectRadius": self.objectRadius,
             "linearDamping": self.linearDamping,
             "angularDamping": self.angularDamping,
             "timeFactor": self.timeFactor,
-            "maxLinearVelocity": self.maxLinearVelocity.asdict(),
-            "maxAngularVelocity": self.maxAngularVelocity.asdict(),
+            "maxLinearVelocity": self.maxLinearVelocity.as_dict(),
+            "maxAngularVelocity": self.maxAngularVelocity.as_dict(),
             "deactivationClass": self.deactivationClass,
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.transform = Matrix.fromdict(d["transform"])
-        inst.sweptTransform = Matrix.fromdict(d["sweptTransform"])
-        inst.deltaAngle = Vector4.fromdict(d["deltaAngle"])
+        inst.transform = Matrix.from_dict(d["transform"])
+        inst.sweptTransform = Matrix.from_dict(d["sweptTransform"])
+        inst.deltaAngle = Vector4.from_dict(d["deltaAngle"])
         inst.objectRadius = d["objectRadius"]
         inst.linearDamping = d["linearDamping"]
         inst.angularDamping = d["angularDamping"]
         inst.timeFactor = d["timeFactor"]
-        inst.maxLinearVelocity = hkUFloat8.fromdict(d["maxLinearVelocity"])
-        inst.maxAngularVelocity = hkUFloat8.fromdict(d["maxAngularVelocity"])
+        inst.maxLinearVelocity = hkUFloat8.from_dict(d["maxLinearVelocity"])
+        inst.maxAngularVelocity = hkUFloat8.from_dict(d["maxAngularVelocity"])
         inst.deactivationClass = d["deactivationClass"]
 
         return inst

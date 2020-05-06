@@ -19,17 +19,17 @@ class hkAabb(hkObject):
         bw.write_vector4(self.min)
         bw.write_vector4(self.max)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "min": self.min.asdict(),
-            "max": self.max.asdict(),
+            "min": self.min.as_dict(),
+            "max": self.max.as_dict(),
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
-        inst.min = Vector4.fromdict(d["min"])
-        inst.max = Vector4.fromdict(d["max"])
+        inst.min = Vector4.from_dict(d["min"])
+        inst.max = Vector4.from_dict(d["max"])
 
         return inst

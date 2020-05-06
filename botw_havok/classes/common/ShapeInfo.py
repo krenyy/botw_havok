@@ -25,7 +25,7 @@ class ShapeInfo(hkObject):
         bw.write_int16(self.BodyGroup)
         bw.write_uint16(self.BodyLayerType)
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "ActorInfoIndex": self.ActorInfoIndex,
             "InstanceId": self.InstanceId,
@@ -34,7 +34,7 @@ class ShapeInfo(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.ActorInfoIndex = Int32(d["ActorInfoIndex"])
         inst.InstanceId = Int32(d["InstanceId"])

@@ -35,7 +35,7 @@ class hkpEntitySpuCollisionCallback(hkObject):
         if hkFile.header.padding_option:
             bw.write_uint32(UInt32(0))
 
-    def asdict(self):
+    def as_dict(self):
         return {
             # "util": self.util,
             "capacity": self.capacity,
@@ -44,7 +44,7 @@ class hkpEntitySpuCollisionCallback(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         # inst.util = d["util"]
         inst.capacity = d["capacity"]

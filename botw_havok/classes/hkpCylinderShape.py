@@ -56,35 +56,35 @@ class hkpCylinderShape(HKBaseClass, hkpConvexShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpConvexShape.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpConvexShape.as_dict(self))
         d.update(
             {
                 "cylRadius": self.cylRadius,
                 "cylBaseRadiusFactorForHeightFieldCollisions": self.cylBaseRadiusFactorForHeightFieldCollisions,
-                "vertexA": self.vertexA.asdict(),
-                "vertexB": self.vertexB.asdict(),
-                "perpendicular1": self.perpendicular1.asdict(),
-                "perpendicular2": self.perpendicular2.asdict(),
+                "vertexA": self.vertexA.as_dict(),
+                "vertexB": self.vertexB.as_dict(),
+                "perpendicular1": self.perpendicular1.as_dict(),
+                "perpendicular2": self.perpendicular2.as_dict(),
             }
         )
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.from_dict(d).__dict__)
 
         inst.cylRadius = d["cylRadius"]
         inst.cylBaseRadiusFactorForHeightFieldCollisions = d[
             "cylBaseRadiusFactorForHeightFieldCollisions"
         ]
-        inst.vertexA = Vector4.fromdict(d["vertexA"])
-        inst.vertexB = Vector4.fromdict(d["vertexB"])
-        inst.perpendicular2 = Vector4.fromdict(d["perpendicular2"])
-        inst.perpendicular1 = Vector4.fromdict(d["perpendicular1"])
+        inst.vertexA = Vector4.from_dict(d["vertexA"])
+        inst.vertexB = Vector4.from_dict(d["vertexB"])
+        inst.perpendicular2 = Vector4.from_dict(d["perpendicular2"])
+        inst.perpendicular1 = Vector4.from_dict(d["perpendicular1"])
 
         return inst

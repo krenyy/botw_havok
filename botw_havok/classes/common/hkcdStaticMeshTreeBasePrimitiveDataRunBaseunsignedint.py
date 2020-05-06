@@ -26,7 +26,7 @@ class hkcdStaticMeshTreeBasePrimitiveDataRunBaseunsignedint(hkObject):
 
         bw.align_to(4)
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "value": self.value,
             "index": self.index,
@@ -34,7 +34,7 @@ class hkcdStaticMeshTreeBasePrimitiveDataRunBaseunsignedint(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
         inst.value = d["value"]

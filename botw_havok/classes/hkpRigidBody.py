@@ -30,14 +30,14 @@ class hkpRigidBody(HKBaseClass, hkpEntity):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpEntity.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpEntity.as_dict(self))
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpEntity.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpEntity.from_dict(d).__dict__)
         return inst

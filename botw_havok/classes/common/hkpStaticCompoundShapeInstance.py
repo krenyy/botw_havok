@@ -74,7 +74,7 @@ class hkpStaticCompoundShapeInstance(hkObject):
         # If an identical HKObject exists,
         # use it instead of creating a new one
         for o in hkFile.data.objects:
-            if o.bytes == gr.dst_obj:
+            if o.bytes == gr.dst_obj.bytes:
                 gr.dst_obj = o
                 break
         else:
@@ -95,21 +95,21 @@ class hkpStaticCompoundShapeInstance(hkObject):
         if hkFile.header.padding_option:
             bw.align_to(16)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "transform": self.transform.asdict(),
-            "shape": self.shape.asdict(),
+            "transform": self.transform.as_dict(),
+            "shape": self.shape.as_dict(),
             "filterInfo": self.filterInfo,
             "childFilterInfoMask": self.childFilterInfoMask,
             "userData": self.userData,
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
-        inst.transform = Matrix.fromdict(d["transform"])
-        inst.shape = class_map.HKClassMap.get(d["shape"]["hkClass"]).fromdict(
+        inst.transform = Matrix.from_dict(d["transform"])
+        inst.shape = class_map.HKClassMap.get(d["shape"]["hkClass"]).from_dict(
             d["shape"]
         )
         inst.filterInfo = d["filterInfo"]

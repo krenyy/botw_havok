@@ -18,11 +18,11 @@ class hkcdStaticTreeCodec3Axis(hkObject):
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         [bw.write_uint8(UInt8(num)) for num in self.xyz]
 
-    def asdict(self):
+    def as_dict(self):
         return {"xyz": self.xyz}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
         inst.xyz = d["xyz"]

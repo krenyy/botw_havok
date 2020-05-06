@@ -20,11 +20,11 @@ class hkReferencedObject(hkBaseObject):
 
         bw.write_uint32(UInt32(self.memSizeAndRefCount))
 
-    def asdict(self):
+    def as_dict(self):
         return {"memSizeAndRefCount": self.memSizeAndRefCount}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.memSizeAndRefCount = UInt32(d["memSizeAndRefCount"])
         return inst

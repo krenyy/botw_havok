@@ -23,17 +23,17 @@ class hkcdStaticTreeCodec3Axis6(hkcdStaticTreeCodec3Axis):
         bw.write_uint8(UInt8(self.hiData))
         bw.write_uint16(UInt16(self.loData))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update(
             {"hiData": self.hiData, "loData": self.loData,}
         )
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.hiData = d["hiData"]
         inst.loData = d["loData"]

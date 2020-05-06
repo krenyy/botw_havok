@@ -114,7 +114,7 @@ class HKHeader:
             bw.write_int32(self.unk48)
             bw.write_int32(self.unk4C)
 
-    def asdict(self):
+    def as_dict(self):
         if self.predicate_size_plus_padding == 16:
             return {
                 "unk40": self.unk40,
@@ -129,7 +129,7 @@ class HKHeader:
             raise NotImplementedError()
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         if d:
             inst.predicate_size_plus_padding = UInt16(16)

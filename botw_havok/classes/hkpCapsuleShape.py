@@ -36,20 +36,20 @@ class hkpCapsuleShape(HKBaseClass, hkpConvexShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpConvexShape.asdict(self))
-        d.update({"vertexA": self.vertexA.asdict(), "vertexB": self.vertexB.asdict()})
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpConvexShape.as_dict(self))
+        d.update({"vertexA": self.vertexA.as_dict(), "vertexB": self.vertexB.as_dict()})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.from_dict(d).__dict__)
 
-        inst.vertexA = Vector4.fromdict(d["vertexA"])
-        inst.vertexB = Vector4.fromdict(d["vertexB"])
+        inst.vertexA = Vector4.from_dict(d["vertexA"])
+        inst.vertexB = Vector4.from_dict(d["vertexB"])
 
         return inst

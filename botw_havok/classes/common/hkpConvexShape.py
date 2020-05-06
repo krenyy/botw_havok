@@ -20,16 +20,16 @@ class hkpConvexShape(hkpSphereRepShape):
 
         bw.write_float32(Float32(self.radius))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
         d.update({"radius": self.radius})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.radius = Float32(d["radius"])
 

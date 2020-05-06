@@ -16,11 +16,11 @@ class hkcdStaticMeshTreeBaseSectionPrimitives(hkObject):
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_uint32(UInt32(self.data))
 
-    def asdict(self):
+    def as_dict(self):
         return {"data": self.data}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
         inst.data = d["data"]

@@ -23,11 +23,11 @@ class HKBaseClass:
     def assign_class(self, hkFile: "HKFile", obj: "HKObject"):
         obj.hkClass = hkFile.classnames.get(self.hkClass)
 
-    def asdict(self):
+    def as_dict(self):
         return {"hkClass": self.hkClass}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.hkClass = String(d["hkClass"])
 

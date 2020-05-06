@@ -18,19 +18,19 @@ class hkpEntityExtendedListeners:
         self.activationListeners.serialize(hkFile, bw)
         self.entityListeners.serialize(hkFile, bw)
 
-    def asdict(self):
+    def as_dict(self):
         return {
-            "activationListeners": self.activationListeners.asdict(),
-            "entityListeners": self.entityListeners.asdict(),
+            "activationListeners": self.activationListeners.as_dict(),
+            "entityListeners": self.entityListeners.as_dict(),
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.activationListeners = hkpEntitySmallArraySerializeOverrideType.fromdict(
+        inst.activationListeners = hkpEntitySmallArraySerializeOverrideType.from_dict(
             d["activationListeners"]
         )
-        inst.entityListeners = hkpEntitySmallArraySerializeOverrideType.fromdict(
+        inst.entityListeners = hkpEntitySmallArraySerializeOverrideType.from_dict(
             d["entityListeners"]
         )
         return inst

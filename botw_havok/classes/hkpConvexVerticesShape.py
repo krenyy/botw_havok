@@ -118,35 +118,35 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 
-    def asdict(self):
-        d = HKBaseClass.asdict(self)
-        d.update(hkpConvexShape.asdict(self))
+    def as_dict(self):
+        d = HKBaseClass.as_dict(self)
+        d.update(hkpConvexShape.as_dict(self))
         d.update(
             {
-                "aabbHalfExtents": self.aabbHalfExtents.asdict(),
-                "aabbCenter": self.aabbCenter.asdict(),
-                "rotatedVertices": [rv.asdict() for rv in self.rotatedVertices],
+                "aabbHalfExtents": self.aabbHalfExtents.as_dict(),
+                "aabbCenter": self.aabbCenter.as_dict(),
+                "rotatedVertices": [rv.as_dict() for rv in self.rotatedVertices],
                 "numVertices": self.numVertices,
                 "useSpuBuffer": bool(self.useSpuBuffer),
-                "planeEquations": self.planeEquations.asdict(),
-                # "connectivity": self.connectivity.asdict(),
+                "planeEquations": self.planeEquations.as_dict(),
+                # "connectivity": self.connectivity.as_dict(),
             }
         )
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(HKBaseClass.fromdict(d).__dict__)
-        inst.__dict__.update(hkpConvexShape.fromdict(d).__dict__)
+        inst.__dict__.update(HKBaseClass.from_dict(d).__dict__)
+        inst.__dict__.update(hkpConvexShape.from_dict(d).__dict__)
 
-        inst.aabbHalfExtents = Vector4.fromdict(d["aabbHalfExtents"])
-        inst.aabbCenter = Vector4.fromdict(d["aabbCenter"])
-        inst.rotatedVertices = [Matrix.fromdict(rv) for rv in d["rotatedVertices"]]
+        inst.aabbHalfExtents = Vector4.from_dict(d["aabbHalfExtents"])
+        inst.aabbCenter = Vector4.from_dict(d["aabbCenter"])
+        inst.rotatedVertices = [Matrix.from_dict(rv) for rv in d["rotatedVertices"]]
         inst.numVertices = d["numVertices"]
         inst.useSpuBuffer = Bool(d["useSpuBuffer"])
-        inst.planeEquations = Matrix.fromdict(d["planeEquations"])
-        # inst.connectivity = hkpConvexVerticesConnectivity.fromdict(d["connectivity"])
+        inst.planeEquations = Matrix.from_dict(d["planeEquations"])
+        # inst.connectivity = hkpConvexVerticesConnectivity.from_dict(d["connectivity"])
 
         return inst

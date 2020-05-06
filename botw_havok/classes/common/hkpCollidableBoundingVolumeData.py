@@ -70,7 +70,7 @@ class hkpCollidableBoundingVolumeData(hkObject):
         hkFile._write_empty_pointer(bw)  # childShapeAabbs
         hkFile._write_empty_pointer(bw)  # childShapeKeys
 
-    def asdict(self):
+    def as_dict(self):
         return {
             "min": self.min,
             "expansionMin": self.expansionMin,
@@ -84,7 +84,7 @@ class hkpCollidableBoundingVolumeData(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         inst.min = d["min"]
         inst.expansionMin = d["expansionMin"]

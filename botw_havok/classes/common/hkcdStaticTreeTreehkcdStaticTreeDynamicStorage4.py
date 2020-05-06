@@ -21,17 +21,17 @@ class hkcdStaticTreeTreehkcdStaticTreeDynamicStorage4(hkcdStaticTreeDynamicStora
 
         self.domain.serialize(hkFile, bw, obj)
 
-    def asdict(self):
-        d = super().asdict()
-        d.update({"domain": self.domain.asdict()})
+    def as_dict(self):
+        d = super().as_dict()
+        d.update({"domain": self.domain.as_dict()})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
-        inst.domain = hkAabb.fromdict(d["domain"])
+        inst.domain = hkAabb.from_dict(d["domain"])
 
         return inst

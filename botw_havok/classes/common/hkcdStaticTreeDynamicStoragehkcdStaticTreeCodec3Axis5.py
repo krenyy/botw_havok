@@ -46,13 +46,13 @@ class hkcdStaticTreeDynamicStoragehkcdStaticTreeCodec3Axis5(hkObject):
 
         # The nodes get written at a later stage
 
-    def asdict(self):
-        return {"nodes": [node.asdict() for node in self.nodes]}
+    def as_dict(self):
+        return {"nodes": [node.as_dict() for node in self.nodes]}
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
 
-        inst.nodes = [hkcdStaticTreeCodec3Axis5.fromdict(node) for node in d["nodes"]]
+        inst.nodes = [hkcdStaticTreeCodec3Axis5.from_dict(node) for node in d["nodes"]]
 
         return inst

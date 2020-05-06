@@ -32,17 +32,17 @@ class hkpLinkedCollidable(hkpCollidable):
         hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.collisionEntries)))
 
-    def asdict(self):
-        d = super().asdict()
+    def as_dict(self):
+        d = super().as_dict()
 
         d.update({"collisionEntries": self.collisionEntries})
 
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.collisionEntries = d["collisionEntries"]
 

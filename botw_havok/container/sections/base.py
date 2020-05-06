@@ -82,7 +82,6 @@ class HKSection:
                 lfu.read(br)
 
                 self.local_fixups.append(lfu)
-        br.align_to(16)
 
         br.step_out()
 
@@ -96,7 +95,6 @@ class HKSection:
                 gfu.read(br)
 
                 self.global_fixups.append(gfu)
-        br.align_to(16)
 
         br.step_out()
 
@@ -104,21 +102,20 @@ class HKSection:
         # Read virtual fixups
         br.step_in(self.absolute_offset + self.virtual_fixups_offset)
 
-        for _ in range((self.exports_offset - self.global_fixups_offset) // 12):
+        for _ in range((self.exports_offset - self.virtual_fixups_offset) // 12):
             if br.peek() != b"\xFF":
                 vfu = VirtualFixup()
                 vfu.read(br)
 
                 self.virtual_fixups.append(vfu)
-        br.align_to(16)
 
         br.step_out()
 
     def write(self, hkFile: "HKFile", bw: BinaryWriter):
         raise NotImplementedError("This method is meant to be overridden!")
 
-    def asdict(self):
+    def as_dict(self):
         raise NotImplementedError("This method is meant to be overridden!")
 
-    def fromdict(self, d: dict):
+    def from_dict(self, d: dict):
         raise NotImplementedError("This method is meant to be overridden!")

@@ -85,18 +85,18 @@ class hkRootLevelContainer(HKBaseClass):
 
         super().serialize(hkFile, bw, obj)
 
-    def asdict(self):
-        d = super().asdict()
-        d.update({"namedVariants": [nv.asdict() for nv in self.namedVariants]})
+    def as_dict(self):
+        d = super().as_dict()
+        d.update({"namedVariants": [nv.as_dict() for nv in self.namedVariants]})
         return d
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().fromdict(d).__dict__)
+        inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.namedVariants = [
-            hkRootLevelContainerNamedVariant.fromdict(nv) for nv in d["namedVariants"]
+            hkRootLevelContainerNamedVariant.from_dict(nv) for nv in d["namedVariants"]
         ]
 
         return inst

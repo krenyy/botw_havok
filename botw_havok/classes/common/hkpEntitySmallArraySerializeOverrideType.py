@@ -30,7 +30,7 @@ class hkpEntitySmallArraySerializeOverrideType(hkObject):
         if hkFile.header.padding_option:
             bw.align_to(8)
 
-    def asdict(self):
+    def as_dict(self):
         return {
             # "data": self.data,
             "size": self.size,
@@ -38,7 +38,7 @@ class hkpEntitySmallArraySerializeOverrideType(hkObject):
         }
 
     @classmethod
-    def fromdict(cls, d: dict):
+    def from_dict(cls, d: dict):
         inst = cls()
         # inst.data = d["data"]
         inst.size = d["size"]

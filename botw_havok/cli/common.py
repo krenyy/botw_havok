@@ -1,15 +1,29 @@
 import os
-from colorama import Fore
+
+from colorama import Fore, init
+
+from .. import Havok
+from ..binary.types import String
+
+templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
 
 class Messages:
     @staticmethod
     def loading(file: str):
-        print(f"{Fore.BLUE}Loading '{os.path.basename(file)}'")
+        print(f"{Fore.BLUE}Loading '{os.path.basename(file)}' to memory")
 
     @staticmethod
     def writing(file: str):
         print(f"{Fore.BLUE}Writing '{os.path.basename(file)}'")
+
+    @staticmethod
+    def serializing(file: str):
+        print(f"{Fore.BLUE}Serializing '{os.path.basename(file)}'")
+
+    @staticmethod
+    def deserializing(file: str):
+        print(f"{Fore.BLUE}Deserializing '{os.path.basename(file)}'")
 
     @staticmethod
     def done():
