@@ -161,6 +161,9 @@ class Bool(BinaryType):
         else:
             self.real = int(bool(x))
 
+    def __bool__(self):
+        return bool(self.real)
+
     def __int__(self):
         return self.real
 
