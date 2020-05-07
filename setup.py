@@ -23,7 +23,9 @@ setup(
     install_requires=["colorama", "numpy", "oead"],
     entry_points={
         "console_scripts": [
-            "hk_convert = botw_havok.cli.hk_convert:main",
+            "hk_to_json = botw_havok.cli.hk_to_json:main",
+            "json_to_hk = botw_havok.cli.json_to_hk:main",
+            "hk_compare = botw_havok.cli.hk_compare:main",
             "hkrb_extract = botw_havok.cli.hkrb_extract:main",
             "hksc_to_hkrb = botw_havok.cli.hksc_to_hkrb:main",
         ]
