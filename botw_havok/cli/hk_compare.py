@@ -8,7 +8,7 @@ def parse_args():
         description="Compare Havok packfiles.\nAlso works between Wii U and Switch packfiles."
     )
     parser.add_argument(
-        "hkFiles", help="Paths to Havok packfiles for comparison", nargs="++"
+        "hkFiles", help="Paths to Havok packfiles for comparison", nargs="+"
     )
 
     return parser.parse_args()
