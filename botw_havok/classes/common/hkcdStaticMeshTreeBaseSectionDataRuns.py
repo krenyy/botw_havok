@@ -7,7 +7,7 @@ if False:
     from ...container.util.hkobject import HKObject
 
 
-class hkcdStaticMeshTreeBaseSectionDataRuns:
+class hkcdStaticMeshTreeBaseSectionDataRuns(hkObject):
     data: UInt32
 
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):

@@ -51,9 +51,11 @@ class hkcdShape(hkReferencedObject):
         inst = cls()
         inst.__dict__.update(super().from_dict(d).__dict__)
 
-        inst.type = d["type"]
-        inst.dispatchType = ShapeDispatchTypeEnum[d["dispatchType"]].value
-        inst.bitsPerKey = d["bitsPerKey"]
-        inst.shapeInfoCodecType = ShapeInfoCodecTypeEnum[d["shapeInfoCodecType"]].value
+        inst.type = UInt8(d["type"])
+        inst.dispatchType = UInt8(ShapeDispatchTypeEnum[d["dispatchType"]].value)
+        inst.bitsPerKey = UInt8(d["bitsPerKey"])
+        inst.shapeInfoCodecType = UInt8(
+            ShapeInfoCodecTypeEnum[d["shapeInfoCodecType"]].value
+        )
 
         return inst

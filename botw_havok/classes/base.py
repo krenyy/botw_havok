@@ -36,4 +36,7 @@ class HKBaseClass:
     def __eq__(self, value: object):
         if not isinstance(value, HKBaseClass):
             raise NotImplementedError()
-        return self.__dict__ == value.__dict__
+        comparison = self.__dict__ == value.__dict__
+        if not comparison:
+            print(f"Class '{self.__class__.__name__}' doesn't match")
+        return comparison

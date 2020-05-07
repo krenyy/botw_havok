@@ -1,12 +1,13 @@
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Float16, Float32, Int8
 from ..enums.ResponseType import ResponseType
+from .hkObject import hkObject
 
 if False:
     from ...hkfile import HKFile
 
 
-class hkpMaterial:
+class hkpMaterial(hkObject):
     responseType: Int8
     rollingFrictionMultiplier: Float16
     friction: Float32

@@ -25,6 +25,11 @@ class hkpStaticCompoundShapeInstance(hkObject):
 
         for gr in obj.global_references:
             if gr.src_rel_offset == br.tell():
+                try:
+                    hkFile.data.objects.remove(gr.dst_obj)
+                except ValueError:
+                    pass
+
                 self.shape = class_map.HKClassMap.get(gr.dst_obj.hkClass.name)()
                 self.shape.deserialize(
                     hkFile,
@@ -34,11 +39,6 @@ class hkpStaticCompoundShapeInstance(hkObject):
                     ),
                     gr.dst_obj,
                 )
-
-                try:
-                    hkFile.data.objects.remove(gr.dst_obj)
-                except ValueError:
-                    pass
 
                 hkFile._assert_pointer(br)
                 break
@@ -63,7 +63,6 @@ class hkpStaticCompoundShapeInstance(hkObject):
         gr.src_obj = obj
         gr.src_rel_offset = bw.tell()
         gr.dst_section_id = Int32(2)
-        # gr.dst_obj = HKObject()
         gr.dst_rel_offset = UInt32(0)
         obj.global_references.append(gr)
 
