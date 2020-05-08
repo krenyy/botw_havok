@@ -8,6 +8,7 @@ from ..hkpCylinderShape import hkpCylinderShape
 from ..hkpPhysicsData import hkpPhysicsData
 from ..hkpPhysicsSystem import hkpPhysicsSystem
 from ..hkpRigidBody import hkpRigidBody
+from ..hkpSphereShape import hkpSphereShape
 from ..hkpStaticCompoundShape import hkpStaticCompoundShape
 from ..hkRootLevelContainer import hkRootLevelContainer
 from ..StaticCompoundInfo import StaticCompoundInfo
@@ -23,6 +24,7 @@ class HKClassMap:
         "hkpPhysicsData": hkpPhysicsData,
         "hkpPhysicsSystem": hkpPhysicsSystem,
         "hkpRigidBody": hkpRigidBody,
+        "hkpSphereShape": hkpSphereShape,
         "hkpStaticCompoundShape": hkpStaticCompoundShape,
         "hkRootLevelContainer": hkRootLevelContainer,
         "StaticCompoundInfo": StaticCompoundInfo,
