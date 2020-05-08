@@ -64,7 +64,7 @@ class hkpEntity(hkpWorldObject):
         ###
 
         self.material = hkpMaterial()
-        self.material.deserialize(hkFile, br)
+        self.material.deserialize(hkFile, br, obj)
 
         if hkFile.header.padding_option:
             br.align_to(8)
@@ -133,7 +133,7 @@ class hkpEntity(hkpWorldObject):
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hkFile, bw, obj)
 
-        self.material.serialize(hkFile, bw)
+        self.material.serialize(hkFile, bw, obj)
 
         if hkFile.header.padding_option:
             bw.align_to(8)

@@ -5,6 +5,10 @@ from ..binary.types import UInt32
 from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
 
+if False:
+    from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
+
 
 class hkpSphereShape(HKBaseClass, hkpConvexShape):
     pad16: Sequence[UInt32]

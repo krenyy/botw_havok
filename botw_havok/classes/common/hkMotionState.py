@@ -3,6 +3,10 @@ from ...binary.types import Float16, Float32, Matrix, UInt8, Vector4
 from .hkObject import hkObject
 from .hkUFloat8 import hkUFloat8
 
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
+
 
 class hkMotionState(hkObject):
     transform: Matrix
@@ -21,7 +25,7 @@ class hkMotionState(hkObject):
 
     deactivationClass: UInt8
 
-    def deserialize(self, hkFile, br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.transform = br.read_matrix(4)
         self.sweptTransform = br.read_matrix(5)
 
@@ -34,16 +38,16 @@ class hkMotionState(hkObject):
         self.timeFactor = br.read_float16()
 
         self.maxLinearVelocity = hkUFloat8()
-        self.maxLinearVelocity.deserialize(br)
+        self.maxLinearVelocity.deserialize(hkFile, br, obj)
 
         self.maxAngularVelocity = hkUFloat8()
-        self.maxAngularVelocity.deserialize(br)
+        self.maxAngularVelocity.deserialize(hkFile, br, obj)
 
         self.deactivationClass = br.read_uint8()
 
         br.align_to(16)
 
-    def serialize(self, hkFile, bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_matrix(self.transform)
         bw.write_matrix(self.sweptTransform)
 
@@ -55,8 +59,8 @@ class hkMotionState(hkObject):
         bw.write_float16(self.angularDamping)
         bw.write_float16(self.timeFactor)
 
-        self.maxLinearVelocity.serialize(bw)
-        self.maxAngularVelocity.serialize(bw)
+        self.maxLinearVelocity.serialize(hkFile, bw, obj)
+        self.maxAngularVelocity.serialize(hkFile, bw, obj)
 
         bw.write_uint8(self.deactivationClass)
 

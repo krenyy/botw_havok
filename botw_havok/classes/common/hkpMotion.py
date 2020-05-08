@@ -44,7 +44,7 @@ class hkpMotion(hkReferencedObject):
         br.align_to(16)
 
         self.motionState = hkMotionState()
-        self.motionState.deserialize(hkFile, br)
+        self.motionState.deserialize(hkFile, br, obj)
 
         self.inertiaAndMassInv = br.read_vector4()
 
@@ -73,7 +73,7 @@ class hkpMotion(hkReferencedObject):
 
         bw.align_to(16)
 
-        self.motionState.serialize(hkFile, bw)
+        self.motionState.serialize(hkFile, bw, obj)
 
         bw.write_vector4(self.inertiaAndMassInv)
 

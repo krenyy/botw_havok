@@ -2,14 +2,18 @@ from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt8
 from .hkObject import hkObject
 
+if False:
+    from ...hkfile import HKFile
+    from ...container.util.hkobject import HKObject
+
 
 class hkUFloat8(hkObject):
     value: UInt8
 
-    def deserialize(self, br: BinaryReader):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         self.value = br.read_uint8()
 
-    def serialize(self, bw: BinaryWriter):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         bw.write_uint8(self.value)
 
     def as_dict(self):
