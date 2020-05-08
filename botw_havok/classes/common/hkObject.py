@@ -18,4 +18,9 @@ class hkObject:
         comparison = self.__dict__ == value.__dict__
         if not comparison:
             print(f"Subclass '{self.__class__.__name__}' doesn't match")
+            print("\n****")
+            print(self.__dict__)
+            print("****")
+            print(value.__dict__)
+            print("****\n")
         return comparison
