@@ -38,8 +38,8 @@ def main():
             if file0.data.contents[0] != file1.data.contents[0]:
                 print(f"{Fore.RED}File contents don't match")
                 break
-    else:
-        print(f"{Fore.GREEN}File contents match")
+        else:
+            print(f"{Fore.GREEN}File contents match")
 
     Messages.done()
 
