@@ -43,7 +43,7 @@ def main():
 
     args = parse_args()
 
-    json_to_hk(args.hkFile, args.outFile, args.switch)
+    json_to_hk(args.jsonFile, args.outFile, args.switch)
 
     Messages.done()
 
