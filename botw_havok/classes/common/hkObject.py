@@ -17,5 +17,5 @@ class hkObject:
             raise NotImplementedError()
         comparison = self.__dict__ == value.__dict__
         if not comparison:
-            print(f"Class '{self.__class__.__name__}' doesn't match")
+            print(f"Subclass '{self.__class__.__name__}' doesn't match")
         return comparison
