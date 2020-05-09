@@ -190,7 +190,7 @@ class HKDataSection(HKSection):
             else:
                 raise Exception("There shouldn't be any other unresolved reservations!")
 
-    def get(self, value: int):
+    def get(self, value: int) -> HKObject:
         for obj in self.objects:
             if obj.offset == value:
                 return obj

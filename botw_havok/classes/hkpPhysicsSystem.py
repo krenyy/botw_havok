@@ -193,10 +193,6 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         return inst
 
     def __repr__(self):
-        return "<{}({}, {}, {}, {})>".format(
-            self.__class__.__name__,
-            self.name,
-            self.active,
-            self.rigidBodies,
-            self.userData,
+        return "<{}({}, {}, {})>".format(
+            self.__class__.__name__, self.name, self.active, len(self.rigidBodies),
         )

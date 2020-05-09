@@ -40,7 +40,7 @@ class Havok:
         for file in self.files:
             file.to_wiiu()
 
-    def guess_extension(self):
+    def guess_extension(self) -> str:
         contents = self.files[0].data.contents
 
         if not contents:
@@ -119,5 +119,5 @@ class Havok:
             else:
                 return json.dump(self.as_dict(), f, default=default)
 
-    def __repr__(self):
-        return f"<{self.__class__.__name__} {[file for file in self.files]}>"
+    def __repr__(self) -> str:
+        return "<{} {}>".format(self.__class__.__name__, self.files)
