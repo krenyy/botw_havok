@@ -1,7 +1,7 @@
 from typing import List, Union
 
 from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import String, UInt32, UInt64
+from ...binary.types import UInt32, UInt64
 from .hkMultiThreadCheck import hkMultiThreadCheck
 from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkReferencedObject import hkReferencedObject
@@ -18,7 +18,7 @@ class hkpWorldObject(hkReferencedObject):
     collidable: hkpLinkedCollidable
     multiThreadCheck: hkMultiThreadCheck
 
-    name: String
+    name: str
 
     properties: List[hkSimpleProperty]
 

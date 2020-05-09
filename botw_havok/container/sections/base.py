@@ -1,7 +1,7 @@
 import typing
 
 from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import String, UInt8, UInt32
+from ...binary.types import UInt8, UInt32
 from ..util.globalfixup import GlobalFixup
 from ..util.localfixup import LocalFixup
 from ..util.virtualfixup import VirtualFixup
@@ -12,7 +12,7 @@ if False:
 
 class HKSection:
     id: int  # 0,1,2
-    tag: String  # __classnames__, __types__, __data__
+    tag: str  # __classnames__, __types__, __data__
 
     local_fixups: typing.List[LocalFixup]
     global_fixups: typing.List[GlobalFixup]

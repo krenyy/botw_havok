@@ -29,7 +29,7 @@ class hkpBoxShape(HKBaseClass, hkpConvexShape):
 
         bw.align_to(16)
 
-        bw.write_vector4(self.halfExtents)
+        bw.write_vector(self.halfExtents)
 
         ###
 

@@ -1,7 +1,7 @@
 import typing
 
 from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import Int32, String, UInt32
+from ....binary.types import Int32, UInt32
 from ....classes.util.class_map import HKClassMap
 from ...util.globalfixup import GlobalFixup
 from ...util.globalreference import GlobalReference
@@ -19,7 +19,7 @@ class HKDataSection(HKSection):
     """
 
     id: int = 2
-    tag: String = String("__data__")
+    tag: str = "__data__"
 
     global_references: typing.List[GlobalReference]
 

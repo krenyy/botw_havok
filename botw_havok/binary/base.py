@@ -1,25 +1,13 @@
 from io import BytesIO
 
+import numpy as np
+
 from .types import UInt32
 
 
 class BinaryBase(BytesIO):
     big_endian: bool = False
     steps: list
-
-    struct_types = {
-        "i8": "b",
-        "i16": "h",
-        "i32": "i",
-        "i64": "q",
-        "u8": "B",
-        "u16": "H",
-        "u32": "I",
-        "u64": "Q",
-        "f32": "f",
-        "f64": "d",
-        "string": "s",
-    }
 
     def __init__(self, initial_bytes=None, big_endian: bool = None):
         super().__init__(initial_bytes=initial_bytes)
@@ -34,17 +22,17 @@ class BinaryBase(BytesIO):
     def length(self):
         return len(self.getvalue())
 
-    def seek_absolute(self, offset: int):
+    def seek_absolute(self, offset: np.integer):
         return self.seek(offset, 0)
 
-    def seek_relative(self, offset: int):
+    def seek_relative(self, offset: np.integer):
         return self.seek(offset, 1)
 
-    def step_in(self, offset: int):
+    def step_in(self, offset: np.integer):
         self.steps.append(self.tell())
         return self.seek_absolute(offset)
 
-    def step_in_relative(self, offset: int):
+    def step_in_relative(self, offset: np.integer):
         self.steps.append(self.tell())
         return self.seek_relative(offset)
 

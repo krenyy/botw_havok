@@ -3,7 +3,7 @@ from typing import List
 import botw_havok.classes.util.class_map as class_map
 
 from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Int32, String, UInt32
+from ...binary.types import Int32, UInt32
 from ...container.util.globalreference import GlobalReference
 from ...container.util.localfixup import LocalFixup
 from ..base import HKBaseClass
@@ -15,8 +15,8 @@ if False:
 
 
 class hkRootLevelContainerNamedVariant(hkObject):
-    name: String
-    className: String
+    name: str
+    className: str
     variant: HKBaseClass
 
     _namePointer_offset: UInt32
@@ -67,8 +67,8 @@ class hkRootLevelContainerNamedVariant(hkObject):
     @classmethod
     def from_dict(cls, d: dict):
         inst = cls()
-        inst.name = String(d["name"])
-        inst.className = String(d["className"])
+        inst.name = d["name"]
+        inst.className = d["className"]
         inst.variant = class_map.HKClassMap.get(d["className"]).from_dict(d["variant"])
 
         return inst

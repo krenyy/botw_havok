@@ -75,12 +75,12 @@ class hkpMotion(hkReferencedObject):
 
         self.motionState.serialize(hkFile, bw, obj)
 
-        bw.write_vector4(self.inertiaAndMassInv)
+        bw.write_vector(self.inertiaAndMassInv)
 
-        bw.write_vector4(self.linearVelocity)
-        bw.write_vector4(self.angularVelocity)
+        bw.write_vector(self.linearVelocity)
+        bw.write_vector(self.angularVelocity)
 
-        [bw.write_vector4(drp) for drp in self.deactivationRefPosition]
+        [bw.write_vector(drp) for drp in self.deactivationRefPosition]
         bw.write_uint32(UInt32(self.deactivationRefOrientation))
 
         bw.align_to(8)

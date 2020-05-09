@@ -63,7 +63,7 @@ class hkcdStaticMeshTreeBaseSection(hkcdStaticTreeTreehkcdStaticTreeDynamicStora
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         super().serialize(hkFile, bw, obj)
 
-        [bw.write_vector3(cp) for cp in self.codecParms]
+        [bw.write_vector(cp) for cp in self.codecParms]
         bw.write_uint32(UInt32(self.firstPackedVertex))
 
         self.sharedVertices.serialize(hkFile, bw, obj)

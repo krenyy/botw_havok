@@ -1,118 +1,64 @@
 __all__ = ("BinaryWriter",)
 
-
 import struct
-import typing
+from typing import Dict, Union
 
 import numpy as np
 
 from .base import BinaryBase
-from .types import (
-    Int8,
-    Int16,
-    Int32,
-    Int64,
-    UInt8,
-    UInt16,
-    UInt32,
-    UInt64,
-    Float16,
-    Float32,
-    Float64,
-    String,
-    Vector3,
-    Vector4,
-    Matrix,
-)
+from .types import *
 
 
 class BinaryWriter(BinaryBase):
-    reservations: typing.Dict[str, int]
+    reservations: Dict[str, int]
 
     def __init__(self, initial_bytes=None, big_endian: bool = None):
         super().__init__(initial_bytes=initial_bytes, big_endian=big_endian)
 
         self.reservations = {}
 
-        self.types = {
-            Int8: self.write_int8,
-            Int16: self.write_int16,
-            Int32: self.write_int32,
-            Int64: self.write_int64,
-            UInt8: self.write_uint8,
-            UInt16: self.write_uint16,
-            UInt32: self.write_uint32,
-            UInt64: self.write_uint64,
-            Float16: self.write_float16,
-            Float32: self.write_float32,
-            Float64: self.write_float64,
-            String: self.write_string,
-            Vector3: self.write_vector3,
-            Vector4: self.write_vector4,
-            Matrix: self.write_matrix,
-        }
-
     # WRITE
 
-    def write(self, value):
-        """Writes value as bytes depending on it's type
-        """
-        if isinstance(value, list):
-            [self.write(i) for i in value]
-        else:
-            try:
-                return self.types[type(value)](value)
-            except KeyError:
-                raise NotImplementedError("Invalid variable type!")
-
-    def write_type(self, type: str, value):
-        return super().write(
-            struct.pack(f"{self.endian_char()}{self.struct_types[type]}", value)
-        )
-
     def write_int8(self, num: Int8):
-        return self.write_type("i8", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}b").tobytes())
 
     def write_uint8(self, num: UInt8):
-        return self.write_type("u8", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}B").tobytes())
 
     def write_int16(self, num: Int16):
-        return self.write_type("i16", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}h").tobytes())
 
     def write_uint16(self, num: UInt16):
-        return self.write_type("u16", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}H").tobytes())
 
     def write_int32(self, num: Int32):
-        return self.write_type("i32", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}i").tobytes())
 
     def write_uint32(self, num: UInt32):
-        return self.write_type("u32", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}I").tobytes())
 
     def write_int64(self, num: Int64):
-        return self.write_type("i64", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}q").tobytes())
 
     def write_uint64(self, num: UInt64):
-        return self.write_type("u64", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}Q").tobytes())
 
     def write_float16(self, num: Float16):
-        return super().write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
+        return self.write(np.array([num], dtype=f"{self.endian_char()}f2").tobytes())
 
     def write_float32(self, num: Float32):
-        return self.write_type("f32", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}f").tobytes())
 
     def write_float64(self, num: Float64):
-        return self.write_type("f64", num)
+        return self.write(np.array([num], dtype=f"{self.endian_char()}d").tobytes())
 
-    def write_vector3(self, vector: Vector3):
-        return super().write(struct.pack(f"{self.endian_char()}3f", *vector))
-
-    def write_vector4(self, vector: Vector4):
-        return super().write(struct.pack(f"{self.endian_char()}4f", *vector))
+    def write_vector(self, v: Vector):
+        return self.write(np.array(v, dtype=f"{self.endian_char()}f").tobytes())
 
     def write_matrix(self, matrix: Matrix):
-        return [self.write_vector4(v) for v in matrix]
+        return [self.write_vector(v) for v in matrix]
 
-    def write_string(self, string: String, size: int = None, encoding: str = "utf-8"):
+    def write_string(self, string: str, size: int = None, encoding: str = "utf-8"):
         if not size:
             size = len(string) + 1
         return super().write(
@@ -130,20 +76,20 @@ class BinaryWriter(BinaryBase):
     # RESERVE, FILL
 
     def reserve(self, name: str, struct_type: str, size: int):
-        name = f"{name}:{struct_type}"
-        if name in self.reservations:
-            raise Exception(f"Key already reserved: {name}")
+        res_name = f"{name}:{struct_type}"
+        if res_name in self.reservations:
+            raise Exception(f"Key already reserved: {res_name}")
 
-        self.reservations[name] = self.tell()
+        self.reservations[res_name] = self.tell()
         for _ in range(size):
             self.write_uint8(UInt8(0xFE))
 
     def fill(self, name: str, struct_type: str):
-        name = f"{name}:{struct_type}"
-        if not (name in self.reservations):
-            raise Exception(f"Key not reserved: {name}")
+        res_name = f"{name}:{struct_type}"
+        if not (res_name in self.reservations):
+            raise Exception(f"Key not reserved: {res_name}")
 
-        return self.reservations.pop(name)
+        return self.reservations.pop(res_name)
 
     def reserve_int8(self, name: str):
         self.reserve(name, "i8", 1)

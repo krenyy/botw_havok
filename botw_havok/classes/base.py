@@ -1,5 +1,4 @@
 from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import String
 from ..container.util.hkobject import HKObject
 
 if False:
@@ -7,7 +6,7 @@ if False:
 
 
 class HKBaseClass:
-    hkClass: String
+    hkClass: str
 
     def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: HKObject):
         # SPECIFIC HKCLASS BEHAVIOUR EXECUTES AFTER THIS
@@ -29,7 +28,7 @@ class HKBaseClass:
     @classmethod
     def from_dict(cls, d: dict):
         inst = cls()
-        inst.hkClass = String(d["hkClass"])
+        inst.hkClass = d["hkClass"]
 
         return inst
 

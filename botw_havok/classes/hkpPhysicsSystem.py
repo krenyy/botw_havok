@@ -1,7 +1,7 @@
 from typing import List, Union
 
 from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Bool, Int8, String, UInt32, UInt64
+from ..binary.types import Int8, UInt32, UInt64
 from ..container.util.globalreference import GlobalReference
 from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
@@ -22,9 +22,9 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
     # actions: List[hkpAction]  # Looks unused
     # phantoms: List[hkpPhantom]  # Looks unused
 
-    name: String
+    name: str
     userData: Union[UInt32, UInt64]
-    active: Bool
+    active: bool
 
     def __init__(self):
         super().__init__()
@@ -66,7 +66,7 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         else:
             raise NotImplementedError()
 
-        self.active = Bool(br.read_int8())
+        self.active = bool(br.read_int8())
         br.align_to(16)
 
         # ----
@@ -188,7 +188,7 @@ class hkpPhysicsSystem(HKBaseClass, hkReferencedObject):
         # inst.constraints = [hkpConstraintInstance.from_dict(c) for c in d["constraints"]]
         inst.name = d["name"]
         inst.userData = d["userData"]
-        inst.active = Bool(d["active"])
+        inst.active = bool(d["active"])
 
         return inst
 

@@ -1,7 +1,7 @@
 import typing
 
 from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import String, UInt32
+from ....binary.types import UInt32
 from ..base import HKSection
 from .hkclass import HKClass
 
@@ -14,13 +14,13 @@ class HKClassnamesSection(HKSection):
     """
 
     id: int = 0
-    tag: String = String("__classnames__")
+    tag: str = "__classnames__"
 
     classes: typing.List[HKClass]
 
     def __init__(self):
         self.classes = [
-            HKClass.from_name(String(x))
+            HKClass.from_name(x)
             for x in ["hkClass", "hkClassMember", "hkClassEnum", "hkClassEnumItem"]
         ]
 
@@ -61,11 +61,11 @@ class HKClassnamesSection(HKSection):
         bw.fill_uint32(f"{self.tag}imp", self.imports_offset)
         bw.fill_uint32(f"{self.tag}eof", self.EOF_offset)
 
-    def get(self, value: typing.Union[UInt32, String]):
+    def get(self, value: typing.Union[UInt32, str]):
         """Get Havok class instance
 
         :param value: Havok class name or offset
-        :type value: typing.Union[UInt32, String]
+        :type value: typing.Union[UInt32, str]
         :raises NotImplementedError: If provided value has wrong type
         :return: Havok class instance
         :rtype: HKClass
@@ -77,7 +77,7 @@ class HKClassnamesSection(HKSection):
             else:
                 raise Exception(f"HKClass with offset {value} was not found!")
 
-        elif isinstance(value, String):
+        elif isinstance(value, str):
             for cls in self.classes:
                 if cls.name == value:
                     return cls

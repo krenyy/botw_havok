@@ -4,10 +4,18 @@ import json
 from io import BytesIO
 from typing import List
 
+import numpy as np
+from oead import yaz0
+
 from .binary import BinaryReader, BinaryWriter
 from .hkfile import HKFile
 
-from oead import yaz0
+
+def default(o):
+    if isinstance(o, np.integer):
+        return int(o)
+    elif isinstance(o, np.floating):
+        return float(o)
 
 
 class Havok:
@@ -109,7 +117,7 @@ class Havok:
             if pretty_print:
                 return f.write(json.dumps(self.as_dict(), indent=4))
             else:
-                return json.dump(self.as_dict(), f)
+                return json.dump(self.as_dict(), f, default=default)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {[file for file in self.files]}>"

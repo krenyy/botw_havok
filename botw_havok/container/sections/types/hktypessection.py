@@ -1,5 +1,5 @@
 from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import String, UInt32
+from ....binary.types import UInt32
 from ..base import HKSection
 
 if False:
@@ -11,7 +11,7 @@ class HKTypesSection(HKSection):
     """
 
     id: int = 1
-    tag: String = String("__types__")
+    tag: str = "__types__"
 
     def read(self, hkFile: "HKFile", br: BinaryReader):
         super().read(hkFile, br)

@@ -3,7 +3,6 @@ import os
 from colorama import Fore, init
 
 from .. import Havok
-from ..binary.types import String
 
 templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 

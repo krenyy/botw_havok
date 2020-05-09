@@ -44,11 +44,11 @@ class hkpCylinderShape(HKBaseClass, hkpConvexShape):
         bw.write_float32(Float32(self.cylRadius))
         bw.write_float32(Float32(self.cylBaseRadiusFactorForHeightFieldCollisions))
 
-        bw.write_vector4(self.vertexA)
-        bw.write_vector4(self.vertexB)
+        bw.write_vector(self.vertexA)
+        bw.write_vector(self.vertexB)
 
-        bw.write_vector4(self.perpendicular1)
-        bw.write_vector4(self.perpendicular2)
+        bw.write_vector(self.perpendicular1)
+        bw.write_vector(self.perpendicular2)
 
         bw.align_to(16)
 

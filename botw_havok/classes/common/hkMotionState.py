@@ -51,7 +51,7 @@ class hkMotionState(hkObject):
         bw.write_matrix(self.transform)
         bw.write_matrix(self.sweptTransform)
 
-        bw.write_vector4(self.deltaAngle)
+        bw.write_vector(self.deltaAngle)
 
         bw.write_float32(self.objectRadius)
 

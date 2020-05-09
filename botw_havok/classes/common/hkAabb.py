@@ -16,8 +16,8 @@ class hkAabb(hkObject):
         self.max = br.read_vector4()
 
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
-        bw.write_vector4(self.min)
-        bw.write_vector4(self.max)
+        bw.write_vector(self.min)
+        bw.write_vector(self.max)
 
     def as_dict(self):
         return {

@@ -1,7 +1,7 @@
 from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Bool, Int32, Matrix, UInt8, UInt32, Vector4
+from ..binary.types import Int32, Matrix, UInt8, UInt32, Vector4
 from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
@@ -18,7 +18,7 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
     rotatedVertices: List[Matrix]
 
     numVertices: Int32
-    useSpuBuffer: Bool
+    useSpuBuffer: bool
 
     planeEquations: Matrix
 
@@ -46,7 +46,7 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
         rotatedVerticesCount = hkFile._read_counter(br)
 
         self.numVertices = br.read_int32()
-        self.useSpuBuffer = Bool(br.read_uint8())
+        self.useSpuBuffer = bool(br.read_uint8())
         br.align_to(4)
 
         planeEquationsCount_offset = hkFile._assert_pointer(br)
@@ -81,8 +81,8 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
 
         bw.align_to(16)
 
-        bw.write_vector4(self.aabbHalfExtents)
-        bw.write_vector4(self.aabbCenter)
+        bw.write_vector(self.aabbHalfExtents)
+        bw.write_vector(self.aabbCenter)
 
         rotatedVerticesCount_offset = hkFile._write_empty_pointer(bw)
         hkFile._write_counter(bw, UInt32(len(self.rotatedVertices)))
@@ -145,7 +145,7 @@ class hkpConvexVerticesShape(HKBaseClass, hkpConvexShape):
         inst.aabbCenter = Vector4.from_dict(d["aabbCenter"])
         inst.rotatedVertices = [Matrix.from_dict(rv) for rv in d["rotatedVertices"]]
         inst.numVertices = d["numVertices"]
-        inst.useSpuBuffer = Bool(d["useSpuBuffer"])
+        inst.useSpuBuffer = bool(d["useSpuBuffer"])
         inst.planeEquations = Matrix.from_dict(d["planeEquations"])
         # inst.connectivity = hkpConvexVerticesConnectivity.from_dict(d["connectivity"])
 

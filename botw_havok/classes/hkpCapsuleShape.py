@@ -31,8 +31,8 @@ class hkpCapsuleShape(HKBaseClass, hkpConvexShape):
 
         bw.align_to(16)
 
-        bw.write_vector4(self.vertexA)
-        bw.write_vector4(self.vertexB)
+        bw.write_vector(self.vertexA)
+        bw.write_vector(self.vertexB)
 
         HKBaseClass.serialize(self, hkFile, bw, obj)
 

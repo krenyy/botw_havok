@@ -1,7 +1,7 @@
 from typing import List
 
 from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Bool, Float32, String, UInt8, UInt32
+from ..binary.types import Float32, UInt8, UInt32
 from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.hkpBvCompressedMeshShapeTree import hkpBvCompressedMeshShapeTree
@@ -17,12 +17,12 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
     convexRadius: Float32
     weldingType: UInt8
 
-    hasPerPrimitiveCollisionFilterInfo: Bool
-    hasPerPrimitiveUserData: Bool
+    hasPerPrimitiveCollisionFilterInfo: bool
+    hasPerPrimitiveUserData: bool
 
     collisionFilterInfoPalette: List[UInt32]
     userDataPalette: List[UInt32]
-    userStringPalette: List[String]
+    userStringPalette: List[str]
 
     tree: hkpBvCompressedMeshShapeTree
 
@@ -48,8 +48,8 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
         self.convexRadius = br.read_float32()
 
         self.weldingType = br.read_uint8()
-        self.hasPerPrimitiveCollisionFilterInfo = Bool(br.read_int8())
-        self.hasPerPrimitiveUserData = Bool(br.read_int8())
+        self.hasPerPrimitiveCollisionFilterInfo = bool(br.read_int8())
+        self.hasPerPrimitiveUserData = bool(br.read_int8())
         br.align_to(4)
 
         collisionFilterInfoPaletteCount_offset = hkFile._assert_pointer(br)
@@ -270,10 +270,11 @@ class hkpBvCompressedMeshShape(HKBaseClass, hkpBvTreeShape):
 
         inst.convexRadius = d["convexRadius"]
         inst.weldingType = WeldingType[d["weldingType"]].value
-        inst.hasPerPrimitiveCollisionFilterInfo = Bool(
-            d["hasPerPrimitiveCollisionFilterInfo"]
-        )
-        inst.hasPerPrimitiveUserData = Bool(d["hasPerPrimitiveUserData"])
+        inst.hasPerPrimitiveCollisionFilterInfo = d[
+            "hasPerPrimitiveCollisionFilterInfo"
+        ]
+
+        inst.hasPerPrimitiveUserData = d["hasPerPrimitiveUserData"]
         inst.collisionFilterInfoPalette = d["collisionFilterInfoPalette"]
         inst.userDataPalette = d["userDataPalette"]
         inst.userStringPalette = d["userStringPalette"]
