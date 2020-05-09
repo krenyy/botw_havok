@@ -6,8 +6,8 @@ from .common import Fore, Messages, change_extension, check_if_exists, init
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Convert Havok JSON file to packfile")
-    parser.add_argument("jsonFile", help="Path to destination JSON file", nargs="?")
-    parser.add_argument("outFile", help="Path to a Havok packfile")
+    parser.add_argument("jsonFile", help="Path to destination JSON file")
+    parser.add_argument("outFile", help="Path to a Havok packfile", nargs="?")
     parser.add_argument(
         "-nx", "--switch", action="store_true", help="Use to output the file for Switch"
     )
