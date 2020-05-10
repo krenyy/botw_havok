@@ -15,5 +15,8 @@ env:
     - TWINE_USERNAME=__token__
     # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
 
+install:
+  - python -m pip install cython==0.29.17
+
 script:
   - python setup.py sdist bdist_wheel
