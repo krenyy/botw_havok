@@ -1,18 +1,7 @@
-from Cython.Build import cythonize
-from setuptools import Extension, find_packages, setup
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as readme:
     long_description = readme.read()
-
-
-extensions = [
-    Extension("botw_havok.binary.base", ["botw_havok/binary/base.py"]),
-    Extension("botw_havok.binary.reader", ["botw_havok/binary/reader.py"]),
-    Extension("botw_havok.binary.writer", ["botw_havok/binary/writer.py"]),
-    ###
-    Extension("botw_havok.havok", ["botw_havok/havok.py"]),
-]
-
 
 setup(
     name="botw_havok",
@@ -25,7 +14,6 @@ setup(
     url="https://github.com/krenyy/botw_havok",
     include_package_data=True,
     packages=find_packages(),
-    ext_modules=cythonize(extensions),
     classifiers=[
         "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
