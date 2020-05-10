@@ -65,9 +65,9 @@ class Havok:
         return [file.as_dict() for file in self.files]
 
     @classmethod
-    def from_dict(cls, d: dict):
+    def from_dict(cls, l: list):
         inst = cls()
-        inst.files = [HKFile.from_dict(file) for file in d]
+        inst.files = [HKFile.from_dict(file) for file in l]
 
         return inst
 

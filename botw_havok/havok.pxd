@@ -8,3 +8,5 @@ cdef class Havok:
     cpdef void to_wiiu(self)
 
     cpdef str guess_extension(self)
+
+    cpdef list as_dict(self)
