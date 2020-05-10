@@ -21,6 +21,7 @@ env:
 
 install:
   - python3 -m pip install cython==0.29.17
+  - python3 setup.py install
   - python3 -m pip install cibuildwheel==1.4.1
 
 script:
