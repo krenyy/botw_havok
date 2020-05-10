@@ -1,4 +1,4 @@
-import typing
+from typing import List, Union
 
 from ....binary import BinaryReader, BinaryWriter
 from ....binary.types import Int32, UInt32
@@ -11,7 +11,8 @@ from ..base import HKSection
 
 if False:
     from ....hkfile import HKFile
-    from ....classes.base import HKBaseClass
+    from ....classes.StaticCompoundInfo import StaticCompoundInfo
+    from ....classes.hkRootLevelContainer import hkRootLevelContainer
 
 
 class HKDataSection(HKSection):
@@ -21,10 +22,10 @@ class HKDataSection(HKSection):
     id: int = 2
     tag: str = "__data__"
 
-    global_references: typing.List[GlobalReference]
+    global_references: List[GlobalReference]
 
-    objects: typing.List[HKObject]
-    contents: typing.List["HKBaseClass"]
+    objects: List[HKObject]
+    contents: List[Union["StaticCompoundInfo", "hkRootLevelContainer"]]
 
     def __init__(self):
         super().__init__()

@@ -1,13 +1,15 @@
 __all__ = ("Havok",)
 
 import json
-from io import BytesIO
-from typing import List
+from typing import List, Union
 
 import numpy as np
 from oead import yaz0
 
 from .binary import BinaryReader, BinaryWriter
+from .classes.base import HKBaseClass
+from .classes.hkRootLevelContainer import hkRootLevelContainer
+from .classes.StaticCompoundInfo import StaticCompoundInfo
 from .hkfile import HKFile
 
 
@@ -46,17 +48,19 @@ class Havok:
         if not contents:
             raise Exception("File needs to be deserialized!")
 
-        if contents[0].hkClass == "StaticCompoundInfo":
+        root_class = contents[0]
+
+        if isinstance(root_class, StaticCompoundInfo):
             return "hksc"
 
-        elif contents[0].hkClass == "hkRootLevelContainer":
-            if contents[0].namedVariants[0].className == "hkpPhysicsData":
+        elif isinstance(root_class, hkRootLevelContainer):
+            if root_class.namedVariants[0].className == "hkpPhysicsData":
                 return "hkrb"
-            elif contents[0].namedVariants[0].className == "hkpRigidBody":
+            elif root_class.namedVariants[0].className == "hkpRigidBody":
                 return "hktmrb"
-            elif contents[0].namedVariants[0].className == "hclClothContainer":
+            elif root_class.namedVariants[0].className == "hclClothContainer":
                 return "hkcl"
-            elif contents[0].namedVariants[0].className == "hkaAnimationContainer":
+            elif root_class.namedVariants[0].className == "hkaAnimationContainer":
                 return "hkrg"
 
         return "hkx"
@@ -102,7 +106,7 @@ class Havok:
             _bw = BinaryWriter(big_endian=file.header.endian == 0)
             file.serialize()
             file.write(_bw)
-            BytesIO.write(bw, _bw.getvalue())
+            bw.write(_bw.getvalue())
 
         with open(path, "wb") as f:
             return f.write(bw.getvalue())
