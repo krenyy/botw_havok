@@ -109,12 +109,12 @@ class StaticCompoundInfo(HKBaseClass):
     def __eq__(self, value):
         if not isinstance(value, StaticCompoundInfo):
             raise NotImplementedError()
-        comparison = (
-            self.ActorInfo == value.ActorInfo and self.ShapeInfo == value.ShapeInfo
+        return hash(self) == hash(value)
+
+    def __hash__(self):
+        return hash(
+            frozenset([frozenset(value) for value in (self.ActorInfo, self.ShapeInfo)])
         )
-        if not comparison:
-            print(f"Class '{self.__class__.__name__}' doesn't match")
-        return comparison
 
     def __repr__(self):
         return (

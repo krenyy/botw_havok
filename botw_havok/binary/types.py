@@ -29,6 +29,9 @@ class Vector(List[_np.float32]):
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"
 
+    def __hash__(self):
+        return hash(tuple(self))
+
 
 class Vector3(Vector):
     pass
@@ -51,3 +54,6 @@ class Matrix(List[Vector4]):
 
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"
+
+    def __hash__(self):
+        return hash(tuple(self))
