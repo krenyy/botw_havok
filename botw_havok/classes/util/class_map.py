@@ -1,4 +1,3 @@
-from ..base import HKBaseClass
 from ..hkpBoxShape import hkpBoxShape
 from ..hkpBvCompressedMeshShape import hkpBvCompressedMeshShape
 from ..hkpCapsuleShape import hkpCapsuleShape
