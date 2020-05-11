@@ -1,5 +1,7 @@
 import typing
 
+import numpy as np
+
 from ....binary import BinaryReader, BinaryWriter
 from ....binary.types import UInt32
 from ..base import HKSection
@@ -61,16 +63,16 @@ class HKClassnamesSection(HKSection):
         bw.fill_uint32(f"{self.tag}imp", self.imports_offset)
         bw.fill_uint32(f"{self.tag}eof", self.EOF_offset)
 
-    def get(self, value: typing.Union[UInt32, str]):
+    def get(self, value: typing.Union[np.integer, str]):
         """Get Havok class instance
 
         :param value: Havok class name or offset
-        :type value: typing.Union[UInt32, str]
+        :type value: typing.Union[numpy.integer, str]
         :raises NotImplementedError: If provided value has wrong type
         :return: Havok class instance
         :rtype: HKClass
         """
-        if isinstance(value, UInt32):
+        if isinstance(value, np.integer):
             for cls in self.classes:
                 if cls.offset == value:
                     return cls
