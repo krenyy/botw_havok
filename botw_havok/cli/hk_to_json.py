@@ -31,7 +31,7 @@ def hk_to_json(hkFile: str, outFile: str, pretty_print: bool):
 
 
 def main():
-    init()
+    init(autoreset=True)
 
     args = parse_args()
 

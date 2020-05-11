@@ -1,19 +1,19 @@
 from ..binary import BinaryReader, BinaryWriter
-from ..container.util.hkobject import HKObject
 
 if False:
     from ..hkfile import HKFile
+    from ..container.util.hkobject import HKObject
 
 
 class HKBaseClass:
     hkClass: str
 
-    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: HKObject):
+    def deserialize(self, hkFile: "HKFile", br: BinaryReader, obj: "HKObject"):
         # SPECIFIC HKCLASS BEHAVIOUR EXECUTES AFTER THIS
 
         self.hkClass = obj.hkClass.name
 
-    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: HKObject):
+    def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         # SPECIFIC HKCLASS BEHAVIOUR EXECUTES BEFORE THIS
 
         obj.bytes = bw.getvalue()

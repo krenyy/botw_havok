@@ -39,7 +39,7 @@ def json_to_hk(jsonFile: str, outFile: str, nx: bool):
 
 
 def main():
-    init()
+    init(autoreset=True)
 
     args = parse_args()
 

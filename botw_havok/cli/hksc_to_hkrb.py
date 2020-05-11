@@ -4,11 +4,10 @@ import os
 from copy import deepcopy
 
 from .. import Havok
+from .common import Messages, init, shapes_to_hkrb
 
-templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
-
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Convert Havok Static Compound (.hksc) to Havok Rigid Body array (.hkrb)"
     )
@@ -17,69 +16,33 @@ def main():
         "outFile", help="Path to the destination Havok Rigid Body file", nargs="?"
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main():
+    init(autoreset=True)
+
+    args = parse_args()
+
+    Messages.loading(args.hkscFile)
     hk = Havok.from_file(args.hkscFile)
+
+    Messages.deserializing(args.hkscFile)
     hk.deserialize()
 
     nx = hk.files[0].header.pointer_size == 8
 
-    shapes = []  # Final shapes to be converted to hkrb
+    shapes = [
+        instance.shape
+        for rigidbody in hk.files[1]
+        .data.contents[0]
+        .namedVariants[0]
+        .variant.systems[0]
+        .rigidBodies
+        for instance in rigidbody.collidable.shape.instance
+    ]
 
-    for rigidbody in (
-        hk.files[1].data.contents[0].namedVariants[0].variant.systems[0].rigidBodies
-    ):
-        for instance in rigidbody.collidable.shape.instances:
-            shapes.append(instance.shape)
-
-    if not shapes:
-        raise Exception("For some reason, no shapes were found.")
-
-    if not args.outFile:
-        args.outFile = ".".join(args.hkscFile.split(".")[:-1] + ["hkrb"])
-
-    with open(os.path.join(templates_dir, "hkrb.json"), "r") as f:
-        hkrb_template = json.load(f)
-
-    with open(os.path.join(templates_dir, "hkrb_rigidbody.json"), "r") as f:
-        hk_rigidbody_template = json.load(f)
-
-    with open(os.path.join(templates_dir, "bphysics.yml"), "r") as f:
-        bphysics_template = f.read()
-
-    with open(os.path.join(templates_dir, "bphysics_rigidbody.yml"), "r") as f:
-        bphysics_rigidbody_template = f.read()
-
-    bphysics_rigidbodies = []
-    for i, shape in enumerate(shapes):
-        hk_rb = deepcopy(hk_rigidbody_template)
-        bp_rb = bphysics_rigidbody_template
-
-        hk_rb["name"] = f"Shape_{i}"
-        hk_rb["collidable"]["shape"] = shape.as_dict()
-
-        hkrb_template[0]["data"]["contents"][0]["namedVariants"][0]["variant"][
-            "systems"
-        ][0]["rigidBodies"].append(hk_rb)
-
-        bphysics_rigidbodies.append(bp_rb.format(i))
-
-    hkrb = Havok.from_dict(hkrb_template)
-
-    if nx:
-        hkrb.to_switch()
-    else:
-        hkrb.to_wiiu()
-
-    hkrb.serialize()
-    hkrb.to_file(args.outFile)
-
-    with open(".".join(args.outFile.split(".")[:-1] + ["yml"]), "w") as f:
-        f.write(
-            bphysics_template.format(
-                len(bphysics_rigidbodies), "\n".join(bphysics_rigidbodies)
-            )
-        )
+    shapes_to_hkrb(shapes, args.hkscFile, args.outFile, nx)
 
 
 if __name__ == "__main__":

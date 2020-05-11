@@ -1,4 +1,5 @@
 import argparse
+
 from .. import Havok
 from .common import Fore, Messages, change_extension, check_if_exists, init
 
@@ -15,7 +16,7 @@ def parse_args():
 
 
 def main():
-    init()
+    init(autoreset=True)
 
     args = parse_args()
 

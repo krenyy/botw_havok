@@ -1,8 +1,9 @@
 from typing import List, Union
 
+import botw_havok.classes.util.class_map as class_map
+
 from ....binary import BinaryReader, BinaryWriter
 from ....binary.types import Int32, UInt32
-from ....classes.util.class_map import HKClassMap
 from ...util.globalfixup import GlobalFixup
 from ...util.globalreference import GlobalReference
 from ...util.hkobject import HKObject
@@ -80,7 +81,7 @@ class HKDataSection(HKSection):
 
     def deserialize(self, hkFile: "HKFile"):
         for obj in self.objects:
-            hkcls = HKClassMap.get(obj.hkClass.name)()
+            hkcls = class_map.HKClassMap.get(obj.hkClass.name)()
             hkcls.deserialize(
                 hkFile,
                 BinaryReader(
@@ -207,7 +208,7 @@ class HKDataSection(HKSection):
     def from_dict(cls, d: dict):
         inst = cls()
         inst.contents = [
-            HKClassMap.get(content["hkClass"]).from_dict(content)
+            class_map.HKClassMap.get(content["hkClass"]).from_dict(content)
             for content in d["contents"]
         ]
         return inst

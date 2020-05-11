@@ -7,9 +7,6 @@ import numpy as np
 from oead import yaz0
 
 from .binary import BinaryReader, BinaryWriter
-from .classes.base import HKBaseClass
-from .classes.hkRootLevelContainer import hkRootLevelContainer
-from .classes.StaticCompoundInfo import StaticCompoundInfo
 from .hkfile import HKFile
 
 
@@ -50,18 +47,20 @@ class Havok:
 
         root_class = contents[0]
 
-        if isinstance(root_class, StaticCompoundInfo):
+        if root_class.hkClass == "StaticCompoundInfo":
             return "hksc"
 
-        elif isinstance(root_class, hkRootLevelContainer):
-            if root_class.namedVariants[0].className == "hkpPhysicsData":
+        elif root_class.hkClass == "hkRootLevelContainer":
+            if root_class.namedVariants[0].className == "hkpPhysicsData":  # type: ignore
                 return "hkrb"
-            elif root_class.namedVariants[0].className == "hkpRigidBody":
+            elif root_class.namedVariants[0].className == "hkpRigidBody":  # type: ignore
                 return "hktmrb"
-            elif root_class.namedVariants[0].className == "hclClothContainer":
+            elif root_class.namedVariants[0].className == "hclClothContainer":  # type: ignore
                 return "hkcl"
-            elif root_class.namedVariants[0].className == "hkaAnimationContainer":
+            elif root_class.namedVariants[0].className == "hkaAnimationContainer":  # type: ignore
                 return "hkrg"
+            elif root_class.namedVariants[0].className == "hkaiNavMesh":  # type: ignore
+                return "hknm2"
 
         return "hkx"
 
