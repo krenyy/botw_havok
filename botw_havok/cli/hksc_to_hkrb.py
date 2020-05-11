@@ -39,7 +39,7 @@ def main():
         .namedVariants[0]
         .variant.systems[0]
         .rigidBodies
-        for instance in rigidbody.collidable.shape.instance
+        for instance in rigidbody.collidable.shape.instances
     ]
 
     shapes_to_hkrb(shapes, args.hkscFile, args.outFile, nx)

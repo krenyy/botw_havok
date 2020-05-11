@@ -23,7 +23,7 @@ class HKObject:
     local_fixups: List[LocalFixup]
     global_references: List["GlobalReference"]
 
-    reservations: Dict[str, int]
+    reservations: Dict[str, UInt32]
 
     def __init__(self):
         self.local_fixups = []

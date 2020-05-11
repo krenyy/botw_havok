@@ -10,7 +10,7 @@ from .types import *
 
 
 class BinaryWriter(BinaryBase):
-    reservations: Dict[str, int]
+    reservations: Dict[str, UInt32]
 
     def __init__(self, initial_bytes=None, big_endian: bool = None):
         super().__init__(initial_bytes=initial_bytes, big_endian=big_endian)
