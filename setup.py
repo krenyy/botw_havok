@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as readme:
 
 setup(
     name="botw_havok",
-    version="0.3.7",
+    version="0.3.8",
     author="kreny",
     author_email="kronerm9@gmail.com",
     description="A library for manipulating Breath of the Wild Havok packfiles",
