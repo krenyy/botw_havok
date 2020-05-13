@@ -118,7 +118,7 @@ class Havok:
     def to_json(self, path: str, pretty_print: bool = False):
         with open(path, "w") as f:
             if pretty_print:
-                return f.write(json.dumps(self.as_dict(), indent=4))
+                return f.write(json.dumps(self.as_dict(), indent=4, default=default))
             else:
                 return json.dump(self.as_dict(), f, default=default)
 
