@@ -14,6 +14,15 @@ class hkObject:
     def serialize(self, hkFile: "HKFile", bw: BinaryWriter, obj: "HKObject"):
         raise NotImplementedError("This method is meant to be overridden!")
 
+    def as_dict(self):
+        return self.__dict__
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        inst = cls()
+        inst.__dict__.update(d)
+        return inst
+
     def __eq__(self, value: object):
         if not isinstance(value, hkObject):
             raise NotImplementedError()
