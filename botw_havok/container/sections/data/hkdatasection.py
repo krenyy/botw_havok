@@ -14,6 +14,10 @@ if False:
     from ....hkfile import HKFile
     from ....classes.StaticCompoundInfo import StaticCompoundInfo
     from ....classes.hkRootLevelContainer import hkRootLevelContainer
+    from ....classes.hkcdStaticAabbTree import hkcdStaticAabbTree
+    from ....classes.hkcdStaticTreeDefaultTreeStorage6 import (
+        hkcdStaticTreeDefaultTreeStorage6,
+    )
 
 
 class HKDataSection(HKSection):
@@ -26,7 +30,14 @@ class HKDataSection(HKSection):
     global_references: List[GlobalReference]
 
     objects: List[HKObject]
-    contents: List[Union["StaticCompoundInfo", "hkRootLevelContainer"]]
+    contents: List[
+        Union[
+            "StaticCompoundInfo",
+            "hkRootLevelContainer",
+            "hkcdStaticAabbTree",
+            "hkcdStaticTreeDefaultTreeStorage6",
+        ]
+    ]
 
     def __init__(self):
         super().__init__()
@@ -82,6 +93,7 @@ class HKDataSection(HKSection):
     def deserialize(self, hkFile: "HKFile"):
         for obj in self.objects:
             hkcls = class_map.HKClassMap.get(obj.hkClass.name)()
+            self.contents.append(hkcls)
             hkcls.deserialize(
                 hkFile,
                 BinaryReader(
@@ -90,7 +102,6 @@ class HKDataSection(HKSection):
                 obj,
             )
 
-            self.contents.append(hkcls)
         self.objects.clear()
 
     def serialize(self, hkFile: "HKFile"):
