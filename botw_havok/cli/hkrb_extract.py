@@ -7,17 +7,22 @@ from typing import List
 from .. import Havok
 from ..binary.types import UInt32
 from ..classes.common.ActorInfo import ActorInfo
-from .common import Fore, Messages, init, shapes_to_hkrb
+from .common import Fore, Messages, Path, init, shapes_to_hkrb
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Extract HKRB actor collision from a single HKSC compound file"
     )
-    parser.add_argument("hkscFile", help="Path to a Havok StaticCompound file")
+    parser.add_argument(
+        "hkscFile", type=Path, help="Path to a Havok StaticCompound file"
+    )
     parser.add_argument("hashId", type=UInt32, help="HashId to extract")
     parser.add_argument(
-        "outFile", help="Path to the destination Havok RigidBody file", nargs="?"
+        "outFile",
+        type=Path,
+        help="Path to the destination Havok RigidBody file",
+        nargs="?",
     )
 
     return parser.parse_args()
@@ -51,16 +56,11 @@ def main():
     Messages.deserializing(args.hkscFile)
     hk.deserialize()
 
-    Messages.check_type(hk, "hksc")
+    Messages.check_type(hk, ".hksc")
 
     nx = hk.files[0].header.pointer_size == 8
 
-    import time
-
-    start = time.time()
-    print(f"{Fore.BLUE}Seaching for HashId '{args.hashId}'")
     ai = binary_search(hk.files[0].data.contents[0].ActorInfo, args.hashId)
-    print(f"found it in: {time.time()-start}")
 
     shapes = [
         instance.shape

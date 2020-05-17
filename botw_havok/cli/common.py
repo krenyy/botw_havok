@@ -1,51 +1,47 @@
-import os
-from copy import deepcopy
 import json
+from copy import deepcopy
+from pathlib import Path
+
 from colorama import Fore, init
 
 from .. import Havok
 
-templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+templates_dir = Path(__file__).parent.absolute().resolve() / "templates"
 
 
 class Templates:
-    hkrb: list = json.load(open(os.path.join(templates_dir, "hkrb.json"), "r"))
-    hkpRigidBody: dict = json.load(
-        open(os.path.join(templates_dir, "hkpRigidBody.json"), "r")
-    )
-
-    bphysics: str = open(os.path.join(templates_dir, "bphysics.yml"), "r").read()
-    bphysics_rigidbody: str = open(
-        os.path.join(templates_dir, "bphysics_rigidbody.yml"), "r"
-    ).read()
+    hkrb: list = json.load(Path(templates_dir / "hkrb.json").open("r"))
+    hkpRigidBody: dict = json.load(Path(templates_dir / "hkpRigidBody.json").open("r"))
+    bphysics: str = Path(templates_dir, "bphysics.yml").read_text()
+    bphysics_rigidbody: str = Path(templates_dir, "bphysics_rigidbody.yml").read_text()
 
 
 class Messages:
     ext_descriptions: dict = {
-        "hksc": "Static Compound",
-        "hkrb": "Rigid Body",
-        "hktmrb": "TeraMesh",
-        "hknm2": "NavMesh",
-        "hkcl": "Cloth",
-        "hkrg": "Ragdoll",
-        "hkx": "Unknown",
+        ".hksc": "Static Compound",
+        ".hkrb": "Rigid Body",
+        ".hktmrb": "TeraMesh",
+        ".hknm2": "NavMesh",
+        ".hkcl": "Cloth",
+        ".hkrg": "Ragdoll",
+        ".hkx": "Unknown",
     }
 
     @staticmethod
-    def loading(file: str):
-        print(f"{Fore.BLUE}Loading '{os.path.basename(file)}' to memory")
+    def loading(file: Path):
+        print(f"{Fore.BLUE}Loading '{file.name}' to memory")
 
     @staticmethod
-    def writing(file: str):
-        print(f"{Fore.BLUE}Writing '{os.path.basename(file)}'")
+    def writing(file: Path):
+        print(f"{Fore.BLUE}Writing '{file.name}'")
 
     @staticmethod
-    def serializing(file: str):
-        print(f"{Fore.BLUE}Serializing '{os.path.basename(file)}'")
+    def serializing(file: Path):
+        print(f"{Fore.BLUE}Serializing '{file.name}'")
 
     @staticmethod
-    def deserializing(file: str):
-        print(f"{Fore.BLUE}Deserializing '{os.path.basename(file)}'")
+    def deserializing(file: Path):
+        print(f"{Fore.BLUE}Deserializing '{file.name}'")
 
     @classmethod
     def check_type(cls, file: Havok, extension: str):
@@ -53,7 +49,7 @@ class Messages:
 
         if ext != extension:
             raise SystemExit(
-                f"{Fore.RED}This is a {cls.ext_descriptions[ext]} file! You need a {cls.ext_descriptions[extension]} file!"
+                f"{Fore.RED}This is a {cls.ext_descriptions[ext]} file! You need a {cls.ext_descriptions[extension]} ({extension}) file!"
             )
 
     @staticmethod
@@ -61,12 +57,12 @@ class Messages:
         print(f"{Fore.GREEN}Done!")
 
 
-def shapes_to_hkrb(shapes: list, hkscFile: str, outFile: str, nx: bool):
+def shapes_to_hkrb(shapes: list, hkscFile: Path, outFile: Path, nx: bool):
     if not shapes:
         raise SystemExit("For some reason, no shapes were found.")
 
     if not outFile:
-        outFile = change_extension(hkscFile, "hkrb")
+        outFile = hkscFile.with_suffix(".hkrb")
 
         check_if_exists(outFile)
 
@@ -98,24 +94,19 @@ def shapes_to_hkrb(shapes: list, hkscFile: str, outFile: str, nx: bool):
     Messages.writing(outFile)
     hkrb.to_file(outFile)
 
-    with open(change_extension(outFile, "yml"), "w") as f:
-        f.write(
-            Templates.bphysics.format(
-                len(bphysics_rigidbodies), "\n".join(bphysics_rigidbodies)
-            )
+    outFile.with_suffix(".yml").write_text(
+        Templates.bphysics.format(
+            len(bphysics_rigidbodies), "\n".join(bphysics_rigidbodies)
         )
+    )
 
 
-def check_if_exists(file: str):
-    if os.path.isfile(file):
+def check_if_exists(file: Path):
+    if file.exists() and file.is_file():
         choice = input(
-            f"{Fore.YELLOW}'{os.path.basename(file)}' exists, do you wish to overwrite it?\n$ "
+            f"{Fore.YELLOW}'{file.name}' exists, do you wish to overwrite it?\n$ "
         ).upper()
         if choice.startswith("Y"):
             pass
         else:
             raise SystemExit(f"{Fore.RED}Operation aborted!")
-
-
-def change_extension(file: str, extension: str) -> str:
-    return f'{".".join(file.split(".")[:-1])}.{extension}'

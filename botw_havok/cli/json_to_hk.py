@@ -1,13 +1,15 @@
 import argparse
 
 from .. import Havok
-from .common import Fore, Messages, change_extension, check_if_exists, init
+from .common import Fore, Messages, Path, check_if_exists, init
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Convert Havok JSON file to packfile")
-    parser.add_argument("jsonFile", help="Path to destination JSON file")
-    parser.add_argument("outFile", help="Path to a Havok packfile", nargs="?")
+    parser.add_argument("jsonFile", type=Path, help="Path to destination JSON file")
+    parser.add_argument(
+        "outFile", type=Path, help="Path to a Havok packfile", nargs="?"
+    )
     parser.add_argument(
         "-nx", "--switch", action="store_true", help="Use to output the file for Switch"
     )
@@ -15,13 +17,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def json_to_hk(jsonFile: str, outFile: str, nx: bool):
+def json_to_hk(jsonFile: Path, outFile: Path, nx: bool):
     Messages.loading(jsonFile)
     hk = Havok.from_json(jsonFile)
 
     if not outFile:
-        outFile = change_extension(jsonFile, hk.guess_extension())
-
+        outFile = jsonFile.with_suffix(hk.guess_extension())
         check_if_exists(outFile)
 
     if nx:

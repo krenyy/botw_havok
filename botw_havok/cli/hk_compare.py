@@ -1,7 +1,7 @@
 import argparse
 
 from .. import Havok
-from .common import Fore, Messages, change_extension, check_if_exists, init
+from .common import Fore, Messages, Path, init
 
 
 def parse_args():
@@ -9,7 +9,7 @@ def parse_args():
         description="Compare Havok packfiles.\nAlso works between Wii U and Switch packfiles."
     )
     parser.add_argument(
-        "hkFiles", help="Paths to Havok packfiles for comparison", nargs="+"
+        "hkFiles", type=Path, help="Paths to Havok packfiles for comparison", nargs="+"
     )
 
     return parser.parse_args()
@@ -35,13 +35,17 @@ def main():
 
     print(f"{Fore.BLUE}Comparing")
     for i in range(len(files) - 1):
-        for file0, file1 in zip(files[i].files, files[i + 1].files):
-            if file0.data.contents[0] != file1.data.contents[0]:
-                print(f"{Fore.RED}File contents don't match")
-                break
-        else:
-            print(f"{Fore.GREEN}File contents match")
 
+        print()
+        print(f"{Fore.BLUE}'{files[i].path.name}' and '{files[i+1].path.name}'")
+
+        for hkfile0, hkfile1 in zip(files[i].files, files[i + 1].files):
+            if hkfile0.data.contents[0] == hkfile1.data.contents[0]:
+                print(f"{Fore.GREEN}File contents match!")
+            else:
+                print(f"{Fore.RED}File contents do not match!")
+
+    print()
     Messages.done()
 
 
