@@ -1,6 +1,7 @@
 __all__ = ("Havok",)
 
 import json
+from pathlib import Path
 from typing import List, Union
 
 import numpy as np
@@ -18,6 +19,8 @@ def default(o):
 
 
 class Havok:
+    path: Path
+
     files: List[HKFile]
 
     def __init__(self):
@@ -48,40 +51,31 @@ class Havok:
         root_class = contents[0]
 
         if root_class.hkClass == "StaticCompoundInfo":
-            return "hksc"
+            return ".hksc"
 
         elif root_class.hkClass == "hkRootLevelContainer":
             if root_class.namedVariants[0].className == "hkpPhysicsData":  # type: ignore
-                return "hkrb"
+                return ".hkrb"
             elif root_class.namedVariants[0].className == "hkpRigidBody":  # type: ignore
-                return "hktmrb"
+                return ".hktmrb"
             elif root_class.namedVariants[0].className == "hclClothContainer":  # type: ignore
-                return "hkcl"
+                return ".hkcl"
             elif root_class.namedVariants[0].className == "hkaAnimationContainer":  # type: ignore
-                return "hkrg"
+                return ".hkrg"
             elif root_class.namedVariants[0].className == "hkaiNavMesh":  # type: ignore
-                return "hknm2"
+                return ".hknm2"
 
-        return "hkx"
+        return ".hkx"
 
     def as_dict(self):
         return [file.as_dict() for file in self.files]
 
     @classmethod
-    def from_dict(cls, l: list):
+    def from_bytes(cls, b: bytes, path: Path = None):
         inst = cls()
-        inst.files = [HKFile.from_dict(file) for file in l]
 
-        return inst
-
-    @classmethod
-    def from_file(cls, path: str):
-        with open(path, "rb") as f:
-            return cls.from_bytes(f.read())
-
-    @classmethod
-    def from_bytes(cls, b: bytes):
-        inst = cls()
+        if path:
+            inst.path = path
 
         if b[0:4] == b"Yaz0":
             b = yaz0.decompress(b)
@@ -98,6 +92,11 @@ class Havok:
 
         return inst
 
+    @classmethod
+    def from_file(cls, path: Union[Path, str]):
+        with open(path, "rb") as f:
+            return cls.from_bytes(f.read(), Path(path))
+
     def to_file(self, path: str):
         bw = BinaryWriter()
 
@@ -111,9 +110,20 @@ class Havok:
             return f.write(bw.getvalue())
 
     @classmethod
-    def from_json(cls, path: str):
+    def from_dict(cls, l: list, path: Path = None):
+        inst = cls()
+
+        if path:
+            inst.path = path
+
+        inst.files = [HKFile.from_dict(file) for file in l]
+
+        return inst
+
+    @classmethod
+    def from_json(cls, path: Union[Path, str]):
         with open(path, "r") as f:
-            return cls.from_dict(json.load(f))
+            return cls.from_dict(json.load(f), Path(path))
 
     def to_json(self, path: str, pretty_print: bool = False):
         with open(path, "w") as f:
