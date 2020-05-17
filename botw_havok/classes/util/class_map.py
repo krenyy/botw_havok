@@ -46,4 +46,4 @@ class HKClassMap:
         try:
             return HKClassMap.hk_class_map[name]
         except KeyError:
-            raise NotImplementedError(f"Class '{name}' is not implemented yet!")
+            raise SystemExit(f"Class '{name}' is not implemented yet!")
