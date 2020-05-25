@@ -54,7 +54,7 @@ class Messages:
 
     @staticmethod
     def done():
-        print(f"{Fore.GREEN}Done!")
+        print(f"\n{Fore.GREEN}Done!\n")
 
 
 def shapes_to_hkrb(shapes: list, hkscFile: Path, outFile: Path, nx: bool):
