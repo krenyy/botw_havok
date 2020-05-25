@@ -33,19 +33,16 @@ def main():
 
         files.append(hk)
 
-    print(f"{Fore.BLUE}Comparing")
     for i in range(len(files) - 1):
-
-        print()
-        print(f"{Fore.BLUE}'{files[i].path.name}' and '{files[i+1].path.name}'")
-
+        print(
+            f"{Fore.BLUE}Comparing '{files[i].path.name}' and '{files[i+1].path.name}'"
+        )
         for hkfile0, hkfile1 in zip(files[i].files, files[i + 1].files):
             if hkfile0.data.contents[0] == hkfile1.data.contents[0]:
                 print(f"{Fore.GREEN}File contents match!")
             else:
                 print(f"{Fore.RED}File contents do not match!")
 
-    print()
     Messages.done()
 
 
