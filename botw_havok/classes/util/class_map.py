@@ -6,8 +6,11 @@ from ..hkcdStaticTreeDefaultTreeStorage6 import hkcdStaticTreeDefaultTreeStorage
 from ..hkpBoxShape import hkpBoxShape
 from ..hkpBvCompressedMeshShape import hkpBvCompressedMeshShape
 from ..hkpCapsuleShape import hkpCapsuleShape
+from ..hkpConvexTransformShape import hkpConvexTransformShape
+from ..hkpConvexTranslateShape import hkpConvexTranslateShape
 from ..hkpConvexVerticesShape import hkpConvexVerticesShape
 from ..hkpCylinderShape import hkpCylinderShape
+from ..hkpListShape import hkpListShape
 from ..hkpPhysicsData import hkpPhysicsData
 from ..hkpPhysicsSystem import hkpPhysicsSystem
 from ..hkpRigidBody import hkpRigidBody
@@ -27,8 +30,11 @@ class HKClassMap:
         "hkpBoxShape": hkpBoxShape,
         "hkpBvCompressedMeshShape": hkpBvCompressedMeshShape,
         "hkpCapsuleShape": hkpCapsuleShape,
+        "hkpConvexTransformShape": hkpConvexTransformShape,
+        "hkpConvexTranslateShape": hkpConvexTranslateShape,
         "hkpConvexVerticesShape": hkpConvexVerticesShape,
         "hkpCylinderShape": hkpCylinderShape,
+        "hkpListShape": hkpListShape,
         "hkpPhysicsData": hkpPhysicsData,
         "hkpPhysicsSystem": hkpPhysicsSystem,
         "hkpRigidBody": hkpRigidBody,
