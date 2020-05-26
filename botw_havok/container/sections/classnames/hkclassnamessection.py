@@ -1,13 +1,13 @@
 import typing
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import UInt32
-from ..base import HKSection
 from .hkclass import HKClass
+from ..base import HKSection
+from ....binary import BinaryReader, BinaryWriter
 
-if False:
+if TYPE_CHECKING:
     from ....hkfile import HKFile
 
 

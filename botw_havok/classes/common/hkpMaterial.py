@@ -1,9 +1,11 @@
+from typing import TYPE_CHECKING
+
+from .hkObject import hkObject
+from ..enums.ResponseType import ResponseType
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Float16, Float32, Int8
-from ..enums.ResponseType import ResponseType
-from .hkObject import hkObject
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

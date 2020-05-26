@@ -1,12 +1,11 @@
-from ..binary import BinaryReader, BinaryWriter
-from ..container.util.globalreference import GlobalReference
+from typing import TYPE_CHECKING
+
 from .base import HKBaseClass
 from .common.hkaiNavMeshQueryMediator import hkaiNavMeshQueryMediator
-from .hkaiNavMesh import hkaiNavMesh
-from .hkcdStaticAabbTree import hkcdStaticAabbTree
-from .hkRootLevelContainer import hkRootLevelContainer
+from ..binary import BinaryReader, BinaryWriter
+from ..container.util.globalreference import GlobalReference
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 
@@ -55,7 +54,7 @@ class hkaiStaticTreeNavMeshQueryMediator(HKBaseClass, hkaiNavMeshQueryMediator):
         d = HKBaseClass.as_dict(self)
         d.update(hkaiNavMeshQueryMediator.as_dict(self))
         d.update(
-            {"tree": "->hkcdStaticAabbTree", "navMesh": "->hkaiNavMesh",}
+            {"tree": "->hkcdStaticAabbTree", "navMesh": "->hkaiNavMesh", }
         )
         return d
 

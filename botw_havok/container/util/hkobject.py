@@ -1,11 +1,12 @@
 from io import BytesIO
 from typing import Dict, List
+from typing import TYPE_CHECKING
 
+from .localfixup import LocalFixup
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from .localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ..sections.classnames.hkclass import HKClass
     from .globalreference import GlobalReference

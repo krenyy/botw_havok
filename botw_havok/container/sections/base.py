@@ -1,12 +1,13 @@
 import typing
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt8, UInt32
 from ..util.globalfixup import GlobalFixup
 from ..util.localfixup import LocalFixup
 from ..util.virtualfixup import VirtualFixup
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8, UInt32
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
 
 
@@ -119,3 +120,6 @@ class HKSection:
 
     def from_dict(self, d: dict):
         raise NotImplementedError("This method is meant to be overridden!")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>"

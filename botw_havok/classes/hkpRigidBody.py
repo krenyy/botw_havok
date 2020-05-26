@@ -1,17 +1,10 @@
-from ..binary import BinaryReader, BinaryWriter
-from .base import HKBaseClass
-from .common.hkMultiThreadCheck import hkMultiThreadCheck
-from .common.hkpConstraintInstance import hkpConstraintInstance
-from .common.hkpEntity import hkpEntity
-from .common.hkpEntitySmallArraySerializeOverrideType import (
-    hkpEntitySmallArraySerializeOverrideType,
-)
-from .common.hkpEntitySpuCollisionCallback import hkpEntitySpuCollisionCallback
-from .common.hkpLinkedCollidable import hkpLinkedCollidable
-from .common.hkpMaterial import hkpMaterial
-from .common.hkpMaxSizeMotion import hkpMaxSizeMotion
+from typing import TYPE_CHECKING
 
-if False:
+from .base import HKBaseClass
+from .common.hkpEntity import hkpEntity
+from ..binary import BinaryReader, BinaryWriter
+
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

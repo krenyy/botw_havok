@@ -1,13 +1,11 @@
 from typing import List
+from typing import TYPE_CHECKING
 
+from .hkpCollidable import hkpCollidable
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from ..enums.ForceCollideOntoPpuReasons import ForceCollideOntoPpuReasons
-from .hkpCollidable import hkpCollidable
-from .hkpCollidableBoundingVolumeData import hkpCollidableBoundingVolumeData
-from .hkpTypedBroadPhaseHandle import hkpTypedBroadPhaseHandle
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

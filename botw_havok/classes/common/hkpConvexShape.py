@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
+from .hkpSphereRepShape import hkpSphereRepShape
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Float32
-from .hkpSphereRepShape import hkpSphereRepShape
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

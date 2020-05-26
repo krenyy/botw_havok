@@ -1,14 +1,15 @@
 from typing import List, Union
+from typing import TYPE_CHECKING
 
+from .base import HKBaseClass
+from .common.hkReferencedObject import hkReferencedObject
+from .hkpRigidBody import hkpRigidBody
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Int8, UInt32, UInt64
 from ..container.util.globalreference import GlobalReference
 from ..container.util.localfixup import LocalFixup
-from .base import HKBaseClass
-from .common.hkReferencedObject import hkReferencedObject
-from .hkpRigidBody import hkpRigidBody
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

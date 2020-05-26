@@ -1,9 +1,11 @@
+from typing import TYPE_CHECKING
+
+from .hkpBroadPhaseHandle import hkpBroadPhaseHandle
+from ..enums.BroadPhaseType import BroadPhaseType
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Int8, UInt32
-from ..enums.BroadPhaseType import BroadPhaseType
-from .hkpBroadPhaseHandle import hkpBroadPhaseHandle
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

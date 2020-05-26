@@ -1,7 +1,6 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt8, UInt16, UInt32, Vector3
 from .hkcdStaticMeshTreeBaseSectionDataRuns import hkcdStaticMeshTreeBaseSectionDataRuns
 from .hkcdStaticMeshTreeBaseSectionPrimitives import (
     hkcdStaticMeshTreeBaseSectionPrimitives,
@@ -12,8 +11,10 @@ from .hkcdStaticMeshTreeBaseSectionSharedVertices import (
 from .hkcdStaticTreeTreehkcdStaticTreeDynamicStorage4 import (
     hkcdStaticTreeTreehkcdStaticTreeDynamicStorage4,
 )
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8, UInt16, UInt32, Vector3
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

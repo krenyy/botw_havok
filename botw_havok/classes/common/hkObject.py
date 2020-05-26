@@ -1,8 +1,9 @@
 from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from ...binary import BinaryReader, BinaryWriter
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

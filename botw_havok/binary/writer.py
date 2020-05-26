@@ -1,7 +1,7 @@
 __all__ = ("BinaryWriter",)
 
 import struct
-from typing import Dict, Union
+from typing import Dict
 
 import numpy as np
 

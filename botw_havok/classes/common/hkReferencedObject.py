@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
+from .hkBaseObject import hkBaseObject
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from .hkBaseObject import hkBaseObject
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

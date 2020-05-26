@@ -1,7 +1,9 @@
 import argparse
 
+from colorama import init
+
+from .common import Messages, Path, check_if_exists
 from .. import Havok
-from .common import Messages, Path, check_if_exists, init
 
 
 def parse_args():

@@ -1,3 +1,5 @@
+from ..StaticCompoundInfo import StaticCompoundInfo
+from ..hkRootLevelContainer import hkRootLevelContainer
 from ..hkaiDirectedGraphExplicitCost import hkaiDirectedGraphExplicitCost
 from ..hkaiNavMesh import hkaiNavMesh
 from ..hkaiStaticTreeNavMeshQueryMediator import hkaiStaticTreeNavMeshQueryMediator
@@ -16,8 +18,6 @@ from ..hkpPhysicsSystem import hkpPhysicsSystem
 from ..hkpRigidBody import hkpRigidBody
 from ..hkpSphereShape import hkpSphereShape
 from ..hkpStaticCompoundShape import hkpStaticCompoundShape
-from ..hkRootLevelContainer import hkRootLevelContainer
-from ..StaticCompoundInfo import StaticCompoundInfo
 
 
 class HKClassMap:

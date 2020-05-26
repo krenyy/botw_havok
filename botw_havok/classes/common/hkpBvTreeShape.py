@@ -1,9 +1,11 @@
+from typing import TYPE_CHECKING
+
+from .hkpShape import hkpShape
+from ..enums.BvTreeType import BvTreeType
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt8
-from ..enums.BvTreeType import BvTreeType
-from .hkpShape import hkpShape
 
-if False:
+if TYPE_CHECKING:
     from ...container.util.hkobject import HKObject
 
 

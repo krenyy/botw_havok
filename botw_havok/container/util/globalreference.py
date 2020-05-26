@@ -1,5 +1,5 @@
-from ...binary.types import Int32, UInt32
 from .hkobject import HKObject
+from ...binary.types import Int32, UInt32
 
 
 class GlobalReference:

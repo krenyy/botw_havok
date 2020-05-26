@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
 from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import Int8, UInt32
+from ....binary.types import UInt32
 from ....classes.util.signature_map import HKSignatureMap
 
-if False:
+if TYPE_CHECKING:
     from .hkclassnamessection import HKClassnamesSection
 
 

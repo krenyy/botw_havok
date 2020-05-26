@@ -1,14 +1,15 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Float32, UInt8, UInt32
-from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.hkpBvCompressedMeshShapeTree import hkpBvCompressedMeshShapeTree
 from .common.hkpBvTreeShape import hkpBvTreeShape
 from .enums.WeldingType import WeldingType
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import Float32, UInt8, UInt32
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

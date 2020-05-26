@@ -1,10 +1,9 @@
 import argparse
-import json
-import os
-from copy import deepcopy
 
+from colorama import init
+
+from .common import Messages, shapes_to_hkrb
 from .. import Havok
-from .common import Messages, init, shapes_to_hkrb
 
 
 def parse_args():
@@ -35,10 +34,10 @@ def main():
     shapes = [
         instance.shape
         for rigidbody in hk.files[1]
-        .data.contents[0]
-        .namedVariants[0]
-        .variant.systems[0]
-        .rigidBodies
+            .data.contents[0]
+            .namedVariants[0]
+            .variant.systems[0]
+            .rigidBodies
         for instance in rigidbody.collidable.shape.instances
     ]
 

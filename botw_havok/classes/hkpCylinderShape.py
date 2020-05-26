@@ -1,9 +1,11 @@
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Float32, Vector4
+from typing import TYPE_CHECKING
+
 from .base import HKBaseClass
 from .common.hkpConvexShape import hkpConvexShape
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import Float32, Vector4
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

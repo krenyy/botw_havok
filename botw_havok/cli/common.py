@@ -2,7 +2,7 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-from colorama import Fore, init
+from colorama import Fore
 
 from .. import Havok
 

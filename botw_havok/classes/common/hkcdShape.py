@@ -1,10 +1,12 @@
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt8
+from typing import TYPE_CHECKING
+
+from .hkReferencedObject import hkReferencedObject
 from ..enums.ShapeDispatchTypeEnum import ShapeDispatchTypeEnum
 from ..enums.ShapeInfoCodecTypeEnum import ShapeInfoCodecTypeEnum
-from .hkReferencedObject import hkReferencedObject
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt8
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

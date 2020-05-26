@@ -1,15 +1,16 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Int8, UInt16, UInt32
-from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.hkcdStaticTreeDefaultTreeStorage6 import hkcdStaticTreeDefaultTreeStorage6
 from .common.hkpBvTreeShape import hkpBvTreeShape
 from .common.hkpShapeKeyTable import hkpShapeKeyTable
 from .common.hkpStaticCompoundShapeInstance import hkpStaticCompoundShapeInstance
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import Int8, UInt16, UInt32
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

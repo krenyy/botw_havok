@@ -1,15 +1,16 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Int32, UInt32, Vector4
-from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
+from .common.hkReferencedObject import hkReferencedObject
 from .common.hkaiDirectedGraphExplicitCostEdge import hkaiDirectedGraphExplicitCostEdge
 from .common.hkaiDirectedGraphExplicitCostNode import hkaiDirectedGraphExplicitCostNode
 from .common.hkaiStreamingSet import hkaiStreamingSet
-from .common.hkReferencedObject import hkReferencedObject
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import Int32, UInt32, Vector4
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

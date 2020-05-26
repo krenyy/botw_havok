@@ -1,14 +1,15 @@
 from typing import List
+from typing import TYPE_CHECKING
 
+from .base import HKBaseClass
+from .common.hkReferencedObject import hkReferencedObject
+from .hkpPhysicsSystem import hkpPhysicsSystem
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import UInt32
 from ..container.util.globalreference import GlobalReference
 from ..container.util.localfixup import LocalFixup
-from .base import HKBaseClass
-from .common.hkReferencedObject import hkReferencedObject
-from .hkpPhysicsSystem import hkpPhysicsSystem
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

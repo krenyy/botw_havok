@@ -1,9 +1,11 @@
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Int32
+from typing import TYPE_CHECKING
+
 from .hkpConvexShape import hkpConvexShape
 from .hkpSingleShapeContainer import hkpSingleShapeContainer
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Int32
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

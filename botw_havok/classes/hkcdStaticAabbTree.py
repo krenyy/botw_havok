@@ -1,11 +1,12 @@
+from typing import TYPE_CHECKING
+
+from .base import HKBaseClass
+from .common.hkReferencedObject import hkReferencedObject
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import UInt8
 from ..container.util.globalreference import GlobalReference
-from .base import HKBaseClass
-from .common.hkReferencedObject import hkReferencedObject
-from .hkcdStaticTreeDefaultTreeStorage6 import hkcdStaticTreeDefaultTreeStorage6
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 
@@ -44,7 +45,7 @@ class hkcdStaticAabbTree(HKBaseClass, hkReferencedObject):
         d = HKBaseClass.as_dict(self)
         d.update(hkReferencedObject.as_dict(self))
         d.update(
-            {"shouldDeleteTree": self.shouldDeleteTree, "treePtr": self.treePtr,}
+            {"shouldDeleteTree": self.shouldDeleteTree, "treePtr": self.treePtr, }
         )
 
         return d

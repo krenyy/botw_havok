@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
+from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt8
-from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

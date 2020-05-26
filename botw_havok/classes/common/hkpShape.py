@@ -1,10 +1,11 @@
+from typing import TYPE_CHECKING
 from typing import Union
 
+from .hkpShapeBase import hkpShapeBase
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32, UInt64
-from .hkpShapeBase import hkpShapeBase
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

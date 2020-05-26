@@ -7,31 +7,32 @@ class HKHeader:
     """
 
     # fmt:off
-    magic0: UInt32 = 0x57E0E057               # 0x00  # Always 0x57E0E057
-    magic1: UInt32 = 0x10C0C010               # 0x04  # Always 0x10C0C010
-    user_tag: Int32 = 0x0                     # 0x08  # Always 0x00 (?)
-    version: Int32 = 0x0B                     # 0x0C  # Always 0x0B
+    magic0: UInt32 = 0x57E0E057  # 0x00  # Always 0x57E0E057
+    magic1: UInt32 = 0x10C0C010  # 0x04  # Always 0x10C0C010
+    user_tag: Int32 = 0x0  # 0x08  # Always 0x00 (?)
+    version: Int32 = 0x0B  # 0x0C  # Always 0x0B
 
-    pointer_size: Int8                        # 0x10  # 4 on WiiU, 8 on Switch
-    endian: Int8                              # 0x11  # 0 (big) on WiiU, 1 (little) on Switch
-    padding_option: Int8                      # 0x12  # 0 on WiiU, 1 on Switch
-    base_class: Int8                          # 0x13  # Always 1
+    pointer_size: Int8  # 0x10  # 4 on WiiU, 8 on Switch
+    endian: Int8  # 0x11  # 0 (big) on WiiU, 1 (little) on Switch
+    padding_option: Int8  # 0x12  # 0 on WiiU, 1 on Switch
+    base_class: Int8  # 0x13  # Always 1
 
-    section_count: Int32 = 3                  # 0x14  # Always 3 (classnames, types, data)
-    data_section_id: Int32 = 2                # 0x18  # Always 2, refers to __data__ section
-    data_section_offset: UInt32 = 0           # 0x1C  # Always 0, beginning offset in __data__
-    classnames_section_id: Int32 = 0          # 0x20  # Always 0, refers to __classnames__ section
+    section_count: Int32 = 3  # 0x14  # Always 3 (classnames, types, data)
+    data_section_id: Int32 = 2  # 0x18  # Always 2, refers to __data__ section
+    data_section_offset: UInt32 = 0  # 0x1C  # Always 0, beginning offset in __data__
+    classnames_section_id: Int32 = 0  # 0x20  # Always 0, refers to __classnames__ section
     classnames_section_offset: UInt32 = 0x4B  # 0x24  # Always 75, offset to hkRootLevelContainer?
-    hk_version: str = "hk_2014.2.0-r1"        # 0x28  # Always same, terminated with 0xFF
-    flags: Int32 = 0                          # 0x38  # Always 0x00 (?)
-    max_predicate: Int16 = 21                 # 0x3C  # Always 0x15 (?)
-    predicate_size_plus_padding: UInt16 = 0   # 0x3E  # 0 or 16; additional data (?)
+    hk_version: str = "hk_2014.2.0-r1"  # 0x28  # Always same, terminated with 0xFF
+    flags: Int32 = 0  # 0x38  # Always 0x00 (?)
+    max_predicate: Int16 = 21  # 0x3C  # Always 0x15 (?)
+    predicate_size_plus_padding: UInt16 = 0  # 0x3E  # 0 or 16; additional data (?)
 
-    unk40: Int16 = 20                         # 0x40  # Always 20
-    unk42: Int16 = 0                          # 0x42  # Always 0 (padding?)
-    unk44: Int32 = 0                          # 0x44  # Always 0 (padding?)
-    unk48: Int32 = 0                          # 0x48  # Always 0 (padding?)
-    unk4C: Int32 = 0                          # 0x4C  # Always 0 (padding?)
+    unk40: Int16 = 20  # 0x40  # Always 20
+    unk42: Int16 = 0  # 0x42  # Always 0 (padding?)
+    unk44: Int32 = 0  # 0x44  # Always 0 (padding?)
+    unk48: Int32 = 0  # 0x48  # Always 0 (padding?)
+    unk4C: Int32 = 0  # 0x4C  # Always 0 (padding?)
+
     # fmt:on
 
     def to_switch(self):

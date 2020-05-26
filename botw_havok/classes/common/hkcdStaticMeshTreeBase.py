@@ -1,14 +1,15 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Int32, UInt16, UInt32
 from .hkcdStaticMeshTreeBasePrimitive import hkcdStaticMeshTreeBasePrimitive
 from .hkcdStaticMeshTreeBaseSection import hkcdStaticMeshTreeBaseSection
 from .hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5 import (
     hkcdStaticTreeTreehkcdStaticTreeDynamicStorage5,
 )
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Int32, UInt16, UInt32
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

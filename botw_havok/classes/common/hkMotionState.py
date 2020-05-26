@@ -1,9 +1,11 @@
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Float16, Float32, Matrix, UInt8, Vector4
+from typing import TYPE_CHECKING
+
 from .hkObject import hkObject
 from .hkUFloat8 import hkUFloat8
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float16, Float32, Matrix, UInt8, Vector4
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

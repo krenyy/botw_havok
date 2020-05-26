@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
+
+from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt8, UInt16
-from .hkcdStaticTreeCodec3Axis import hkcdStaticTreeCodec3Axis
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 
@@ -26,7 +28,7 @@ class hkcdStaticTreeCodec3Axis6(hkcdStaticTreeCodec3Axis):
     def as_dict(self):
         d = super().as_dict()
         d.update(
-            {"hiData": self.hiData, "loData": self.loData,}
+            {"hiData": self.hiData, "loData": self.loData, }
         )
         return d
 

@@ -1,11 +1,12 @@
 from typing import List
+from typing import TYPE_CHECKING
 
+from .hkObject import hkObject
+from .hkcdStaticTreeCodec3Axis6 import hkcdStaticTreeCodec3Axis6
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from .hkcdStaticTreeCodec3Axis6 import hkcdStaticTreeCodec3Axis6
-from .hkObject import hkObject
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

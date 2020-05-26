@@ -1,15 +1,15 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Float16, UInt8, UInt16, UInt32, Vector4
-from ..enums.MotionType import MotionType
 from .hkMotionState import hkMotionState
 from .hkReferencedObject import hkReferencedObject
+from ..enums.MotionType import MotionType
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float16, UInt8, UInt16, UInt32, Vector4
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
-    from .hkpMaxSizeMotion import hkpMaxSizeMotion
 
 
 class hkpMotion(hkReferencedObject):

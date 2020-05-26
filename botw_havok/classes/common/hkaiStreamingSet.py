@@ -1,13 +1,14 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt32
+from .hkObject import hkObject
 from .hkaiStreamingSetGraphConnection import hkaiStreamingSetGraphConnection
 from .hkaiStreamingSetNavMeshConnection import hkaiStreamingSetNavMeshConnection
 from .hkaiStreamingSetVolumeConnection import hkaiStreamingSetVolumeConnection
-from .hkObject import hkObject
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

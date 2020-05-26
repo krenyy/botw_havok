@@ -1,11 +1,12 @@
 from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt32, UInt64
 from .hkcdStaticMeshTreeBase import hkcdStaticMeshTreeBase
 from .hkpBvCompressedMeshShapeTreeDataRun import hkpBvCompressedMeshShapeTreeDataRun
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32, UInt64
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

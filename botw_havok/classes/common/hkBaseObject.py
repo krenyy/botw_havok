@@ -1,7 +1,9 @@
-from ...binary import BinaryReader, BinaryWriter
-from .hkObject import hkObject
+from typing import TYPE_CHECKING
 
-if False:
+from .hkObject import hkObject
+from ...binary import BinaryReader, BinaryWriter
+
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

@@ -1,7 +1,9 @@
 import argparse
 
+from colorama import init
+
+from .common import Fore, Messages, Path
 from .. import Havok
-from .common import Fore, Messages, Path, init
 
 
 def parse_args():
@@ -35,7 +37,7 @@ def main():
 
     for i in range(len(files) - 1):
         print(
-            f"{Fore.BLUE}Comparing '{files[i].path.name}' and '{files[i+1].path.name}'"
+            f"{Fore.BLUE}Comparing '{files[i].path.name}' and '{files[i + 1].path.name}'"
         )
         for hkfile0, hkfile1 in zip(files[i].files, files[i + 1].files):
             if hkfile0.data.contents[0] == hkfile1.data.contents[0]:

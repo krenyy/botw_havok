@@ -1,8 +1,9 @@
-from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import UInt32
-from ..base import HKSection
+from typing import TYPE_CHECKING
 
-if False:
+from ..base import HKSection
+from ....binary import BinaryReader, BinaryWriter
+
+if TYPE_CHECKING:
     from ....hkfile import HKFile
 
 

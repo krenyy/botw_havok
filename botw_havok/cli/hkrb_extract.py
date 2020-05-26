@@ -1,13 +1,12 @@
 import argparse
-import json
-import os
-from copy import deepcopy
 from typing import List
 
+from colorama import init
+
+from .common import Messages, Path, shapes_to_hkrb
 from .. import Havok
 from ..binary.types import UInt32
 from ..classes.common.ActorInfo import ActorInfo
-from .common import Fore, Messages, Path, init, shapes_to_hkrb
 
 
 def parse_args():
@@ -65,10 +64,10 @@ def main():
     shapes = [
         instance.shape
         for rigidbody in hk.files[1]
-        .data.contents[0]
-        .namedVariants[0]
-        .variant.systems[0]
-        .rigidBodies
+            .data.contents[0]
+            .namedVariants[0]
+            .variant.systems[0]
+            .rigidBodies
         for instance in rigidbody.collidable.shape.instances
         if instance.userData in range(ai.ShapeInfoStart, ai.ShapeInfoEnd + 1)
     ]

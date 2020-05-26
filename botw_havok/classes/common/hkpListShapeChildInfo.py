@@ -1,12 +1,13 @@
-import botw_havok.classes.util.class_map as class_map
+from typing import TYPE_CHECKING
 
+import botw_havok.classes.util.class_map as class_map
+from .hkObject import hkObject
+from ..base import HKBaseClass
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import Int16, Int32, UInt16, UInt32
 from ...container.util.globalreference import GlobalReference
-from ..base import HKBaseClass
-from .hkObject import hkObject
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

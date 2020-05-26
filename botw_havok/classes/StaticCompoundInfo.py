@@ -1,13 +1,14 @@
 from typing import List, Union
+from typing import TYPE_CHECKING
 
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import UInt32, UInt64
-from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.ActorInfo import ActorInfo
 from .common.ShapeInfo import ShapeInfo
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import UInt32, UInt64
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

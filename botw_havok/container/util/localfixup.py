@@ -1,5 +1,3 @@
-from typing import Union
-
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
 

@@ -21,9 +21,9 @@ class GlobalFixup:
         if not isinstance(value, GlobalFixup):
             raise NotImplementedError()
         return (
-            (self.src == value.src)
-            and (self.dst_section_id == value.dst_section_id)
-            and (self.dst == value.dst)
+                (self.src == value.src)
+                and (self.dst_section_id == value.dst_section_id)
+                and (self.dst == value.dst)
         )
 
     def __hash__(self):

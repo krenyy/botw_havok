@@ -1,11 +1,13 @@
-from ..binary import BinaryReader, BinaryWriter
-from ..container.util.localfixup import LocalFixup
+from typing import TYPE_CHECKING
+
 from .base import HKBaseClass
 from .common.hkcdStaticTreeDefaultTreeStorage6 import (
     hkcdStaticTreeDefaultTreeStorage6 as _hkcdStaticTreeDefaultTreeStorage6,
 )
+from ..binary import BinaryReader, BinaryWriter
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

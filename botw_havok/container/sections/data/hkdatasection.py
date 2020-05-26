@@ -1,16 +1,16 @@
 from typing import List, Union
+from typing import TYPE_CHECKING
 
 import botw_havok.classes.util.class_map as class_map
-
-from ....binary import BinaryReader, BinaryWriter
-from ....binary.types import Int32, UInt32
+from ..base import HKSection
 from ...util.globalfixup import GlobalFixup
 from ...util.globalreference import GlobalReference
 from ...util.hkobject import HKObject
 from ...util.virtualfixup import VirtualFixup
-from ..base import HKSection
+from ....binary import BinaryReader, BinaryWriter
+from ....binary.types import Int32
 
-if False:
+if TYPE_CHECKING:
     from ....hkfile import HKFile
     from ....classes.StaticCompoundInfo import StaticCompoundInfo
     from ....classes.hkRootLevelContainer import hkRootLevelContainer
@@ -69,7 +69,7 @@ class HKDataSection(HKSection):
             # Assign local fixups to respective HK chunks
             for lfu in self.local_fixups:
                 if (obj.offset <= lfu.src < obj.offset + obj.size) and (
-                    obj.offset <= lfu.dst < obj.offset + obj.size
+                        obj.offset <= lfu.dst < obj.offset + obj.size
                 ):
                     obj.local_fixups.append(lfu - obj.offset)
 

@@ -1,17 +1,17 @@
-from enum import Enum
 from typing import List
+from typing import TYPE_CHECKING
 
-from ..binary import BinaryReader, BinaryWriter
-from ..binary.types import Float64, Int32, UInt8, UInt64, Vector4
-from ..container.util.localfixup import LocalFixup
 from .base import HKBaseClass
 from .common.hkAabb import hkAabb
+from .common.hkReferencedObject import hkReferencedObject
 from .common.hkaiNavMeshEdge import hkaiNavMeshEdge
 from .common.hkaiNavMeshFace import hkaiNavMeshFace
 from .common.hkaiStreamingSet import hkaiStreamingSet
-from .common.hkReferencedObject import hkReferencedObject
+from ..binary import BinaryReader, BinaryWriter
+from ..binary.types import Float64, Int32, UInt8, UInt64, Vector4
+from ..container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

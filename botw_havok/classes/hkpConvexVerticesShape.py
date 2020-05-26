@@ -1,12 +1,13 @@
 from typing import List
+from typing import TYPE_CHECKING
 
+from .base import HKBaseClass
+from .common.hkpConvexShape import hkpConvexShape
 from ..binary import BinaryReader, BinaryWriter
 from ..binary.types import Int32, Matrix, UInt8, UInt32, Vector4
 from ..container.util.localfixup import LocalFixup
-from .base import HKBaseClass
-from .common.hkpConvexShape import hkpConvexShape
 
-if False:
+if TYPE_CHECKING:
     from ..hkfile import HKFile
     from ..container.util.hkobject import HKObject
 

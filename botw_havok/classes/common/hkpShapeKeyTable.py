@@ -1,11 +1,12 @@
+from typing import TYPE_CHECKING
+
+from .hkObject import hkObject
 from ...binary import BinaryReader, BinaryWriter
 from ...binary.types import UInt32
-from .hkObject import hkObject
 
 # from .hkpShapeKeyTableBlock import hkpShapeKeyTableBlock
 
-
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

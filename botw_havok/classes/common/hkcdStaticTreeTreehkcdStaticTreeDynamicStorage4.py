@@ -1,8 +1,10 @@
-from ...binary import BinaryReader, BinaryWriter
+from typing import TYPE_CHECKING
+
 from .hkAabb import hkAabb
 from .hkcdStaticTreeDynamicStorage4 import hkcdStaticTreeDynamicStorage4
+from ...binary import BinaryReader, BinaryWriter
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

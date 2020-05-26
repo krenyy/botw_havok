@@ -1,22 +1,17 @@
-from typing import List
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Float32, Int8, UInt8, UInt16, UInt32
-from ...container.util.localfixup import LocalFixup
-from .hkLocalFrame import hkLocalFrame
-from .hkMultiThreadCheck import hkMultiThreadCheck
-from .hkpConstraintInstance import hkpConstraintInstance
-from .hkpEntityExtendedListeners import hkpEntityExtendedListeners
 from .hkpEntitySmallArraySerializeOverrideType import (
     hkpEntitySmallArraySerializeOverrideType,
 )
 from .hkpEntitySpuCollisionCallback import hkpEntitySpuCollisionCallback
-from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkpMaterial import hkpMaterial
 from .hkpMaxSizeMotion import hkpMaxSizeMotion
 from .hkpWorldObject import hkpWorldObject
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float32, Int8, UInt8, UInt16, UInt32
+from ...container.util.localfixup import LocalFixup
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

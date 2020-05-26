@@ -3,6 +3,5 @@ __all__ = (
     "BinaryWriter",
 )
 
-
 from .reader import BinaryReader
 from .writer import BinaryWriter

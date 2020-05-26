@@ -1,11 +1,13 @@
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import Float32, Int8, UInt8, UInt16
-from ..enums.ForceCollideOntoPpuReasons import ForceCollideOntoPpuReasons
+from typing import TYPE_CHECKING
+
 from .hkpCdBody import hkpCdBody
 from .hkpCollidableBoundingVolumeData import hkpCollidableBoundingVolumeData
 from .hkpTypedBroadPhaseHandle import hkpTypedBroadPhaseHandle
+from ..enums.ForceCollideOntoPpuReasons import ForceCollideOntoPpuReasons
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import Float32, Int8, UInt8, UInt16
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 

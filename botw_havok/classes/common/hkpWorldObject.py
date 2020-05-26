@@ -1,13 +1,14 @@
 from typing import List, Union
+from typing import TYPE_CHECKING
 
-from ...binary import BinaryReader, BinaryWriter
-from ...binary.types import UInt32, UInt64
 from .hkMultiThreadCheck import hkMultiThreadCheck
-from .hkpLinkedCollidable import hkpLinkedCollidable
 from .hkReferencedObject import hkReferencedObject
 from .hkSimpleProperty import hkSimpleProperty
+from .hkpLinkedCollidable import hkpLinkedCollidable
+from ...binary import BinaryReader, BinaryWriter
+from ...binary.types import UInt32, UInt64
 
-if False:
+if TYPE_CHECKING:
     from ...hkfile import HKFile
     from ...container.util.hkobject import HKObject
 
