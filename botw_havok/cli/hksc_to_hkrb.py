@@ -2,7 +2,7 @@ import argparse
 
 from colorama import init
 
-from .common import Messages, shapes_to_hkrb
+from .common import Messages, shapes_to_hkrb, Path
 from .. import Havok
 
 
@@ -10,9 +10,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Convert Havok Static Compound (.hksc) to Havok Rigid Body array (.hkrb)"
     )
-    parser.add_argument("hkscFile", help="Path to a Havok Static Compound file")
+    parser.add_argument("hkscFile", type=Path, help="Path to a Havok Static Compound file")
     parser.add_argument(
-        "outFile", help="Path to the destination Havok Rigid Body file", nargs="?"
+        "outFile", type=Path, help="Path to the destination Havok Rigid Body file", nargs="?"
     )
 
     return parser.parse_args()
