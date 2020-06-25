@@ -53,9 +53,7 @@ class hkaiStaticTreeNavMeshQueryMediator(HKBaseClass, hkaiNavMeshQueryMediator):
     def as_dict(self):
         d = HKBaseClass.as_dict(self)
         d.update(hkaiNavMeshQueryMediator.as_dict(self))
-        d.update(
-            {"tree": "->hkcdStaticAabbTree", "navMesh": "->hkaiNavMesh", }
-        )
+        d.update({"tree": "->hkcdStaticAabbTree", "navMesh": "->hkaiNavMesh"})
         return d
 
     @classmethod

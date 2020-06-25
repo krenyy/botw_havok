@@ -27,9 +27,7 @@ class hkcdStaticTreeCodec3Axis6(hkcdStaticTreeCodec3Axis):
 
     def as_dict(self):
         d = super().as_dict()
-        d.update(
-            {"hiData": self.hiData, "loData": self.loData, }
-        )
+        d.update({"hiData": self.hiData, "loData": self.loData})
         return d
 
     @classmethod

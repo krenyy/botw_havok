@@ -69,7 +69,7 @@ class HKDataSection(HKSection):
             # Assign local fixups to respective HK chunks
             for lfu in self.local_fixups:
                 if (obj.offset <= lfu.src < obj.offset + obj.size) and (
-                        obj.offset <= lfu.dst < obj.offset + obj.size
+                    obj.offset <= lfu.dst < obj.offset + obj.size
                 ):
                     obj.local_fixups.append(lfu - obj.offset)
 

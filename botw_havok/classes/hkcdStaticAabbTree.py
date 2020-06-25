@@ -44,9 +44,7 @@ class hkcdStaticAabbTree(HKBaseClass, hkReferencedObject):
     def as_dict(self):
         d = HKBaseClass.as_dict(self)
         d.update(hkReferencedObject.as_dict(self))
-        d.update(
-            {"shouldDeleteTree": self.shouldDeleteTree, "treePtr": self.treePtr, }
-        )
+        d.update({"shouldDeleteTree": self.shouldDeleteTree, "treePtr": self.treePtr})
 
         return d
 

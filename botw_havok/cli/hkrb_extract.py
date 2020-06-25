@@ -64,10 +64,10 @@ def main():
     shapes = [
         instance.shape
         for rigidbody in hk.files[1]
-            .data.contents[0]
-            .namedVariants[0]
-            .variant.systems[0]
-            .rigidBodies
+        .data.contents[0]
+        .namedVariants[0]
+        .variant.systems[0]
+        .rigidBodies
         for instance in rigidbody.collidable.shape.instances
         if instance.userData in range(ai.ShapeInfoStart, ai.ShapeInfoEnd + 1)
     ]
