@@ -97,7 +97,7 @@ class Havok:
         with open(path, "rb") as f:
             return cls.from_bytes(f.read(), Path(path))
 
-    def to_file(self, path: str):
+    def to_file(self, path: Union[Path, str]):
         bw = BinaryWriter()
 
         for file in self.files:
