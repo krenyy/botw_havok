@@ -25,10 +25,10 @@ def parse_args():
         "hkscFile1", type=Path, help="Path to Havok Static Compound file"
     )
     parser.add_argument(
-        "HashId", type=UInt32, help="HashId used for added shapes", nargs="?"
+        "--hashid", type=UInt32, help="HashId used for added shapes", nargs="?"
     )
     parser.add_argument(
-        '-nx', '--switch', action='store_true', help="Use to output the file for Switch"
+        "-nx", "--switch", action="store_true", help="Use to output the file for Switch"
     )
     parser.add_argument(
         "outFile",
@@ -58,8 +58,8 @@ def main():
     hk1.deserialize()
 
     HashId = (
-        args.HashId
-        if args.HashId
+        args.hashid
+        if args.hashid
         else max([ai.HashId for ai in hk.files[0].data.contents[0].ActorInfo]) + 1
     )
 
@@ -92,12 +92,12 @@ def main():
         .rigidBodies
     ]:
         rb = deepcopy(Templates.hkpRigidBody)
-        rb['name']=str(datetime.datetime.now())
+        rb["name"] = str(datetime.datetime.now())
 
         for i, inst in enumerate(shape.instances):
             si = ShapeInfo()
             si.ActorInfoIndex = len(hk.files[0].data.contents[0].ActorInfo) - 1
-            si.InstanceId = ai.ShapeInfoStart+shape_index  # ?
+            si.InstanceId = ai.ShapeInfoStart + shape_index  # ?
             si.BodyGroup = 0  # Seems to be 0 or 5, no idea what it does
             si.BodyLayerType = 0
 
@@ -106,14 +106,20 @@ def main():
             shape.instances[i].userData = shape_index
             shape_index += 1
 
-        rb['collidable']['shape'] = shape.as_dict()
+        rb["collidable"]["shape"] = shape.as_dict()
 
         rbs.append(rb)
 
     hk = hk.as_dict()
-    hk[1]['data']['contents'][0]['namedVariants'][0]['variant']['systems'][0]['rigidBodies'].extend(rbs)
+    hk[1]["data"]["contents"][0]["namedVariants"][0]["variant"]["systems"][0][
+        "rigidBodies"
+    ].extend(rbs)
 
-    outFile = args.outFile if args.outFile else args.hkscFile.with_name('Merged').with_suffix('.hksc')
+    outFile = (
+        args.outFile
+        if args.outFile
+        else args.hkscFile.with_name("Merged").with_suffix(".hksc")
+    )
     check_if_exists(outFile)
 
     hk = Havok.from_dict(hk, outFile)
