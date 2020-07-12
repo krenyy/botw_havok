@@ -3,6 +3,9 @@ from setuptools import find_packages, setup
 with open("README.md", "r", encoding="utf-8") as readme:
     long_description = readme.read()
 
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
 setup(
     name="botw_havok",
     version="0.3.14",
@@ -20,7 +23,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    install_requires=["colorama", "numpy", "oead"],
+    install_requires=requirements,
     entry_points={
         "console_scripts": [
             "hk_to_json = botw_havok.cli.hk_to_json:main",
