@@ -57,7 +57,7 @@ class Messages:
         print(f"\n{Fore.GREEN}Done!\n")
 
 
-def shapes_to_hkrb(shapes: list, hkscFile: Path, outFile: Path, nx: bool):
+def shapes_to_hkrb(names: list, colInfos: list, shapes: list, hkscFile: Path, outFile: Path, nx: bool):
     if not shapes:
         raise SystemExit("For some reason, no shapes were found.")
 
@@ -68,18 +68,20 @@ def shapes_to_hkrb(shapes: list, hkscFile: Path, outFile: Path, nx: bool):
 
     hkrb_template = deepcopy(Templates.hkrb)
     bphysics_rigidbodies = []
-    for i, shape in enumerate(shapes):
+
+    for i, (name, colInfo, shape) in enumerate(zip(names, colInfos, shapes)):
         hk_rb = deepcopy(Templates.hkpRigidBody)
         bp_rb = Templates.bphysics_rigidbody
 
         hk_rb["name"] = f"Shape_{i}"
         hk_rb["collidable"]["shape"] = shape.as_dict()
+        hk_rb["collidable"]["broadPhaseHandle"]["collisionFilterInfo"] = colInfo
 
         hkrb_template[0]["data"]["contents"][0]["namedVariants"][0]["variant"][
             "systems"
         ][0]["rigidBodies"].append(hk_rb)
 
-        bphysics_rigidbodies.append(bp_rb.format(i))
+        bphysics_rigidbodies.append(bp_rb.format(i, name.split('_')[1]))
 
     hkrb = Havok.from_dict(hkrb_template)
 

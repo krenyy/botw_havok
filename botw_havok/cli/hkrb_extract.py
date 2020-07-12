@@ -61,18 +61,18 @@ def main():
 
     ai = binary_search(hk.files[0].data.contents[0].ActorInfo, args.hashId)
 
-    shapes = [
-        instance.shape
-        for rigidbody in hk.files[1]
-        .data.contents[0]
-        .namedVariants[0]
-        .variant.systems[0]
-        .rigidBodies
-        for instance in rigidbody.collidable.shape.instances
-        if instance.userData in range(ai.ShapeInfoStart, ai.ShapeInfoEnd + 1)
-    ]
+    names = []
+    colInfos = []
+    shapes = []
 
-    shapes_to_hkrb(shapes, args.hkscFile, args.outFile, nx)
+    for rigidBody in hk.files[1].data.contents[0].namedVariants[0].variant.systems[0].rigidBodies:
+        for instance in rigidBody.collidable.shape.instances:
+            if instance.userData in range(ai.ShapeInfoStart, ai.ShapeInfoEnd+1):
+                names.append(rigidBody.name)
+                colInfos.append(rigidBody.collidable.broadPhaseHandle.collisionFilterInfo)
+                shapes.append(instance.shape)
+
+    shapes_to_hkrb(names, colInfos, shapes, args.hkscFile, args.outFile, nx)
 
 
 if __name__ == "__main__":

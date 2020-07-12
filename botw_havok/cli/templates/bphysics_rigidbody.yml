@@ -19,7 +19,7 @@
                       water_buoyancy_scale: 1.0
                       water_flow_effective_rate: 1.0
                       link_matrix: ''
-                      layer: !str32 EntityGround
+                      layer: !str32 {1}
                       no_hit_ground: false
                       no_hit_water: false
                       navmesh: !str32 NOT_USE
