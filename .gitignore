@@ -135,6 +135,7 @@ dmypy.json
 .pytype/
 
 # custom
+.idea
 __main__.py
 update.sh
 test_files
