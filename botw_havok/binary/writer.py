@@ -1,7 +1,7 @@
 __all__ = ("BinaryWriter",)
 
 import struct
-from typing import Dict
+from typing import Dict, Union
 
 import numpy as np
 
@@ -52,7 +52,7 @@ class BinaryWriter(BinaryBase):
     def write_float64(self, num: Float64):
         return self.write(np.array([num], dtype=f"{self.endian_char()}d").tobytes())
 
-    def write_vector(self, v: Vector):
+    def write_vector(self, v: Union[Vector3, Vector4]):
         return self.write(np.array(v, dtype=f"{self.endian_char()}f").tobytes())
 
     def write_matrix(self, matrix: Matrix):

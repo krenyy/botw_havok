@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as _np
 
@@ -15,9 +15,9 @@ UInt32 = _np.uint32
 UInt64 = _np.uint64
 
 
-class Vector(List[_np.float32]):
-    def __init__(self, *args):
-        super().__init__([Float32(f) for f in args])
+class Vector3(List[Float32]):
+    def __init__(self, x: Optional[Float32] = None, y: Optional[Float32] = None, z: Optional[Float32] = None):
+        super().__init__([x or Float32(0.0), y or Float32(0.0), z or Float32(0.0)])
 
     def as_dict(self):
         return self
@@ -26,23 +26,41 @@ class Vector(List[_np.float32]):
     def from_dict(cls, l: list):
         return cls(*[Float32(f) for f in l])
 
+    def __sub__(self, other):
+        if not isinstance(other, self.__class__) or not len(self) == len(other):
+            raise NotImplementedError()
+
+        return self.__class__(*[f1 - f2 for f1, f2 in zip(self, other)])
+
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"
 
-    def __hash__(self):
-        return hash(tuple(self))
 
+class Vector4(List[Float32]):
+    def __init__(self, x: Optional[Float32] = None, y: Optional[Float32] = None, z: Optional[Float32] = None,
+                 w: Optional[Float32] = None):
+        super().__init__([x or Float32(0.0), y or Float32(0.0), z or Float32(0.0), w or Float32(0.0)])
 
-class Vector3(Vector):
-    pass
+    def as_dict(self):
+        return self
 
+    @classmethod
+    def from_dict(cls, l: list):
+        return cls(*[Float32(f) for f in l])
 
-class Vector4(Vector):
-    pass
+    def __sub__(self, other):
+        if not isinstance(other, self.__class__) or not len(self) == len(other):
+            raise NotImplementedError()
+
+        return self.__class__(*[f1 - f2 for f1, f2 in zip(self, other)])
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}{tuple(self)}"
 
 
 class Matrix(List[Vector4]):
     def __init__(self, *args):
+        super().__init__()
         self.extend(args)
 
     def as_dict(self):
@@ -54,6 +72,3 @@ class Matrix(List[Vector4]):
 
     def __repr__(self):
         return f"{self.__class__.__name__}{tuple(self)}"
-
-    def __hash__(self):
-        return hash(tuple(self))
