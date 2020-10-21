@@ -92,12 +92,7 @@ class Havok:
 
         return inst
 
-    @classmethod
-    def from_file(cls, path: Union[Path, str]):
-        with open(path, "rb") as f:
-            return cls.from_bytes(f.read(), Path(path))
-
-    def to_file(self, path: Union[Path, str]):
+    def to_bytes(self):
         bw = BinaryWriter()
 
         for file in self.files:
@@ -106,8 +101,16 @@ class Havok:
             file.write(_bw)
             bw.write(_bw.getvalue())
 
+        return bw
+
+    @classmethod
+    def from_file(cls, path: Union[Path, str]):
+        with open(path, "rb") as f:
+            return cls.from_bytes(f.read(), Path(path))
+
+    def to_file(self, path: Union[Path, str]):
         with open(path, "wb") as f:
-            return f.write(bw.getvalue())
+            return f.write(self.to_bytes().getvalue())
 
     @classmethod
     def from_dict(cls, l: list, path: Path = None):
