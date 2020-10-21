@@ -101,7 +101,7 @@ class Havok:
             file.write(_bw)
             bw.write(_bw.getvalue())
 
-        return bw
+        return bw.getvalue()
 
     @classmethod
     def from_file(cls, path: Union[Path, str]):
@@ -110,7 +110,7 @@ class Havok:
 
     def to_file(self, path: Union[Path, str]):
         with open(path, "wb") as f:
-            return f.write(self.to_bytes().getvalue())
+            return f.write(self.to_bytes())
 
     @classmethod
     def from_dict(cls, l: list, path: Path = None):
