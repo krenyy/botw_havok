@@ -64,15 +64,13 @@ class hkpSingleShapeContainer(hkpShapeContainer):
 
     def as_dict(self):
         d = hkpShapeContainer.as_dict(self)
-        d.update({"childShape": self.childShape})
+        d.update({"childShape": self.childShape.as_dict()})
         return d
 
     @classmethod
     def from_dict(cls, d: dict):
         inst = cls()
         inst.__dict__.update(hkpShapeContainer.from_dict(d).__dict__)
-        inst.childShape = class_map.HKClassMap.get(
-            d["childShape"]["hkClass"]
-        ).from_dict(d["childShape"])
+        inst.childShape = class_map.HKClassMap.get(d["childShape"]["hkClass"]).from_dict(d["childShape"])
 
         return inst

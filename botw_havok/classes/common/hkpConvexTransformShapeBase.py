@@ -52,7 +52,7 @@ class hkpConvexTransformShapeBase(hkpConvexShape):
     @classmethod
     def from_dict(cls, d: dict):
         inst = cls()
-        inst.__dict__.update(super().from_dict(d))
+        inst.__dict__.update(super().from_dict(d).__dict__)
         inst.__dict__.update(
             {
                 "childShape": hkpSingleShapeContainer.from_dict(d["childShape"]),
