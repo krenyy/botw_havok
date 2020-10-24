@@ -39,7 +39,7 @@ class hkpShapeCollection(hkpShape):
         d.update(
             {
                 "disableWelding": self.disableWelding,
-                "collectionType": CollectionType(self.collectionType),
+                "collectionType": CollectionType(self.collectionType).name,
             }
         )
         return d
@@ -50,6 +50,6 @@ class hkpShapeCollection(hkpShape):
         inst.__dict__.update(super().from_dict(d).__dict__)
 
         inst.disableWelding = d["disableWelding"]
-        inst.collectionType = CollectionType[d["collectionType"]]
+        inst.collectionType = CollectionType[d["collectionType"]].value
 
         return inst
