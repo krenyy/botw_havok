@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setup(
     name="botw_havok",
-    version="0.3.16",
+    version="0.3.17",
     author="kreny",
     author_email="kronerm9@gmail.com",
     description="A library for manipulating Breath of the Wild Havok packfiles",
