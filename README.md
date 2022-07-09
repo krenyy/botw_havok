@@ -1,3 +1,5 @@
+# Deprecated in favor of [HKX2](https://gitlab.com/HKX2)
+
 # botw_havok
 
 ### A library for manipulating Breath of the Wild Havok packfiles.
